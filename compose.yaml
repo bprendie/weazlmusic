@@ -1,0 +1,21 @@
+services:
+  weazltunes:
+    build: .
+    image: weazltunes-web:local
+    ports:
+      - "0.0.0.0:4000:4000"
+    environment:
+      LISTEN_ADDR: 0.0.0.0:4000
+      DATA_DIR: /data
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    volumes:
+      - weazltunes-data:/data
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:size=8m,mode=1777
+volumes:
+  weazltunes-data:

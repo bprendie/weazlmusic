@@ -1,0 +1,37 @@
+[
+  {
+    "name": "DEF CON Radio",
+    "url": "https://api.somafm.com/defcon256.pls",
+    "preset": true
+  },
+  {
+    "name": "80s 90s Super Pop Hits",
+    "url": "https://s4.myradiostream.com:7344/listen.mp3?",
+    "preset": true
+  },
+  {
+    "name": "Radio Caprice - Retrowave",
+    "url": "http://79.120.39.202:9125/",
+    "preset": true
+  },
+  {
+    "name": "Groove Salad",
+    "url": "https://somafm.com/groovesalad.pls",
+    "preset": true
+  },
+  {
+    "name": "Lush",
+    "url": "https://api.somafm.com/lush.pls",
+    "preset": true
+  },
+  {
+    "name": "Deep Space One",
+    "url": "https://api.somafm.com/deepspaceone.pls",
+    "preset": true
+  },
+  {
+    "name": "Freestlye-Rhythm 98 WTHM-DB Miami",
+    "url": "https://cast6.my-control-panel.com/proxy/rhythm98/stream",
+    "preset": true
+  }
+]

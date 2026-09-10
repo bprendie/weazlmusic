@@ -1,0 +1,9 @@
+.git
+.env
+.env.*
+data
+bin
+mockup-ui
+docs
+tests
+weazlhead.png

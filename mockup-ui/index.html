@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111215"><title>WeazlTunes / the listening desk</title>
+<link rel="icon" href="data:,"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="responsive.css">
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<a class="brand" href="#home" aria-label="WeazlTunes home"><img class="brand-icon" src="weazlhead.png" alt="" width="40" height="40"><span>WEAZL<span class="brand-thin">TUNES</span><small>YOUR MUSIC. YOUR MACHINE.</small></span></a>
+<div class="node"><span class="dot"></span> LOCAL NODE <span class="dim">/ 001</span></div>
+<nav aria-label="Main navigation">
+<p class="nav-label">THE COLLECTION</p>
+<button data-view="home" class="nav-item active"><span>⌂</span> Home <kbd>1</kbd></button>
+<button data-view="albums" class="nav-item"><span>▦</span> Albums <kbd>2</kbd></button>
+<button data-view="favorites" class="nav-item"><span>♡</span> Favorites <kbd>3</kbd></button>
+<button data-view="playlists" class="nav-item"><span>≡</span> Playlists <kbd>4</kbd></button>
+<p class="nav-label">BEYOND THE LIBRARY</p>
+<button data-view="radio" class="nav-item"><span>◎</span> Radio <kbd>5</kbd></button>
+<div class="nav-divider"></div><p class="nav-label">YOUR MIXTAPES</p>
+<button data-view="mixtape" class="nav-item playlist-link"><span class="purple">↳</span> After hours</button>
+<button data-view="grind" class="nav-item playlist-link"><span class="purple">↳</span> Zero-tax grindage</button>
+</nav>
+<div class="sidebar-bottom"><div class="ethos"><span>NO NOISE.<br>JUST THE GOOD STUFF.</span><span class="mint">//</span></div><button id="account" class="account"><span class="avatar">B</span><span id="username">bob<small>Local account · preview</small></span><span>↗</span></button></div>
+</aside>
+<div class="workspace">
+<header class="topbar"><span class="breadcrumb">WEAZL / <b id="breadcrumb">HOME</b></span><label class="search"><span>⌕</span><input id="search" type="search" placeholder="Search your music" aria-label="Search your music"><kbd>/</kbd></label><button class="icon-button" id="help" aria-label="Keyboard shortcuts">?</button></header>
+<div class="preview-strip"><span><span class="dot"></span> UI PROTOTYPE <span class="dim">/ sample library · no audio or server connection</span></span><span>v0.1</span></div>
+<div class="desk"><main id="content"></main><aside class="queue-panel" aria-label="Play queue"><div class="section-title"><h2>Up next <span id="queue-count" class="count"></span></h2><button id="clear-queue" class="text-button">Clear</button></div><p class="eyebrow">THE QUEUE IS YOURS.</p><div id="queue"></div><div class="queue-note"><span>↳</span> Library or live radio.<br>One place to press play.</div><div class="signal-card"><div class="signal-heading">THE WEAZL PROMISE <span>↗</span></div><p>Your library.<br>Your frequency.<br><em>Your rules.</em></p><span class="eyebrow">NEVER TAX THE GIG.</span></div></aside></div>
+</div>
+<footer class="player" aria-label="Playback controls"><div class="now-playing"><div id="now-cover" class="mini-cover art-0">W</div><div><strong id="now-title">A Walk</strong><small id="now-artist">Tycho · Dive</small></div><button id="favorite" class="icon-button" aria-label="Favorite current track" aria-pressed="false">♡</button></div><div class="transport"><div class="transport-buttons"><button id="shuffle" class="icon-button" aria-label="Shuffle queue">⤨</button><button id="previous" class="icon-button" aria-label="Previous track">Ⅰ◀</button><button id="play" class="play-button" aria-label="Play preview">▶</button><button id="next" class="icon-button" aria-label="Next track">▶Ⅰ</button><span class="mock-audio">DEMO</span></div><div class="timeline"><span id="elapsed">0:00</span><input id="seek" type="range" min="0" max="100" value="0" aria-label="Playback position preview"><span id="duration">5:16</span></div></div><div class="output"><span id="source" class="tag">LIBRARY</span><label>VOL <input type="range" value="70" aria-label="Volume preview"></label></div></footer>
+</div>
+<dialog id="modal"><button class="dialog-close icon-button" aria-label="Close dialog">×</button><div id="modal-content"></div></dialog>
+<div id="toast" role="status" hidden></div>
+<script type="module" src="app.js"></script>
+</body></html>
