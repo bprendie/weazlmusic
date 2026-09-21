@@ -16,7 +16,11 @@ async function loadAccount(user) {
   $('#login-screen').hidden = true;$('.app').hidden = false;
   renderQueue();renderPlayer();
   if (!user.connection) {
-    if (state.admin) {state.view = 'home';await openAdminSettings();}
+    if (state.admin) {
+      const config = await api('admin/config');
+      if (!config.navidromeURL) {state.view = 'home';await openAdminSettings();}
+      else {state.view = 'radio';state.radioTab = 'Presets';await navigate('radio');}
+    }
     else {state.view = 'radio';state.radioTab = 'Presets';await navigate('radio');connectionForm(false);}
   } else {
     $('#connection-status').textContent = `NAVIDROME / ${user.connection.username}`;
