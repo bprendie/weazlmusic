@@ -96,6 +96,17 @@ func TestNavidromeUsersSignInAgainstGlobalServer(t *testing.T) {
 	if code != http.StatusOK || h.nav.Playlists["1"].Owner != "bob" {
 		t.Fatalf("playlist did not use Navidrome identity: %d", code)
 	}
+	handler, err := New(Config{DataDir: h.dir}, fstest.MapFS{"index.html": {Data: []byte("Weazl")}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	restarted := httptest.NewServer(handler)
+	defer restarted.Close()
+	h.app = restarted
+	code, body, _ = h.request("POST", "/api/login", map[string]string{"username": "bob", "password": "test-password"}, nil)
+	if code != http.StatusOK || !strings.Contains(string(body), h.upstream) {
+		t.Fatalf("Navidrome login did not survive restart: %d %s", code, body)
+	}
 }
 func TestUsersChooseDifferentServers(t *testing.T) {
 	h := setup(t)

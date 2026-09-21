@@ -162,7 +162,8 @@ tests/run-browser.sh
 The runner uses temporary test ports 4002 and 4534, then removes its processes and
 state. `PLAYWRIGHT_MODULE` can point to an existing Playwright installation.
 
-See [the phase plan](docs/PHASES.md) and [verification record](docs/VERIFICATION.md).
+See [the phase plan](docs/PHASES.md), [verification record](docs/VERIFICATION.md),
+and [deployment notes](docs/DEPLOYMENT.md).
 API contracts follow OpenSubsonic's
 [createPlaylist](https://opensubsonic.netlify.app/docs/endpoints/createplaylist/)
 and [updatePlaylist](https://opensubsonic.netlify.app/docs/endpoints/updateplaylist/)
