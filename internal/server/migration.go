@@ -11,7 +11,15 @@ import (
 func (s *Server) migrateGlobalConfig(a account) error {
 	cfg, err := s.store.readGlobal()
 	if err == nil {
-		return nil
+		if cfg.NavidromeURL != "" || a.Connection == nil {
+			return nil
+		}
+		cfg.NavidromeURL = a.Connection.URL
+		if cfg.LLM == nil && a.LLM != nil {
+			copyLLM := *a.LLM
+			cfg.LLM = &copyLLM
+		}
+		return s.store.writeGlobal(cfg)
 	}
 	if !os.IsNotExist(err) {
 		return err

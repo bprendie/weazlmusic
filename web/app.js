@@ -6,12 +6,13 @@ import {audio, play, toggle, next, previous, playList, enqueue, stop, resetPlaye
 import {account, help, closeModal, playlistDialog, addToPlaylistDialog, confirmDelete} from './dialogs.js';
 import {bindAuth, openConnection} from './auth.js';
 import {openLLMSettings} from './llm-settings.js';
+import {openAdminSettings} from './admin-settings.js';
 import {buildMood, cancelMood} from './mood.js';
 let searchTimer;
 function signedOut() {
  cancelMood(true);
   cancelNavigation(); cancelSave(); clearTimeout(searchTimer); resetPlayer();
-  state.user = '';state.connection = null;state.queue = [];state.stations = [];state.tracks = [];state.albums = [];state.playlists = [];state.directory = [];state.favorites.clear();
+  state.user = '';state.admin = false;state.connection = null;state.queue = [];state.stations = [];state.tracks = [];state.albums = [];state.playlists = [];state.directory = [];state.favorites.clear();
   state.album = null;state.playlist = null;state.view = 'home';state.query = '';state.radioTab = 'Presets';
   $('.app').hidden = true;$('#login-screen').hidden = false;$('#toast').hidden = true;closeModal();
   $('#content').replaceChildren();$('#queue').replaceChildren();
@@ -66,12 +67,13 @@ async function action(button) {
   if (button.classList.contains('dialog-close')) closeModal();
   if (button.id === 'mobile-account') {closeModal();account();}
   if (button.id === 'configure-llm') {await openLLMSettings();}
+  if (button.id === 'configure-admin') {await openAdminSettings();}
   if (button.id === 'configure-connection') {closeModal();await openConnection();}
   if (button.id === 'logout') {await flushState();await api('logout','POST',{});signedOut();}
 }
 document.addEventListener('click',event => {
   const button = event.target.closest('button');if (!button || button.disabled || button.type === 'submit' && button.closest('form')) return;
-  if (!Object.keys(button.dataset).length && !['logout','mobile-account','configure-connection','configure-llm'].includes(button.id) && !button.classList.contains('dialog-close')) return;
+  if (!Object.keys(button.dataset).length && !['logout','mobile-account','configure-connection','configure-llm','configure-admin'].includes(button.id) && !button.classList.contains('dialog-close')) return;
   button.disabled = true;action(button).catch(error => toast(error.message)).finally(() => {button.disabled = false;});
 });
 $('.brand').addEventListener('click',event => {event.preventDefault();navigate('home');});

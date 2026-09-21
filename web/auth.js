@@ -7,7 +7,7 @@ import {cancelMood} from './mood.js';
 import {modal, closeModal} from './dialogs.js';
 let signOut, registering = false;
 async function loadAccount(user) {
-  state.user = user.username;state.connection = user.connection;
+  state.user = user.username;state.admin = !!user.admin;state.connection = user.connection;
   $('#username').innerHTML = `${esc(state.user)}<small>Web-app account</small>`;
   $('.avatar').textContent = state.user[0].toUpperCase();
   const saved = await api('state');

@@ -41,6 +41,8 @@ func New(cfg Config, assets fs.FS) (http.Handler, error) {
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) { jsonOut(w, 200, map[string]string{"status": "ok"}) })
 	mux.HandleFunc("POST /api/login", s.login)
 	mux.HandleFunc("POST /api/register", s.register)
+	mux.HandleFunc("GET /api/admin/config", s.admin(s.adminConfig))
+	mux.HandleFunc("PUT /api/admin/config", s.admin(s.saveAdminConfig))
 	mux.HandleFunc("PUT /api/connection", s.auth(s.configureConnection))
 	mux.HandleFunc("GET /api/llm", s.auth(s.llmSettings))
 	mux.HandleFunc("PUT /api/llm", s.auth(s.saveLLM))

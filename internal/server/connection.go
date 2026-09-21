@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/url"
 	"strings"
@@ -19,8 +20,8 @@ func (s *Server) configureConnection(w http.ResponseWriter, r *http.Request, se 
 		fail(w, 400, "Enter the Navidrome server, username, and password")
 		return
 	}
-	u, err := url.Parse(strings.TrimSpace(in.URL))
-	if err != nil || u.Hostname() == "" || (u.Scheme != "http" && u.Scheme != "https") || u.User != nil || u.RawQuery != "" || u.Fragment != "" {
+	cleanURL, err := validNavidromeURL(in.URL)
+	if err != nil {
 		fail(w, 400, "Enter an http(s) server URL without credentials, query, or fragment")
 		return
 	}
@@ -30,7 +31,7 @@ func (s *Server) configureConnection(w http.ResponseWriter, r *http.Request, se 
 	salt := randomID()
 	h := md5.Sum([]byte(in.Password + salt))
 	in.Password = ""
-	c := connection{URL: strings.TrimRight(u.String(), "/"), Username: strings.TrimSpace(in.Username), Salt: salt, Token: hex.EncodeToString(h[:])}
+	c := connection{URL: cleanURL, Username: strings.TrimSpace(in.Username), Salt: salt, Token: hex.EncodeToString(h[:])}
 	candidate := *se
 	candidate.ServerURL = c.URL
 	candidate.NavUser = c.Username
@@ -71,4 +72,12 @@ func (s *Server) configureConnection(w http.ResponseWriter, r *http.Request, se 
 		return
 	}
 	s.startSession(w, r, a, true)
+}
+
+func validNavidromeURL(raw string) (string, error) {
+	u, err := url.Parse(strings.TrimSpace(raw))
+	if err != nil || u.Hostname() == "" || (u.Scheme != "http" && u.Scheme != "https") || u.User != nil || u.RawQuery != "" || u.Fragment != "" {
+		return "", errors.New("invalid Navidrome URL")
+	}
+	return strings.TrimRight(u.String(), "/"), nil
 }

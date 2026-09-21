@@ -1,5 +1,5 @@
 export const state = {
-  user: '', connection: null, view: 'home', query: '', albums: [], playlists: [], tracks: [],
+  user: '', admin: false, connection: null, view: 'home', query: '', albums: [], playlists: [], tracks: [],
   stations: [], directory: [], radioTab: 'Presets', queue: [], current: null,
   mood: null, radioMetadata: null, favorites: new Set(), playing: false, album: null, playlist: null,
   offset: 0, more: false, loading: false, error: '', resume: null,

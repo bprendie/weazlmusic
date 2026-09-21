@@ -13,6 +13,7 @@ import (
 type session struct {
 	radio                                 *radioHub
 	User, NavUser, ServerURL, Token, Salt string
+	Admin                                 bool
 	Expires                               time.Time
 	ctx                                   context.Context
 	cancel                                context.CancelFunc
@@ -60,7 +61,7 @@ func (s *Server) allowLogin(w http.ResponseWriter, r *http.Request, user string)
 	return true
 }
 func (s *Server) startSession(w http.ResponseWriter, r *http.Request, a account, revokeAll bool) {
-	se := &session{radio: newRadioHub(), User: a.Username, Expires: time.Now().Add(24 * time.Hour)}
+	se := &session{radio: newRadioHub(), User: a.Username, Admin: a.Admin, Expires: time.Now().Add(24 * time.Hour)}
 	if c := a.Connection; c != nil {
 		se.ServerURL = c.URL
 		se.NavUser = c.Username
@@ -121,6 +122,15 @@ func (s *Server) connected(next func(http.ResponseWriter, *http.Request, *sessio
 	return s.auth(func(w http.ResponseWriter, r *http.Request, se *session) {
 		if se.ServerURL == "" {
 			fail(w, 409, "Configure your Navidrome connection first")
+			return
+		}
+		next(w, r, se)
+	})
+}
+func (s *Server) admin(next func(http.ResponseWriter, *http.Request, *session)) http.HandlerFunc {
+	return s.auth(func(w http.ResponseWriter, r *http.Request, se *session) {
+		if !se.Admin {
+			fail(w, http.StatusForbidden, "Administrator access required")
 			return
 		}
 		next(w, r, se)

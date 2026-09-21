@@ -134,6 +134,28 @@ func TestGlobalConfigMigratesOnceAndStaysEncrypted(t *testing.T) {
 	}
 }
 
+func TestAdminInstallationSettingsAreProtected(t *testing.T) {
+	h := setup(t)
+	admin := h.login("alice")
+	user := h.login("bob")
+	code, body, _ := h.request("GET", "/api/admin/config", nil, admin)
+	if code != http.StatusOK || !strings.Contains(string(body), h.upstream) {
+		t.Fatalf("admin config unavailable: %d %s", code, body)
+	}
+	code, _, _ = h.request("GET", "/api/admin/config", nil, user)
+	if code != http.StatusForbidden {
+		t.Fatalf("non-admin config access accepted: %d", code)
+	}
+	code, _, _ = h.request("PUT", "/api/admin/config", map[string]any{"navidromeURL": h.upstream, "provider": "off"}, user)
+	if code != http.StatusForbidden {
+		t.Fatalf("non-admin config write accepted: %d", code)
+	}
+	code, _, _ = h.request("PUT", "/api/admin/config", map[string]any{"navidromeURL": h.upstream, "provider": "off"}, admin)
+	if code != http.StatusOK {
+		t.Fatalf("admin config write failed: %d", code)
+	}
+}
+
 func TestLegacySettingsMigrateAfterVerifiedConnection(t *testing.T) {
 	h := setup(t)
 	st, err := newStore(h.dir)

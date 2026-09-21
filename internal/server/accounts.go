@@ -27,6 +27,7 @@ type account struct {
 	Hash       string      `json:"hash"`
 	Salt       string      `json:"salt"`
 	Connection *connection `json:"connection,omitempty"`
+	Admin      bool        `json:"admin,omitempty"`
 }
 type loginInput struct {
 	Username string `json:"username"`
@@ -87,6 +88,23 @@ func (s *Server) register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	a := account{Username: in.Username, Hash: hash, Salt: salt}
+	global, globalErr := s.store.readGlobal()
+	if os.IsNotExist(globalErr) || (globalErr == nil && global.AdminUsername == "") {
+		a.Admin = true
+		if globalErr != nil {
+			global = globalConfig{Version: 1}
+		}
+		global.AdminUsername = a.Username
+		if err = s.store.writeGlobal(global); err != nil {
+			s.accountsMu.Unlock()
+			fail(w, 500, "Could not initialize admin settings")
+			return
+		}
+	} else if globalErr != nil {
+		s.accountsMu.Unlock()
+		fail(w, 500, "Could not read installation settings")
+		return
+	}
 	err = s.store.writeRecord("account:"+a.Username, a)
 	s.accountsMu.Unlock()
 	if err != nil {
@@ -128,7 +146,7 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 	s.startSession(w, r, a, false)
 }
 func identity(se *session) map[string]any {
-	out := map[string]any{"username": se.User, "connection": nil}
+	out := map[string]any{"username": se.User, "admin": se.Admin, "connection": nil}
 	if se.ServerURL != "" {
 		out["connection"] = map[string]string{"url": se.ServerURL, "username": se.NavUser}
 	}
