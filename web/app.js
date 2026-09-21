@@ -3,7 +3,7 @@ import {api, library, saveState, cancelSave, flushState} from './api.js';
 import {renderMain, renderPlayer, renderQueue} from './render.js';
 import {navigate, refreshPlaylists, cancelNavigation} from './navigation.js';
 import {audio, play, toggle, next, previous, playList, enqueue, stop, resetPlayer} from './player.js';
-import {account, help, closeModal, playlistDialog, addToPlaylistDialog, confirmDelete} from './dialogs.js';
+import {account, help, closeModal, playlistDialog, addToPlaylistDialog, confirmDelete, passwordDialog} from './dialogs.js';
 import {bindAuth, openConnection} from './auth.js';
 import {openLLMSettings} from './llm-settings.js';
 import {openAdminSettings} from './admin-settings.js';
@@ -68,12 +68,13 @@ async function action(button) {
   if (button.id === 'mobile-account') {closeModal();account();}
   if (button.id === 'configure-llm') {await openLLMSettings();}
   if (button.id === 'configure-admin') {await openAdminSettings();}
+  if (button.id === 'change-password') {await passwordDialog();}
   if (button.id === 'configure-connection') {closeModal();await openConnection();}
   if (button.id === 'logout') {await flushState();await api('logout','POST',{});signedOut();}
 }
 document.addEventListener('click',event => {
   const button = event.target.closest('button');if (!button || button.disabled || button.type === 'submit' && button.closest('form')) return;
-  if (!Object.keys(button.dataset).length && !['logout','mobile-account','configure-connection','configure-llm','configure-admin'].includes(button.id) && !button.classList.contains('dialog-close')) return;
+  if (!Object.keys(button.dataset).length && !['logout','mobile-account','configure-connection','configure-llm','configure-admin','change-password'].includes(button.id) && !button.classList.contains('dialog-close')) return;
   button.disabled = true;action(button).catch(error => toast(error.message)).finally(() => {button.disabled = false;});
 });
 $('.brand').addEventListener('click',event => {event.preventDefault();navigate('home');});

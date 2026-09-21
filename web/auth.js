@@ -5,6 +5,7 @@ import {navigate, refreshPlaylists, cancelNavigation} from './navigation.js';
 import {resetPlayer} from './player.js';
 import {cancelMood} from './mood.js';
 import {modal, closeModal} from './dialogs.js';
+import {openAdminSettings} from './admin-settings.js';
 let signOut, registering = false;
 async function loadAccount(user) {
   state.user = user.username;state.admin = !!user.admin;state.connection = user.connection;
@@ -15,7 +16,8 @@ async function loadAccount(user) {
   $('#login-screen').hidden = true;$('.app').hidden = false;
   renderQueue();renderPlayer();
   if (!user.connection) {
-    state.view = 'radio';state.radioTab = 'Presets';await navigate('radio');connectionForm(false);
+    if (state.admin) {state.view = 'home';await openAdminSettings();}
+    else {state.view = 'radio';state.radioTab = 'Presets';await navigate('radio');connectionForm(false);}
   } else {
     $('#connection-status').textContent = `NAVIDROME / ${user.connection.username}`;
     await Promise.all([navigate('home'),refreshPlaylists().catch(error => toast(error.message))]);

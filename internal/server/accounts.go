@@ -34,6 +34,34 @@ type loginInput struct {
 	Password string `json:"password"`
 }
 
+func (s *Server) ensureDefaultAdmin() error {
+	if _, err := s.loadAccount("weazladmin"); err == nil {
+		return nil
+	} else if !os.IsNotExist(err) {
+		return err
+	}
+	global, err := s.store.readGlobal()
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	if err != nil {
+		global = globalConfig{Version: 1}
+	}
+	salt := randomID()
+	hash, err := derivePassword("admin", salt)
+	if err != nil {
+		return err
+	}
+	admin := account{Username: "weazladmin", Hash: hash, Salt: salt, Admin: true}
+	if err = s.store.writeRecord("account:"+admin.Username, admin); err != nil {
+		return err
+	}
+	if global.AdminUsername == "" {
+		global.AdminUsername = admin.Username
+	}
+	return s.store.writeGlobal(global)
+}
+
 func derivePassword(password, salt string) (string, error) {
 	b, e := pbkdf2.Key(sha256.New, password, []byte(salt), passwordIterations, 32)
 	return hex.EncodeToString(b), e

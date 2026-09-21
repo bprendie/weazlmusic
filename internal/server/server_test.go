@@ -165,7 +165,7 @@ func TestEncryptedStateAndUserIsolation(t *testing.T) {
 		t.Fatal("state leaked")
 	}
 	files, err := filepath.Glob(filepath.Join(h.dir, "*.bin"))
-	if err != nil || len(files) != 4 {
+	if err != nil || len(files) != 5 {
 		t.Fatal(files, err)
 	}
 	raw, _ := os.ReadFile(filepath.Join(h.dir, digest("state:web-alice:"+h.upstream+"/alice")+".bin"))

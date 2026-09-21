@@ -4,7 +4,15 @@ import {navigate, refreshPlaylists} from './navigation.js';
 export function modal(html) { $('#modal-content').innerHTML = html; $('#modal').showModal(); }
 export function closeModal() { $('#modal').close(); }
 export function account() {
-  modal(`<img class="auth-brand" src="weazlhead.png" alt="Weazl"><span class="eyebrow purple">YOUR LOCAL NODE</span><h2>${esc(state.user)}</h2><p>${state.admin ? 'Administrator' : 'Web-app account'}</p><p>Navidrome: ${esc(state.connection?.url || "Not configured")}<br>User: ${esc(state.connection?.username || "—")}</p><div class="dialog-actions">${state.admin ? '<button class="secondary" id="configure-admin">Installation settings</button>' : ''}<button class="secondary" id="configure-connection">Configure Navidrome</button><button class="secondary" id="configure-llm">LLM curator</button></div><button class="primary" id="logout">Sign out</button>`);
+  modal(`<img class="auth-brand" src="weazlhead.png" alt="Weazl"><span class="eyebrow purple">YOUR LOCAL NODE</span><h2>${esc(state.user)}</h2><p>${state.admin ? 'Administrator' : 'Web-app account'}</p><p>Navidrome: ${esc(state.connection?.url || "Not configured")}<br>User: ${esc(state.connection?.username || "—")}</p><div class="dialog-actions">${state.admin ? '<button class="secondary" id="configure-admin">Installation settings</button>' : ''}<button class="secondary" id="change-password">Change password</button><button class="secondary" id="configure-connection">Configure Navidrome</button><button class="secondary" id="configure-llm">LLM curator</button></div><button class="primary" id="logout">Sign out</button>`);
+}
+export function passwordDialog() {
+  modal('<span class="eyebrow purple">YOUR LOCAL LOGIN</span><h2>Change password.</h2><p>This changes the WeazlMusic login only. It never changes or tests your Navidrome password.</p><form id="password-form" class="auth-form"><label>Current password<input name="current" type="password" autocomplete="current-password" required></label><label>New password<input name="next" type="password" autocomplete="new-password" minlength="10" maxlength="1024" required></label><button class="primary">Save password</button><p id="password-error" role="alert"></p></form>');
+  $('#password-form').onsubmit = async event => {
+    event.preventDefault();const button = event.target.querySelector('button');button.disabled = true;
+    try {const data = new FormData(event.target);await api('password','PUT',{current:data.get('current'),next:data.get('next')});closeModal();toast('Local password changed.');}
+    catch (error) {$('#password-error').textContent = error.message;button.disabled = false;}
+  };
 }
 export function help() {
   modal('<span class="eyebrow purple">KEEP YOUR HANDS ON THE KEYS</span><h2>The short route.</h2>' + [['Search','/'],['Home / Albums / Favorites / Playlists / Radio','1–5'],['Play / pause','Space'],['Next / previous','N / P'],['Queue','6'],['Build Mood','M'],['Close / clear search','Esc']].map(([a,b]) => `<div class="shortcut"><span>${a}</span><kbd>${b}</kbd></div>`).join('') + '<button class="secondary" id="mobile-account">Your account ↗</button>');

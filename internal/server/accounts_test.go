@@ -136,7 +136,11 @@ func TestGlobalConfigMigratesOnceAndStaysEncrypted(t *testing.T) {
 
 func TestAdminInstallationSettingsAreProtected(t *testing.T) {
 	h := setup(t)
-	admin := h.login("alice")
+	code, _, res := h.request("POST", "/api/login", map[string]string{"username": "weazladmin", "password": "admin"}, nil)
+	if code != http.StatusOK {
+		t.Fatalf("default admin login failed: %d", code)
+	}
+	admin := res.Cookies()[0]
 	user := h.login("bob")
 	code, body, _ := h.request("GET", "/api/admin/config", nil, admin)
 	if code != http.StatusOK || !strings.Contains(string(body), h.upstream) {
@@ -153,6 +157,14 @@ func TestAdminInstallationSettingsAreProtected(t *testing.T) {
 	code, _, _ = h.request("PUT", "/api/admin/config", map[string]any{"navidromeURL": h.upstream, "provider": "off"}, admin)
 	if code != http.StatusOK {
 		t.Fatalf("admin config write failed: %d", code)
+	}
+	code, _, _ = h.request("PUT", "/api/password", map[string]string{"current": "admin", "next": "admin-password-changed"}, admin)
+	if code != http.StatusOK {
+		t.Fatalf("default admin password change failed: %d", code)
+	}
+	code, _, _ = h.request("POST", "/api/login", map[string]string{"username": "weazladmin", "password": "admin-password-changed"}, nil)
+	if code != http.StatusOK {
+		t.Fatalf("changed admin password did not login: %d", code)
 	}
 }
 

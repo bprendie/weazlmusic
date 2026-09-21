@@ -33,6 +33,10 @@ func New(cfg Config, assets fs.FS) (http.Handler, error) {
 	if err != nil {
 		return nil, err
 	}
+	bootstrap := &Server{store: st}
+	if err = bootstrap.ensureDefaultAdmin(); err != nil {
+		return nil, err
+	}
 	transport := navidromeTransport()
 	llmTransport := navidromeTransport()
 	llmTransport.ResponseHeaderTimeout = 120 * time.Second
@@ -41,6 +45,7 @@ func New(cfg Config, assets fs.FS) (http.Handler, error) {
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) { jsonOut(w, 200, map[string]string{"status": "ok"}) })
 	mux.HandleFunc("POST /api/login", s.login)
 	mux.HandleFunc("POST /api/register", s.register)
+	mux.HandleFunc("PUT /api/password", s.auth(s.changePassword))
 	mux.HandleFunc("GET /api/admin/config", s.admin(s.adminConfig))
 	mux.HandleFunc("PUT /api/admin/config", s.admin(s.saveAdminConfig))
 	mux.HandleFunc("PUT /api/connection", s.auth(s.configureConnection))
