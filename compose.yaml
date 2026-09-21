@@ -11,6 +11,8 @@ services:
     volumes:
       - weazltunes-data:/data
     restart: unless-stopped
+    init: true
+    stop_grace_period: 15s
     read_only: true
     cap_drop: [ALL]
     security_opt:

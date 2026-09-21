@@ -5,8 +5,8 @@
 - Preserve the approved UI and `weazlhead` branding. Keep `mockup-ui/` as the design reference.
 - Port 4000 for development and containers. Container listens on `0.0.0.0`.
 - One Go process serves static assets, API, and authenticated media. No Node runtime.
-- Users create/sign in to a local web-app account, then configure their own
-  Navidrome URL and credentials. Local accounts and upstream identities are separate.
+- The local administrator configures one Navidrome URL; normal users sign in
+  with their Navidrome credentials. The local admin identity remains separate.
 - Navidrome is the source of truth for library, favorites, and playlists. Every
   playlist write uses the configured Navidrome user's credentials, never a shared admin.
 - One browser audio element. Radio pauses the library without discarding its queue.
@@ -33,7 +33,7 @@ Server checks playlist ownership before mutation; writes complete on Navidrome
 before success is shown. Exit: fake-upstream integration tests prove owner
 identity and write-through; browser exercises the full flow.
 
-## Phase 4 — Radio
+## Phase 4 — Radio (complete)
 
 Real installed presets, per-user saved stations, eight preset slots, PLS/M3U
 resolution, same-origin radio relay, on-demand SomaFM/Icecast directories.
@@ -41,7 +41,7 @@ Outbound radio fetching rejects private/link-local destinations and validates
 redirects at dial time. Exit: playlist resolution and URL-policy tests pass;
 UI switches sources while preserving the library queue.
 
-## Phase 5 — Release checks
+## Phase 5 — Release checks (next)
 
 Race tests, browser checks, Docker build/run, persisted state after restart,
 reverse-proxy deployment notes and operational limits. Live Navidrome acceptance
@@ -55,7 +55,8 @@ No background LLM work or decorative visualization.
 
 ## Delivery status — 2026-09-21
 
-The deployment foundation, admin configuration, and Navidrome identity handoff are complete. The
+The deployment foundation, admin configuration, Navidrome identity handoff, and
+radio surface are complete. The
 app runs in Docker on `0.0.0.0:4000` with an encrypted persistent store,
 local web-app authentication, a local-only `weazladmin` bootstrap account, and
 direct Navidrome login for normal users.

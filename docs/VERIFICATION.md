@@ -25,12 +25,15 @@
   the app stores only the generated API token and salt. New Navidrome users are
   provisioned on first successful login, and playlist writes use their upstream
   owner identity. The login surface has no local registration control.
+- Radio acceptance remains green: all installed presets render in order, radio
+  playback relays through same-origin routes, ICY metadata updates the player,
+  user stations persist, and private/link-local radio targets are rejected.
 
 ## Container
 
 `docker compose up --build -d` successfully builds and starts the application.
 The service publishes `0.0.0.0:4000`, runs as UID/GID 10001, and uses a named volume
-for `/data`. Direct HTTP and the health endpoint return 200. The filesystem is
+for `/data`, with an init process and a 15-second graceful stop window. Direct HTTP and the health endpoint return 200. The filesystem is
 read-only except for the data volume and temporary directory. The application
 requires no public-domain setting or bundled reverse proxy.
 
