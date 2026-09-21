@@ -27,6 +27,29 @@ export function playlistDialog(mode) {
     finally {button.disabled = false;}
   };
 }
+export function addToPlaylistDialog(items, label = 'tracks') {
+  const tracks = [...new Map(items.filter(t => t && !t.url).map(t => [t.id,t])).values()];
+  if (!tracks.length) {toast('Pick library tracks first.');return;}
+  const owned = state.playlists.filter(p => p.owner === state.connection?.username);
+  modal(`<span class="eyebrow purple">EDIT NAVIDROME PLAYLISTS</span><h2>Add ${esc(label)}.</h2><p>${tracks.length} tracks ready for ${esc(state.connection?.username)}.</p><form id="playlist-add-form" class="auth-form"><label>Destination<select name="target"><option value="new">New playlist</option>${owned.map(p => `<option value="${esc(p.id)}">${esc(p.name)} · ${p.songCount || 0} tracks</option>`).join('')}</select></label><label id="new-playlist-name">Playlist name<input name="name" required maxlength="200"></label><button class="primary">Save tracks →</button><p id="form-error" role="alert"></p></form>`);
+  const form = $('#playlist-add-form'), name = $('#new-playlist-name'), select = form.elements.namedItem('target'), input = form.elements.namedItem('name');
+  const sync = () => {name.hidden = select.value !== 'new';input.required = select.value === 'new';};
+  select.onchange = sync;sync();
+  form.onsubmit = async event => {
+    event.preventDefault();const button = form.querySelector('button');button.disabled = true;
+    try {
+      const data = new FormData(form), ids = tracks.map(t => t.id);
+      const body = data.get('target') === 'new' ? {name:data.get('name'),songIds:ids} : {id:data.get('target'),songIds:ids};
+      const out = await api('playlists','POST',body);
+      closeModal();await refreshPlaylists();
+      const id = body.id || out.playlist?.id;
+      if (id) {state.playlist = state.playlists.find(p => p.id === id) || out.playlist;await navigate('playlist');}
+      else await navigate('playlists');
+      toast(body.id ? 'Tracks added to your playlist.' : 'Playlist created in Navidrome.');
+    } catch (error) {const target = $('#form-error');if (target) target.textContent = error.message;}
+    finally {button.disabled = false;}
+  };
+}
 export function confirmDelete() {
   const target = {...state.playlist};
   modal(`<span class="eyebrow purple">NAVIDROME PLAYLIST</span><h2>Delete “${esc(target.name)}”?</h2><p>This deletes the playlist from your Navidrome account. Your music files and current queue remain.</p><div class="dialog-actions"><button class="primary" id="confirm-delete">Delete playlist</button><button class="secondary dialog-close">Keep it</button></div><p id="form-error" role="alert"></p>`);

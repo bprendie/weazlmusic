@@ -3,7 +3,7 @@ import {api, library, saveState, cancelSave, flushState} from './api.js';
 import {renderMain, renderPlayer, renderQueue} from './render.js';
 import {navigate, refreshPlaylists, cancelNavigation} from './navigation.js';
 import {audio, play, toggle, next, previous, playList, enqueue, stop, resetPlayer} from './player.js';
-import {account, help, closeModal, playlistDialog, confirmDelete} from './dialogs.js';
+import {account, help, closeModal, playlistDialog, addToPlaylistDialog, confirmDelete} from './dialogs.js';
 import {bindAuth, openConnection} from './auth.js';
 import {openLLMSettings} from './llm-settings.js';
 import {buildMood, cancelMood} from './mood.js';
@@ -24,6 +24,7 @@ async function action(button) {
   if (d.playlist !== undefined) {state.playlist = state.playlists[Number(d.playlist)];await navigate('playlist');}
   if (d.play !== undefined) await play(state.tracks[Number(d.play)]);
   if (d.enqueue !== undefined) enqueue(state.tracks[Number(d.enqueue)]);
+  if (d.addTrack !== undefined) addToPlaylistDialog([state.tracks[Number(d.addTrack)]],'this track');
   if (d.remove !== undefined) {state.queue.splice(Number(d.remove),1);renderQueue();renderPlayer();saveState();}
   if (d.move !== undefined) {const i = Number(d.move);[state.queue[i-1],state.queue[i]] = [state.queue[i],state.queue[i-1]];renderQueue();saveState();}
   if (d.queuePlay !== undefined) {const [t] = state.queue.splice(Number(d.queuePlay),1);await play(t);renderQueue();saveState();}
@@ -38,7 +39,8 @@ async function action(button) {
   if (d.stationDelete !== undefined) {const url = state.visibleStations[Number(d.stationDelete)].url;state.stations = state.stations.filter(s => s.url !== url);renderMain();saveState();}
   if (d.playlistRemove !== undefined) {await api('playlists','POST',{id:state.playlist.id,remove:[Number(d.playlistRemove)]});await navigate('playlist');await refreshPlaylists();}
   switch (d.action) {
-    case 'save-queue': playlistDialog('queue');break;
+    case 'save-queue': addToPlaylistDialog([state.current?.url ? state.resume : state.current,...state.queue],'the queue');break;
+    case 'save-tracks': addToPlaylistDialog(state.tracks,state.view === 'album' ? 'this album' : 'these tracks');break;
     case 'clear-queue': state.queue = [];renderQueue();renderPlayer();saveState();break;
     case 'resume': {
       const out = await library('getRandomSongs',{size:31});
@@ -76,7 +78,7 @@ $('.brand').addEventListener('click',event => {event.preventDefault();navigate('
 $('#search').addEventListener('input',event => {clearTimeout(searchTimer);const query = event.target.value.trim();searchTimer = setTimeout(() => navigate(state.view,query),180);});
 $('#play').onclick = toggle;$('#next').onclick = next;$('#previous').onclick = previous;
 $('#stop').onclick = () => {stop();renderPlayer();};
-$('#save-queue').onclick = () => playlistDialog('queue');
+$('#save-queue').onclick = () => addToPlaylistDialog([state.current?.url ? state.resume : state.current,...state.queue],'the queue');
 $('#clear-queue').onclick = () => {state.queue = [];renderQueue();renderPlayer();saveState();};
 $('#shuffle').onclick = () => {for (let i=state.queue.length-1;i>0;i--) {const j=Math.floor(Math.random()*(i+1));[state.queue[i],state.queue[j]]=[state.queue[j],state.queue[i]];}renderQueue();saveState();};
 $('#favorite').onclick = async () => {
