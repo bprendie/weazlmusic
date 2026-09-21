@@ -149,29 +149,58 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 	if !s.allowLogin(w, r, in.Username) {
 		return
 	}
-	a, err := s.loadAccount(in.Username)
-	salt := a.Salt
-	if err != nil {
-		salt = "unknown-account-timing-salt"
+	a, accountErr := s.loadAccount(in.Username)
+	if accountErr == nil && a.Admin {
+		salt := a.Salt
+		hash, hashErr := derivePassword(in.Password, salt)
+		in.Password = ""
+		if hashErr != nil || subtle.ConstantTimeCompare([]byte(hash), []byte(a.Hash)) != 1 {
+			fail(w, 401, "Incorrect local admin password")
+			return
+		}
+		s.startSession(w, r, a, false)
+		return
 	}
-	hash, hashErr := derivePassword(in.Password, salt)
+	cfg, err := s.store.readGlobal()
+	if err != nil || cfg.NavidromeURL == "" {
+		fail(w, 409, "The administrator must configure the Navidrome server first")
+		return
+	}
+	password := in.Password
+	c, navErr := s.authenticateNavidrome(r.Context(), cfg.NavidromeURL, in.Username, password)
 	in.Password = ""
-	if err != nil || hashErr != nil || subtle.ConstantTimeCompare([]byte(hash), []byte(a.Hash)) != 1 {
-		fail(w, 401, "Incorrect web-app username or password")
+	if navErr != nil {
+		// Existing local accounts can finish their migration if Navidrome is
+		// unavailable; newly created users never get a second password.
+		if accountErr == nil && a.Hash != "" {
+			hash, hashErr := derivePassword(password, a.Salt)
+			if hashErr == nil && subtle.ConstantTimeCompare([]byte(hash), []byte(a.Hash)) == 1 {
+				s.startSession(w, r, a, false)
+				return
+			}
+		}
+		fail(w, 401, "Navidrome rejected those credentials")
 		return
 	}
 	s.accountsMu.Lock()
 	defer s.accountsMu.Unlock()
-	a, err = s.loadAccount(in.Username)
-	if err != nil {
+	if accountErr != nil && !os.IsNotExist(accountErr) {
 		fail(w, 500, "Could not load account")
 		return
 	}
-	if err = s.migrateGlobalConfig(a); err != nil {
-		fail(w, 500, "Could not migrate installation settings")
+	if os.IsNotExist(accountErr) {
+		a = account{Username: in.Username}
+	}
+	a.Connection = &c
+	if err = s.store.migrateLegacyState(&session{User: a.Username, ServerURL: c.URL, NavUser: c.Username}); err != nil {
+		fail(w, 500, "Could not restore your previous saved settings")
 		return
 	}
-	s.startSession(w, r, a, false)
+	if err = s.store.writeRecord("account:"+a.Username, a); err != nil {
+		fail(w, 500, "Could not save account")
+		return
+	}
+	s.startSession(w, r, a, true)
 }
 func identity(se *session) map[string]any {
 	out := map[string]any{"username": se.User, "admin": se.Admin, "connection": nil}

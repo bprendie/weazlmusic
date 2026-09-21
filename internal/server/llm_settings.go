@@ -30,13 +30,27 @@ func visibleLLM(c *llmConfig) map[string]any {
 	}
 	return map[string]any{"provider": c.Provider, "url": c.URL, "model": c.Model, "hasKey": c.APIKey != ""}
 }
-func (s *Server) llmSettings(w http.ResponseWriter, r *http.Request, se *session) {
+func (s *Server) effectiveLLM(se *session) (*llmConfig, error) {
 	a, err := s.loadAccount(se.User)
+	if err != nil {
+		return nil, err
+	}
+	if a.LLM != nil {
+		return a.LLM, nil
+	}
+	cfg, err := s.store.readGlobal()
+	if err != nil {
+		return nil, err
+	}
+	return cfg.LLM, nil
+}
+func (s *Server) llmSettings(w http.ResponseWriter, r *http.Request, se *session) {
+	c, err := s.effectiveLLM(se)
 	if err != nil {
 		fail(w, 500, "Could not load settings")
 		return
 	}
-	jsonOut(w, 200, visibleLLM(a.LLM))
+	jsonOut(w, 200, visibleLLM(c))
 }
 func (s *Server) readLLMInput(r *http.Request, se *session) (llmConfig, error) {
 	var in llmInput

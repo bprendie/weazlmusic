@@ -26,8 +26,8 @@ func TestLocalAccountAndSavedConnection(t *testing.T) {
 		t.Fatal("unconfigured library allowed", code)
 	}
 	code, _, _ = h.request("POST", "/api/login", map[string]string{"username": "listener", "password": "test-password"}, nil)
-	if code != 401 {
-		t.Fatal("Navidrome password accepted as local password")
+	if code != 409 {
+		t.Fatal("unconfigured Navidrome login was accepted")
 	}
 	code, _, _ = h.request("POST", "/api/register", map[string]string{"username": "listener", "password": "another-password"}, nil)
 	if code != 409 {
@@ -78,6 +78,23 @@ func TestLocalAccountAndSavedConnection(t *testing.T) {
 	code, _, _ = h.request("POST", "/api/playlists", map[string]any{"name": "Local user mix", "songIds": []string{"0-0"}}, res.Cookies()[0])
 	if code != 200 || h.nav.Playlists["1"].Owner != "alice" {
 		t.Fatal("playlist owner is not configured Navidrome user")
+	}
+}
+
+func TestNavidromeUsersSignInAgainstGlobalServer(t *testing.T) {
+	h := setup(t)
+	_ = h.login("alice") // Seeds the global URL through the compatibility path.
+	code, body, res := h.request("POST", "/api/login", map[string]string{"username": "bob", "password": "test-password"}, nil)
+	if code != http.StatusOK || !strings.Contains(string(body), `"username":"bob"`) || len(h.nav.Requests) == 0 {
+		t.Fatalf("Navidrome login failed: %d %s", code, body)
+	}
+	code, _, _ = h.request("POST", "/api/login", map[string]string{"username": "bob", "password": "wrong-password"}, nil)
+	if code != http.StatusUnauthorized {
+		t.Fatalf("bad Navidrome password accepted: %d", code)
+	}
+	code, _, _ = h.request("POST", "/api/playlists", map[string]any{"name": "Bob's mix", "songIds": []string{"0-0"}}, res.Cookies()[0])
+	if code != http.StatusOK || h.nav.Playlists["1"].Owner != "bob" {
+		t.Fatalf("playlist did not use Navidrome identity: %d", code)
 	}
 }
 func TestUsersChooseDifferentServers(t *testing.T) {

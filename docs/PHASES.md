@@ -55,16 +55,18 @@ No background LLM work or decorative visualization.
 
 ## Delivery status — 2026-09-21
 
-The deployment foundation and admin configuration groundwork are complete. The
+The deployment foundation, admin configuration, and Navidrome identity handoff are complete. The
 app runs in Docker on `0.0.0.0:4000` with an encrypted persistent store,
-local web-app authentication, and a local-only `weazladmin` bootstrap account.
+local web-app authentication, a local-only `weazladmin` bootstrap account, and
+direct Navidrome login for normal users.
 The approved mockup remains under `mockup-ui/`.
 
 Go race tests cover authentication/origin checks, playlist write-through and
 ownership, encrypted settings and user isolation, media byte ranges, and radio
 URL policy. Browser tests exercise playback and the complete playlist workflow
 against an isolated fixture. Admin/non-admin settings protection, default-admin
-password change, Docker build, and direct HTTP health checks pass.
+password change, direct Navidrome login, upstream playlist ownership, Docker
+build, and direct HTTP health checks pass.
 Live Navidrome login, browse, covers, and playlist reads were verified; the first
 installed radio preset successfully delivered audio through the relay. Real
 playlist mutations are reserved for the user's smoke test.
@@ -77,5 +79,6 @@ The first smoke-test revision separates app login from upstream credentials,
 removes NAVIDROME_URL from deployment, makes all sidebar playlists scrollable,
 and adds horizontal browsing of 16 recent albums.
 
-The next phase passes normal user logins through to the configured Navidrome
-server, while preserving the local admin escape hatch for backend configuration.
+The next phase is release hardening: persisted upgrades, operational checks, and
+reverse-proxy deployment notes. The local admin remains the escape hatch for
+backend configuration while Navidrome remains the user identity source.

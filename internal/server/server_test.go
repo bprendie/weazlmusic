@@ -80,7 +80,7 @@ func TestAuthenticationAndOrigin(t *testing.T) {
 		t.Fatal(code)
 	}
 	code, _, _ = h.request("POST", "/api/login", map[string]string{"username": "alice", "password": "wrong"}, nil)
-	if code != 401 {
+	if code != 409 {
 		t.Fatal(code)
 	}
 	c := h.login("alice")

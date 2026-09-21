@@ -21,6 +21,10 @@
 - Admin installation settings are encrypted at rest and protected from
   non-admin sessions. The admin can save the shared Navidrome URL and LLM
   provider configuration without exposing API keys to the browser.
+- Normal users authenticate directly against the configured Navidrome server;
+  the app stores only the generated API token and salt. New Navidrome users are
+  provisioned on first successful login, and playlist writes use their upstream
+  owner identity. The login surface has no local registration control.
 
 ## Container
 

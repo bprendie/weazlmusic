@@ -6,7 +6,7 @@ import {resetPlayer} from './player.js';
 import {cancelMood} from './mood.js';
 import {modal, closeModal} from './dialogs.js';
 import {openAdminSettings} from './admin-settings.js';
-let signOut, registering = false;
+let signOut;
 async function loadAccount(user) {
   state.user = user.username;state.admin = !!user.admin;state.connection = user.connection;
   $('#username').innerHTML = `${esc(state.user)}<small>Web-app account</small>`;
@@ -50,20 +50,12 @@ function connectionForm(existing) {
 export function bindAuth(onSignOut) {
   signOut = onSignOut;
   document.addEventListener('session-expired',signOut);
-  $('#auth-mode').onclick = () => {
-    registering = !registering;
-    $('#login-description').textContent = registering ? 'Create a local web-app account. Connect Navidrome next.' : 'Sign in to your WeazlTunes web-app account.';
-    $('#auth-mode').textContent = registering ? 'Already registered? Sign in' : 'New here? Create a web-app account';
-    $('#login-form button').textContent = registering ? 'Create account →' : 'Sign in →';
-    const password = $('#login-form input[name=password]');password.autocomplete = registering ? 'new-password' : 'current-password';password.minLength = registering ? 10 : 1;
-    $('#login-error').textContent = '';
-  };
   $('#login-form').onsubmit = async event => {
     event.preventDefault();const button = event.target.querySelector('button');button.disabled = true;$('#login-error').textContent = '';
     const data = new FormData(event.target);
     try {
-      const user = await api(registering ? 'register' : 'login','POST',{username:data.get('username'),password:data.get('password')});
-      event.target.reset();if (registering) $('#auth-mode').click();await loadAccount(user);
+      const user = await api('login','POST',{username:data.get('username'),password:data.get('password')});
+      event.target.reset();await loadAccount(user);
     } catch (error) {$('#login-error').textContent = error.message;}
     finally {button.disabled = false;}
   };

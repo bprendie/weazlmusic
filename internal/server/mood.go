@@ -32,8 +32,8 @@ func (s *Server) buildMood(w http.ResponseWriter, r *http.Request, se *session) 
 		fail(w, 400, "Play a library track before building Mood")
 		return
 	}
-	a, err := s.loadAccount(se.User)
-	if err != nil || a.LLM == nil || a.LLM.Provider == "off" {
+	llm, err := s.effectiveLLM(se)
+	if err != nil || llm == nil || llm.Provider == "off" {
 		fail(w, 409, "Configure Ollama or vLLM in your account settings first")
 		return
 	}
@@ -62,7 +62,7 @@ func (s *Server) buildMood(w http.ResponseWriter, r *http.Request, se *session) 
 	go func() {
 		defer close(events)
 		defer func() { s.mu.Lock(); delete(s.moodJobs, key); s.mu.Unlock() }()
-		if err := s.runMood(ctx, se, *a.LLM, in.SeedID, emit); err != nil {
+		if err := s.runMood(ctx, se, *llm, in.SeedID, emit); err != nil {
 			_ = emit(moodEvent{Type: "error", Error: err.Error()})
 		}
 	}()

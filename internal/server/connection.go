@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
@@ -28,28 +29,13 @@ func (s *Server) configureConnection(w http.ResponseWriter, r *http.Request, se 
 	if !s.allowLogin(w, r, se.User) {
 		return
 	}
-	salt := randomID()
-	h := md5.Sum([]byte(in.Password + salt))
-	in.Password = ""
-	c := connection{URL: cleanURL, Username: strings.TrimSpace(in.Username), Salt: salt, Token: hex.EncodeToString(h[:])}
-	candidate := *se
-	candidate.ServerURL = c.URL
-	candidate.NavUser = c.Username
-	candidate.Salt = c.Salt
-	candidate.Token = c.Token
-	if _, err = s.call(r.Context(), &candidate, "ping", nil); err != nil {
+	c, err := s.authenticateNavidrome(r.Context(), cleanURL, strings.TrimSpace(in.Username), in.Password)
+	if err != nil {
 		fail(w, 422, "Could not connect. Check the server URL and Navidrome credentials.")
 		return
 	}
-	// Use the canonical upstream identity for playlist ownership checks.
-	if info, e := s.call(r.Context(), &candidate, "getUser", url.Values{"username": {c.Username}}); e == nil {
-		var user struct {
-			Username string `json:"username"`
-		}
-		if json.Unmarshal(info["user"], &user) == nil && user.Username != "" {
-			c.Username = user.Username
-		}
-	}
+	candidate := *se
+	candidate.ServerURL, candidate.NavUser, candidate.Salt, candidate.Token = c.URL, c.Username, c.Salt, c.Token
 	s.accountsMu.Lock()
 	defer s.accountsMu.Unlock()
 	a, err := s.loadAccount(se.User)
@@ -72,6 +58,25 @@ func (s *Server) configureConnection(w http.ResponseWriter, r *http.Request, se 
 		return
 	}
 	s.startSession(w, r, a, true)
+}
+
+func (s *Server) authenticateNavidrome(ctx context.Context, serverURL, username, password string) (connection, error) {
+	salt := randomID()
+	h := md5.Sum([]byte(password + salt))
+	c := connection{URL: serverURL, Username: username, Salt: salt, Token: hex.EncodeToString(h[:])}
+	candidate := &session{ServerURL: c.URL, NavUser: c.Username, Salt: c.Salt, Token: c.Token}
+	if _, err := s.call(ctx, candidate, "ping", nil); err != nil {
+		return connection{}, err
+	}
+	if info, err := s.call(ctx, candidate, "getUser", url.Values{"username": {c.Username}}); err == nil {
+		var user struct {
+			Username string `json:"username"`
+		}
+		if json.Unmarshal(info["user"], &user) == nil && user.Username != "" {
+			c.Username = user.Username
+		}
+	}
+	return c, nil
 }
 
 func validNavidromeURL(raw string) (string, error) {

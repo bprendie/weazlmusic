@@ -19,16 +19,16 @@ WeazlMusic and is never sent to Navidrome. The administrator can open
 **Account → Installation settings** to save the shared Navidrome backend and
 curator configuration.
 
-1. Choose **Create a web-app account**, with its own username and password.
-2. Enter your **Navidrome server URL** in the connection screen.
-3. Enter that server's **Navidrome username and password**, then **Test & save**.
+1. Sign in as `weazladmin` / `admin` on a fresh data volume and change the local
+   password immediately.
+2. Open **Account → Installation settings** and save the shared Navidrome URL.
+3. Sign out, then sign in with any existing Navidrome username and password.
 
-Afterward, sign in with your web-app credentials. The connection is saved for
-that account and can be changed under **Account → Configure Navidrome**. Different
-web-app users can connect to different servers or different Navidrome users.
-Local login works even if the connected Navidrome server is offline. Registration
-is available on the login screen; usernames are case-insensitive and local
-passwords require at least 10 characters.
+Normal users authenticate against that configured Navidrome server. The app stores
+only the Navidrome API token and salt, never the password. The local administrator
+login remains available if Navidrome is offline. Existing pre-passthrough accounts
+can finish migration through the compatibility path; new users are created in the
+app on their first successful Navidrome login.
 
 Your reverse proxy handles the domain and TLS. The app serves plain HTTP and
 requires no public URL setting. Forward to port 4000 and preserve the request
