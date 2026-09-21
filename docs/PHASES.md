@@ -53,15 +53,18 @@ Library metadata cache, queue conflict handling across devices, and explicit
 transcoding policy.
 No background LLM work or decorative visualization.
 
-## Delivery status — 2026-09-10
+## Delivery status — 2026-09-21
 
-Phases 1–5 are implemented. The app runs in Docker on `0.0.0.0:4000` with
-local web-app authentication and per-user Navidrome connections. The approved mockup remains under `mockup-ui/`.
+The deployment foundation and admin configuration groundwork are complete. The
+app runs in Docker on `0.0.0.0:4000` with an encrypted persistent store,
+local web-app authentication, and a local-only `weazladmin` bootstrap account.
+The approved mockup remains under `mockup-ui/`.
 
 Go race tests cover authentication/origin checks, playlist write-through and
 ownership, encrypted settings and user isolation, media byte ranges, and radio
 URL policy. Browser tests exercise playback and the complete playlist workflow
-against an isolated fixture. Docker build and direct HTTP health checks pass.
+against an isolated fixture. Admin/non-admin settings protection, default-admin
+password change, Docker build, and direct HTTP health checks pass.
 Live Navidrome login, browse, covers, and playlist reads were verified; the first
 installed radio preset successfully delivered audio through the relay. Real
 playlist mutations are reserved for the user's smoke test.
@@ -74,6 +77,5 @@ The first smoke-test revision separates app login from upstream credentials,
 removes NAVIDROME_URL from deployment, makes all sidebar playlists scrollable,
 and adds horizontal browsing of 16 recent albums.
 
-The next revision adds on-demand per-user Ollama/vLLM Mood curation with streaming
-Navidrome writes, ICY now-playing metadata, Weazl favicon, and random playback
-with 30 upcoming tracks. The duplicate sidebar Mixtapes surface is removed.
+The next phase passes normal user logins through to the configured Navidrome
+server, while preserving the local admin escape hatch for backend configuration.

@@ -13,6 +13,12 @@ docker compose up --build -d
 Open **http://localhost:4000**, or your machine's IP on port 4000. Compose publishes
 **0.0.0.0:4000**. No Navidrome server is configured in Docker or environment variables.
 
+Fresh data volumes include a local-only administrator: `weazladmin` / `admin`.
+Sign in and use **Account → Change password** immediately. This password is for
+WeazlMusic and is never sent to Navidrome. The administrator can open
+**Account → Installation settings** to save the shared Navidrome backend and
+curator configuration.
+
 1. Choose **Create a web-app account**, with its own username and password.
 2. Enter your **Navidrome server URL** in the connection screen.
 3. Enter that server's **Navidrome username and password**, then **Test & save**.
@@ -127,7 +133,8 @@ idle-power claim has been measured.
   operation. Album browsing loads 40 at a time.
 - Navidrome remains authoritative for its users and music permissions. If its
   password changes, update the saved connection; the separate web-app login remains
-  valid. Local password reset/account administration is not implemented yet.
+  valid. Local account administration is limited to changing the current user's
+  password.
 - The app supports a dedicated hostname/root path, not a reverse-proxy subpath.
 
 ## Development and verification

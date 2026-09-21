@@ -1,4 +1,4 @@
-# Verification — 2026-09-10
+# Verification — 2026-09-21
 
 ## Automated checks
 
@@ -15,6 +15,12 @@
   logout, second-user isolation, and desktop/mobile layout. No JavaScript errors.
 - All Go files remain below the 300-line ceiling. Production uses the Go standard
   library and static browser modules without an npm build or runtime dependency.
+- Fresh and existing data directories bootstrap the local-only `weazladmin` /
+  `admin` account when that account is absent. The default password can be
+  changed through the account dialog; it is never used as a Navidrome credential.
+- Admin installation settings are encrypted at rest and protected from
+  non-admin sessions. The admin can save the shared Navidrome URL and LLM
+  provider configuration without exposing API keys to the browser.
 
 ## Container
 
