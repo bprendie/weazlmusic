@@ -26,6 +26,16 @@ type userState struct {
 	Queue    []json.RawMessage `json:"queue"`
 	Current  json.RawMessage   `json:"current"`
 }
+
+// globalConfig is the installation-wide configuration introduced by the
+// admin-managed connection model. It is kept in the same encrypted store as
+// account records so upgrades do not add a second persistence mechanism.
+type globalConfig struct {
+	Version       int        `json:"version"`
+	NavidromeURL  string     `json:"navidromeURL,omitempty"`
+	LLM           *llmConfig `json:"llm,omitempty"`
+	AdminUsername string     `json:"adminUsername,omitempty"`
+}
 type store struct {
 	mu   sync.Mutex
 	dir  string
@@ -125,6 +135,17 @@ func (st *store) read(user string) (userState, error) {
 	return state, err
 }
 func (st *store) write(user string, state userState) error { return st.writeRecord(user, state) }
+func (st *store) readGlobal() (globalConfig, error) {
+	var cfg globalConfig
+	err := st.readRecord("global:config", &cfg)
+	return cfg, err
+}
+func (st *store) writeGlobal(cfg globalConfig) error {
+	if cfg.Version == 0 {
+		cfg.Version = 1
+	}
+	return st.writeRecord("global:config", cfg)
+}
 func (se *session) stateKey() string {
 	return "state:" + se.User + ":" + se.ServerURL + "/" + se.NavUser
 }

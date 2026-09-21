@@ -121,6 +121,10 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 		fail(w, 500, "Could not load account")
 		return
 	}
+	if err = s.migrateGlobalConfig(a); err != nil {
+		fail(w, 500, "Could not migrate installation settings")
+		return
+	}
 	s.startSession(w, r, a, false)
 }
 func identity(se *session) map[string]any {

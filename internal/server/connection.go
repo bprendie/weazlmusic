@@ -66,5 +66,9 @@ func (s *Server) configureConnection(w http.ResponseWriter, r *http.Request, se 
 		fail(w, 500, "Could not save your connection")
 		return
 	}
+	if err = s.migrateGlobalConfig(a); err != nil {
+		fail(w, 500, "Could not migrate installation settings")
+		return
+	}
 	s.startSession(w, r, a, true)
 }

@@ -1,9 +1,12 @@
 package server
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"testing/fstest"
@@ -102,6 +105,32 @@ func TestUsersChooseDifferentServers(t *testing.T) {
 	}
 	if h.nav.Playlists["1"].Name != "first-user" || other.Playlists["1"].Name != "second-user" {
 		t.Fatal("users shared a hardcoded server")
+	}
+}
+
+func TestGlobalConfigMigratesOnceAndStaysEncrypted(t *testing.T) {
+	h := setup(t)
+	cookie := h.login("alice")
+	_ = cookie
+	st, err := newStore(h.dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cfg, err := st.readGlobal()
+	if err != nil || cfg.Version != 1 || cfg.NavidromeURL != h.upstream {
+		t.Fatalf("global config not seeded: %#v %v", cfg, err)
+	}
+	raw, err := os.ReadFile(filepath.Join(h.dir, digest("global:config")+".bin"))
+	if err != nil || bytes.Contains(raw, []byte(h.upstream)) {
+		t.Fatal("global config was not encrypted")
+	}
+	second := account{Username: "later", Connection: &connection{URL: "https://different.invalid"}}
+	if err = (&Server{store: st}).migrateGlobalConfig(second); err != nil {
+		t.Fatal(err)
+	}
+	cfg, err = st.readGlobal()
+	if err != nil || cfg.NavidromeURL != h.upstream {
+		t.Fatal("global config was overwritten")
 	}
 }
 
