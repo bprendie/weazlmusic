@@ -83,3 +83,19 @@ and adds horizontal browsing of 16 recent albums.
 The next phase is release hardening: persisted upgrades, operational checks, and
 reverse-proxy deployment notes. The local admin remains the escape hatch for
 backend configuration while Navidrome remains the user identity source.
+
+## Native API and Flight Recorder — 2026-10-03
+
+The S0–S6 implementation is now present: durable independent native devices,
+normalized music/media/presets/Mood, per-device queues, encrypted SQLite jobs,
+recurrence/DST, bounded independent recording workers, immutable AAC segments,
+scoped downloads and a compact web management/shared playback surface.
+SQLite supplements the compatible encrypted legacy account/settings store;
+the earlier standard-library-only/session-memory choices above describe history.
+
+FDK AAC-LC160k/44100/stereo matches the user's iPod profile. One-minute synthetic
+six-stream capture, real Chromium AAC playback, race/vet, restart and storage
+checks are recorded in VERIFICATION.md. The six-hour soak is delegated to Luna
+by the user; AVPlayer/background transfers require Apple acceptance. Capabilities
+continue to report these two validation flags false. See SOL_WORKBOOK.md and
+NATIVE_HANDOFF.md for current status, rather than the historical phase labels.

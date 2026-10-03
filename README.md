@@ -1,6 +1,6 @@
 # WeazlTunes web
 
-A lightweight browser listening desk for Navidrome and Internet radio, with
+A browser listening desk and native Subweazl backend for Navidrome and Internet radio, with
 `weazlhead` branding. One Go binary serves the UI, authenticated API, and audio.
 No frontend framework, Node runtime, cloud identity, or telemetry.
 
@@ -39,7 +39,7 @@ for radio and Mood; proxies should stream responses rather than buffer them.
 | Setting | Default | Purpose |
 | --- | --- | --- |
 | `LISTEN_ADDR` | `0.0.0.0:4000` | HTTP listener |
-| `DATA_DIR` | `./data` (`/data` in Docker) | Encrypted user settings and encryption key |
+| `DATA_DIR` | `./data` (`/data` in Docker) | Encrypted user settings, SQLite, recording assets and encryption key |
 | `COOKIE_SECURE` | `false` | Restrict session cookies to HTTPS when enabled |
 
 `localhost` inside a container means that container. Use a reachable server URL
@@ -47,8 +47,8 @@ or a service name on a shared Docker network for Navidrome and your LLM endpoint
 
 ## What works
 
-- Local web-app accounts, 24-hour sessions, sign-out, and encrypted per-user
-  Navidrome connection settings.
+- Navidrome sign-in, an independent local administrator, browser sessions,
+  persistent revocable native devices, and encrypted upstream connection settings.
 - A horizontal shelf of 16 recently added albums, paginated album browsing,
   a scrolling sidebar, search, real cover art,
   and favorites saved to Navidrome.
@@ -103,32 +103,33 @@ AES-GCM. Neither passwords nor upstream tokens are sent back to the browser.
 The password-hashing work factor follows the
 [OWASP password storage guidance](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2).
 
-Restarting the application invalidates sessions, but local accounts and saved
-connections survive. Logging out cancels the session's streams. Changing a
+Restarting invalidates browser cookies; native refresh sessions, accounts,
+connections, schedules and recording jobs survive. Logging out cancels the session's streams. Changing a
 Navidrome connection rotates the current session and revokes other sessions for
 that web-app user. Saved queues/settings are isolated by both local account and
 upstream identity, so changing servers does not replay IDs from the previous
 library. Previous first-release queue/radio settings are copied forward after
 successfully reconnecting to the same Navidrome server and user; originals remain.
 
-Run one instance per data volume. Multiple tabs use last-save-wins queue/radio
-settings; live cross-device coordination is not implemented. Navidrome URLs may
+Run one instance per data volume. A volume lock prevents a second writer. Preset edits use versions and reject
+stale writes; queues are scoped to each browser/native device. Navidrome URLs may
 point to reachable LAN or loopback servers, while link-local/metadata addresses
 are rejected. Redirects are not followed for authenticated Navidrome requests.
 
-No directory polling, progress animation timer, or second audio decoder runs in
-the app. Browser media events drive playback updates; writes follow user actions.
+Recorder status polls while its management view is open; captures continue
+independently when the view closes. One audible source handles playback. Browser media events drive playback updates; writes follow user actions.
 Docker's health check runs every 30 seconds against `/healthz`. No battery or
 idle-power claim has been measured.
 
 ## Current limits
 
-- Browser-supported audio formats only. No bundled transcoder, HLS radio, or
-  YouTube/mpv URL resolver. If a library file cannot play natively, configure
+- Library playback uses browser-supported formats. Recorder captures public
+  MP3/AAC and encodes seekable AAC-LC M4A. No HLS or YouTube/mpv URL resolver. If a library file cannot play natively, configure
   a compatible Navidrome transcoding policy. Radio stations can be offline.
 - Radio destinations must be public Internet addresses; private/LAN radio URLs
   are intentionally rejected by the relay. Redirects and DNS results are checked.
-- No play-history/scrobble reporting yet. Radio titles depend on station-supplied ICY metadata.
+- Native library scrobbles are supported with durable dedupe and explicit
+  ambiguous outcomes. Recorded radio is not submitted as library scrobbles. Radio titles depend on station-supplied ICY metadata.
 - Search shows up to 100 tracks; playlist writes accept up to 1,000 tracks per
   operation. Album browsing loads 40 at a time.
 - Navidrome remains authoritative for its users and music permissions. If its
@@ -139,7 +140,8 @@ idle-power claim has been measured.
 
 ## Development and verification
 
-Go 1.26 or newer; production has no external Go modules.
+Go 1.26 or newer; SQLite uses pinned modernc.org/sqlite. Recording requires
+ffmpeg, ffprobe and fdkaac; Docker includes the tested packages.
 
 ```sh
 make dev                 # same .env, HTTP on 0.0.0.0:4000
@@ -170,8 +172,36 @@ and [updatePlaylist](https://opensubsonic.netlify.app/docs/endpoints/updateplayl
 endpoints. Container connectivity follows
 [Docker Compose networking](https://docs.docker.com/compose/how-tos/networking/).
 
-## Subweazl backend and Flight Recorder development
+## Subweazl backend and Flight Recorder
 
-The next implementation assignment is [SOL_WORKBOOK.md](SOL_WORKBOOK.md).
-Its versioned native API target is [docs/SUBWEAZL_API_V1.md](docs/SUBWEAZL_API_V1.md).
-These are planned server additions; the routes and recording capability are not yet implemented.
+Implementation and outstanding acceptance are tracked in [SOL_WORKBOOK.md](SOL_WORKBOOK.md).
+Its versioned native API is [docs/SUBWEAZL_API_V1.md](docs/SUBWEAZL_API_V1.md).
+Contract revision **2026-10-03.2** is implemented. See
+[the native handoff](docs/NATIVE_HANDOFF.md) for fixtures and acceptance boundaries.
+
+Flight Recorder sits under Internet Radio. Choose one to six saved favorites;
+record now or schedule once, daily, or selected weekdays in an IANA time zone.
+Four hours is the default; twelve hours is the maximum. A 22:00–04:00 window
+crosses midnight, with actual UTC boundaries and DST corrections returned.
+Logout and closing a tab do not stop server capture. Restart resumes the
+remaining original window and records unavailable time as gaps.
+
+The output matches profile 1 in `~/ipod_script/ipod.py`: **FDK AAC-LC, 160 kbps,
+44.1 kHz, stereo, M4A**. Six stations for six hours use roughly 2.59 GB before
+packaging; reservations include twice the nominal rate. Encoding a 128 kbps
+source at this profile increases its size. Defaults: 20 GiB installation budget,
+10 GiB per account, 1 GiB disk-free reserve, retention off. Configure
+`CAPTURE_BUDGET_BYTES`, `CAPTURE_ACCOUNT_BUDGET_BYTES`, `CAPTURE_RESERVE_BYTES`,
+and `CAPTURE_RETENTION_DAYS` in Compose's environment. Storage is checked before
+reservation and during capture; one failed station does not stop the others.
+
+Listen through one shared session timeline: switch presets at the current
+offset, pause globally, or seek all stations together. Server capture status
+and phone offline readiness are separate. Server deletion/retention never
+silently removes phone copies. Native download leases support HEAD/Range,
+renewal, immutable checksums and verified atomic download promotion.
+
+Run isolated acceptance with `scripts/run-recorder-fixture.sh 60`. Six-hour
+soak uses `scripts/recorder-client.py --duration 21600`; see the handoff for
+a fixture container. Overnight validation and AVPlayer/background transfer
+acceptance remain false until their respective evidence is reviewed.

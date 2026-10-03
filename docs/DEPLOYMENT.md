@@ -1,29 +1,88 @@
-# Deployment
+# Deployment and recovery
 
-The container listens on `0.0.0.0:4000`. Put the reverse proxy in front of that
-port and preserve the incoming `Host` header. TLS termination, certificates,
-DNS, and public access policy belong to the proxy.
+One service, one durable data volume, one replica. Port4000 remains unchanged.
+Compose runs as UID/GID10001 with init, dropped capabilities, a read-only root,
+8 MiB /tmp and a 45-second stop grace period. Both staging and published recordings
+live under /data. An advisory volume lock rejects a second writer. The image pins
+Go/Alpine base digests and FFmpeg8.0.1-r1/fdkaac1.0.6-r0 packages.
 
-For a proxy that supports a simple upstream, the shape is:
+Your proxy owns TLS/DNS/access policy; preserve Host and disable buffering for
+radio/Mood/SSE, including v1 routes. No WebSocket is needed. Allow long-lived media
+responses and do not log lease query strings. Set COOKIE_SECURE=true only when
+all browser access is HTTPS. The administrator saves Navidrome/curator settings
+through the app; no upstream URL or credential environment variables are needed.
 
-```text
-music.example.test  ->  http://127.0.0.1:4000
+| Environment | Default | Meaning |
+| --- | --- | --- |
+| DATA_DIR | /data | Encryption key, encrypted records, SQLite/WAL, media |
+| CAPTURE_BUDGET_BYTES | 21474836480 | 20 GiB installation capture budget |
+| CAPTURE_ACCOUNT_BUDGET_BYTES | 10737418240 | 10 GiB per-account capture budget |
+| CAPTURE_RESERVE_BYTES | 1073741824 | 1 GiB filesystem free reserve |
+| CAPTURE_RETENTION_DAYS | 0 | Retention disabled; positive days removes old server copies |
+
+Reservations include twice the nominal FDK AAC-LC160k output rate. Native storage
+and the management view expose limits, used and available space. Scheduled repeats
+reserve their next occurrence, then revalidate storage/source/duration when
+advancing; a failed future occurrence is visible. Capacity is checked against a
+one-year recurrence horizon and enforced again at dispatch. Keep the server clock
+synchronized. DST behavior uses embedded IANA timezone data. Native refresh and
+recordings persist; browser cookies expire on restart. /healthz checks the HTTP
+process, not station availability or proof of overnight capture. Inspect session
+and per-station status for recorder degradation.
+
+## Backup and upgrade
+
+Back up the **whole volume, including key**, with the service stopped. Never copy
+a live database without its WAL, never restore only a key or only media, and do
+not use compose down -v during upgrades. Archives contain private account data;
+protect them with mode0700 directories and restricted access.
+
+```sh
+# Substitute the actual Compose project's existing volume name.
+mkdir -m 700 -p ~/weazlmusic-backups/release
+# Retain the current image before a build replaces the local tag.
+docker tag weazltunes-web:local weazltunes-web:rollback-release
+docker compose stop
+docker run --rm --user 0 --entrypoint tar \
+  -v weazlmusic_weazltunes-data:/source:ro \
+  -v "$HOME/weazlmusic-backups/release:/backup" alpine:3.23 \
+  -czf /backup/data.tar.gz -C /source .
+sha256sum ~/weazlmusic-backups/release/data.tar.gz
+# Verify the archive before advancing the checkout.
+git pull --ff-only
+docker compose up -d --build
+curl -fsS http://127.0.0.1:4000/healthz
+curl -fsS http://127.0.0.1:4000/api/v1/info
+docker compose ps
 ```
 
-Keep response buffering disabled for `/api/mood` and `/api/radio/events`; both
-routes stream incremental events. The app sends `X-Accel-Buffering: no` for
-these routes, but the proxy must honor it. Allow long-lived responses for radio
-audio and Mood generation. No WebSocket upgrade is required.
+Legacy encrypted files are preserved. Shared presets migrate lazily into encrypted
+SQLite; original queue files remain archival. Native sessions/leases, jobs,
+manifests and idempotency outcomes use SQLite WAL/FULL synchronous transactions.
+Never discard that database to repair an authentication problem. Media assets
+are intentionally ordinary M4A files protected by filesystem ownership and scoped
+HTTP leases; SQLite encryption does not encrypt the media files themselves.
 
-Set `COOKIE_SECURE=true` when users reach the app only through HTTPS. Leave it
-false for direct local HTTP smoke tests. Do not set a Navidrome URL in the
-environment: the administrator saves it through **Installation settings**.
+## Restore and rollback
 
-The named `weazltunes-data` volume contains the encryption key and encrypted
-records. Update with `git pull && docker compose up -d --build`; do not use
-`docker compose down -v` during an upgrade. Back up the whole volume, including
-the key. The app is one process and one data volume; use a single replica.
+Stop the current service first. Restore into a **new** empty named volume and
+verify key/database/media together before switching Compose to it. This preserves
+the original volume for investigation. A data rollback discards changes since the
+backup; consider that explicitly before restoring. Start the retained image with
+a Compose image override and no build; do not rebuild an old source tree over the
+rollback image. Native/recorder features disappear on the pre-v1 image; its
+preserved legacy settings remain usable. Current SQLite state is authoritative
+for preset edits made after upgrade, so an old server will not see those newer
+edits without a deliberate export. See VERIFICATION.md for the deployment's exact
+source, backup and rollback tag.
 
-The health endpoint is `GET /healthz`. A healthy container exposes port 4000 and
-returns `{"status":"ok"}`. Sessions are intentionally in memory and expire on
-restart; accounts, installation settings, queues, and radio stations persist.
+Production access uses nested SSH (the destination is reached through the jumpbox):
+
+```sh
+ssh bobp@jumpbox.prendie.io \
+  'ssh bobp@weazlmusic.teralab.local "cd /home/bobp/weazlmusic && docker compose ps"'
+```
+
+No production playlists/listening history are mutated by acceptance tests. The
+fixture command's trusted radio transport is absent from the production command.
+Fixtures and six-hour soak run on isolated local volumes.

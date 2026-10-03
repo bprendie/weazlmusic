@@ -1,3 +1,83 @@
+# Verification — native API and Flight Recorder, 2026-10-03
+
+Contract revision **2026-10-03.2**. Implementation release commit and production
+receipt are added below when deployment finishes. Tests use isolated synthetic
+Alice/Bob accounts; production library mutations are excluded.
+
+## Release checks
+
+- `go test -race ./...` and `go vet ./...`: passed, including independent native
+  device login/refresh/restart/lost-response replay/revocation, encrypted SQLite,
+  normalized library paging, typed favorites, duplicate playlist replacement,
+  scrobble dedupe, original-file Range, presets and per-device queue isolation.
+- `tests/run-browser.sh`: passed existing library/playlist/radio/Mood/settings,
+  real audio, persistence, two-user and mobile flows, without JavaScript errors.
+- `node tests/recorder.cjs` against the isolated fixture container: passed
+  22:00–04:00 schedule/edit/cancel, six-stream capture after initiating tab close,
+  actual AAC audio readyState/currentTime advancement, shared switch/pause/seek,
+  correct server-recording deletion, mobile layout. Screenshot:
+  `test-results/recorder-browser-mobile.png` (ignored local artifact).
+- AAC input and VBR MP3 are converted to the exact FDK AAC-LC160k/44100/stereo
+  profile; all generated segments pass ffprobe and FFmpeg local decode/seek.
+  Invalid/incomplete MP4 is rejected. Manifest/asset HEAD/Range/416/ETag, lease
+  expiry/renewal/revocation, reserve exhaustion and deletion tombstones pass.
+- Injected-clock, overnight, DST fold/gap, capacity, cancellation, ownership,
+  missed-window/no-duplicate firing and explicit retention checks pass.
+  Native refresh works with the fixture upstream shut down.
+- Production/fixture image builds pass with pinned base digests and media packages.
+  Go files remain under300 lines. Tool versions/licenses/short-run impact are
+  recorded in MEDIA_TOOLCHAIN.md. Existing encrypted files remain readable;
+  preset migration retains stable IDs and prevents stale browser overwrites.
+
+## Real synthetic capture evidence
+
+`scripts/run-recorder-fixture.sh 60 test-results/recorder-aac160` passed with six
+simultaneous inputs. Final state partial, 6,769,131 bytes,69 immutable assets,
+60.36 seconds wall time. Four uninterrupted streams each covered98.703% of the
+logical window; disconnect stream97.073%, stall stream70.317%. Every downloaded
+asset matched its size/SHA-256; corrupt partial download was rejected and replaced;
+local seek decoded. Initial/disconnect/stall gaps partition the original timeline.
+A representative M4A, complete sample manifest and actual partial manifest are
+checked into fixtures/v1. Apple validation is not implied by this Linux run.
+
+`python3 scripts/recorder-client.py --base http://127.0.0.1:4005 --duration 180
+--output test-results/recorder-restart-final --container weazl-workbook-restart
+--kill-after 45` passed after a real SIGKILL/container restart. The original
+180-second end remained fixed. Start tolerance was268ms; final partial recording
+contained18,749,808 bytes/189 verified assets. Healthy coverage88.907% reflects
+intentional downtime plus discarded unfinished staging; the forced-restart gate
+allows at most30 seconds unavailable, separately from the90% uninterrupted gate.
+Short-run CPU samples17.76–78.41% of one core, last active memory222.8MiB.
+This is recovery evidence, not a six-hour performance bound.
+
+`scripts/verify-volume-recovery.py` stopped the fixture, archived its entire
+volume/key, restored into a new named volume, and verified identical installation,
+owned sessions, exact encrypted refresh-replay response and media checksum.
+Local evidence is under test-results/volume-recovery. Production rollback uses
+its own restricted backup; this fixture test does not modify production data.
+
+## Outstanding acceptance
+
+The user explicitly delegated the six-stream, six-hour fixture soak to Luna after
+release. It must record compact resources, timing, bytes, all asset checksums,
+local seeking and decoded station/cue identity at shared minute30 and50 offsets.
+Use fixture production30-second segments and actual21600-second wall time.
+`overnightValidated:false` remains until that report is reviewed. AVPlayer,
+background URLSession/proxy-header paths, locked-screen playback and Apple
+interruptions remain device-side acceptance; `appleValidated:false` stays explicit.
+
+Physical ENOSPC was not induced on this shared filesystem; reserve/quota rejection
+and incomplete media are tested. Timestamp anchors preserve detected restart/
+disconnect gaps, but do not reconstruct sub-deadline stalls or synchronize
+broadcaster delivery clocks. Capacity scans a one-year recurrence horizon and
+runtime dispatch enforces six streams. Directory/provider and entire real codec
+collection compatibility are not claimed from fixture tests. No phone offline
+readiness is inferred from a completed server capture.
+
+---
+
+The following is the historical browser-release evidence, retained for context.
+
 # Verification — 2026-09-21
 
 ## Automated checks

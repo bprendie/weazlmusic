@@ -1,7 +1,7 @@
 # Subweazl and Flight Recorder API contract
 
-Revision: **draft-2026-10-03.1**. Status: implementation target, no v1 routes exist
-at the audited baseline. Canonical copy: WeazlTunes `docs/SUBWEAZL_API_V1.md`.
+Revision: **2026-10-03.2**. Status: implemented; six-hour fixture soak and Apple
+media acceptance remain pending. Canonical copy: WeazlTunes `docs/SUBWEAZL_API_V1.md`.
 The iOS repository carries an identical review snapshot at
 `docs/WEAZLTUNES_API_V1.md`. Change the canonical contract and fixtures together;
 update the native snapshot before consuming a changed contract.
@@ -21,8 +21,9 @@ namespace all caches, files and mutations. Changing the upstream library changes
 `libraryId`; changing home/remote address for the same installation does not.
 The server must verify installation identity before the client reuses credentials.
 
-Success entities use `{ "data": ... }`; lists use
-`{ "data": [...], "nextCursor": null }`. Pagination uses opaque `cursor` and
+Success entities use `{ "data": ... }`; paged lists use
+`{ "data": [...], "nextCursor": null, "snapshotRevision": "opaque" }`.
+Devices and saved stations use an unpaged `{ "data": [...] }` envelope. Pagination uses opaque `cursor` and
 `limit` (default 100, max 200); stable ordering, no silent truncation. A multi-page
 scan must retain its snapshot revision or fail with `snapshot_expired`, requiring
 restart without deleting the last valid local library.
@@ -37,11 +38,12 @@ Required codes: `unauthorized`, `session_revoked`, `forbidden`, `not_found`,
 `validation_failed`, `version_conflict`, `snapshot_expired`, `capacity_conflict`,
 `storage_full`, `upstream_unavailable`, `upstream_rejected`, `outcome_unknown`,
 `unsupported`, `asset_expired`, `rate_limited`. Never include credentials or raw
-upstream authenticated URLs. Use 401/403/404/409/410/422/429/502/503 appropriately.
+upstream authenticated URLs. Also `idempotency_conflict` is not a separate code: key/body conflicts use
+`version_conflict`. Unsupported methods use 405, missing preconditions use 428.
 Mutation responses may be 200/201 with data or 204 with no body; document per route.
 
-Create, stop and mutation requests carry `Idempotency-Key` UUID. Scope by account,
-route and normalized body hash; replay same request/result, reject reused key with
+Create, stop and mutation requests carry `Idempotency-Key` UUID. Scope by account, library, method,
+route and normalized body hash (including If-Match); replay same request/result, reject reused key with
 different body. Retain job-create dedupe at least as long as that schedule/session;
 retain music mutation results at least 30 days. Do not promise exactly-once
 Navidrome scrobbles after an ambiguous upstream failure; record `outcome_unknown`
@@ -70,28 +72,35 @@ Credential response:
 {"data":{"accessToken":"fixture-only","accessExpiresAt":"2026-10-04T02:15:00Z","refreshToken":"fixture-only-refresh","refreshExpiresAt":"2026-11-03T02:00:00Z","deviceId":"device-a","accountId":"account-a","libraryId":"library-a"}}
 ```
 
-Proposed lifetimes: access 15 minutes, refresh 30 days sliding with explicit revoke.
+Lifetimes: access 15 minutes, refresh 30 days sliding with explicit revoke.
 Use `Authorization: Bearer` for native JSON APIs; legacy browser cookie requests
 retain origin/CSRF rules. Refresh idempotency must survive restart and lost response:
-retain the encrypted exact result for a bounded retry window (at least 2 minutes),
+retain the encrypted exact result for a bounded retry window (2 minutes),
 then reject reuse. Client serializes refresh; do not log refresh or login bodies.
 Account/security revocation remains authoritative over idempotency replay.
 
 Capabilities shape:
 
 ```json
-{"data":{"library":true,"originalDownloads":true,"favorites":["track","album","artist"],"playlistReplace":true,"scrobble":true,"radio":true,"mood":false,"flightRecorder":{"enabled":true,"maxStations":6,"defaultDurationMs":14400000,"maxDurationMs":43200000,"maxConcurrentStreams":6,"recurrence":["once","daily","weekly"],"inputFormats":["mp3","aac"],"outputProfiles":["aac-lc-m4a"]}}}
+{"data":{"library":true,"originalDownloads":true,"favorites":["track","album","artist"],"playlistReplace":true,"scrobble":true,"radio":true,"mood":true,"flightRecorder":{"enabled":true,"maxStations":6,"defaultDurationMs":14400000,"maxDurationMs":43200000,"maxConcurrentStreams":6,"recurrence":["once","daily","weekly"],"inputFormats":["mp3","aac"],"outputProfiles":["aac-lc-m4a"],"outputEncoding":{"encoder":"fdkaac","profile":"AAC-LC","bitRateKbps":160,"sampleRateHz":44100,"channels":2},"overnightValidated":false,"appleValidated":false}}}
 ```
 
-This example describes the target, not current support. Output profile is
-provisional until S0 packager/player fixture evidence; pin the actual format in
-capabilities and fixture manifests before both clients implement it.
+Recorder enabled is false when ffmpeg, ffprobe or fdkaac is absent.
+The output matches profile 1 in `~/ipod_script/ipod.py`: FDK AAC-LC, 160 kbps,
+44.1 kHz, stereo, M4A. ADTS is an internal pipe transport only. Assets use
+`audio/mp4` and `codec:"aac-lc"`. Ordinary FFmpeg decode/seek and Chromium playback
+are tested; AVPlayer/background transfers await Apple device validation.
+The server reserves 40,000 bytes/second/station (twice the nominal encoded rate).
+Six streams for six hours encode roughly 2.59 GB plus packaging and reserve
+5.18 GB of capacity. A 128 kbps input grows at this profile. Capabilities also
+include `maxPlaylistTracks:1000`, `radioDirectory:["somafm","icecast"]`, and
+`contractRevision`. Library streams/downloads currently offer original quality only.
 
 ## Library and music mutations
 
 | Method and route | Request or response |
 | --- | --- |
-| GET `/library/albums` | cursor/limit/sort → Album list + snapshot revision |
+| GET `/library/albums` | cursor/limit/sort (`newest` or default alphabeticalByName) → Album list + snapshot revision |
 | GET `/library/albums/{id}` | `{album,tracks:[Track]}` in disc/track order |
 | GET `/library/artists` | Artist list |
 | GET `/library/artists/{id}` | `{artist,albums:[Album]}` |
@@ -129,10 +138,10 @@ POST `/media/leases` body `{kind,resourceId,quality?}` where kind is `trackStrea
 {"data":{"url":"https://music.example.invalid/api/v1/media/assets/asset-a?lease=fixture-only","expiresAt":"2026-10-04T14:00:00Z","contentType":"audio/mp4","byteLength":123456,"sha256":null,"supportsRanges":true}}
 ```
 
-URL is resource-scoped authorization, never an upstream credential. Proposed
-maximum lease lifetime 12 hours, bounded by ownership/device revocation, sufficient
+URL is resource-scoped authorization, never an upstream credential. Maximum lease lifetime 12 hours, bounded by ownership/device revocation, sufficient
 for the first overnight transfer scenario; clients renew before retrying expired
-Range requests. Prefer same-origin URLs. Do not log query strings. GET and HEAD
+Range requests. Returned URLs are **relative same-origin** paths; resolve against the configured
+WeazlTunes origin. `playbackId` is non-null only for `radioLive`. Do not log query strings. GET and HEAD
 support ranges, 206/416, ETag/If-Range and stable content length for immutable files.
 Live streams have null byteLength/hash and no byte-seek claim. Original download
 means original bytes; transcoding is only a separately advertised quality.
@@ -155,9 +164,13 @@ credential-bearing URLs.
 | PATCH `/radio/stations/{id}` | If-Match + changed fields → Station |
 | DELETE `/radio/stations/{id}` | If-Match, 204; existing recording snapshots survive |
 | PUT `/radio/presets` | If-Match collection version + `{stationIds:[...]}` → ordered list; max eight |
-| GET `/radio/directory` | provider, query, cursor/limit; provider capability advertised |
+| GET `/radio/directory` | provider, query, cursor/limit → `{name,url,preset}` rows; provider capability advertised |
 | GET `/radio/events` | playbackId issued with radio lease; authenticated metadata SSE, never owns recording jobs |
 
+GET/PUT `/queue` returns `{queue:[savedTrack],current:savedTrack|null}` and
+requires a native device. PUT accepts that same shape (max 1,000 entries), with
+Idempotency-Key. Saved tracks use legacy Subsonic fields (`id`, `title`, `artist`,
+`album`, `duration` seconds, optional `albumId`/`coverArt`/`radio`).
 Queue and playback position remain per device; no native client writes legacy
 `/api/state`. Legacy browser state writes must migrate through the same preset
 store or they can undo native edits. Return stale-write conflicts after migration.
@@ -167,15 +180,25 @@ GET `/mood/jobs/{id}/events` → typed selection/progress/completed/failed event
 DELETE `/mood/jobs/{id}` cancels. Reuse current ownership and confirmed incremental
 playlist semantics. GET/PUT `/preferences/curator` and POST
 `/preferences/curator/models` mirror existing curator options without returning
-saved secrets. Define fixtures before enabling native Mood. Admin installation
+saved secrets. GET `/mood/jobs/{id}` also returns saved `{jobId,state,username,deviceId,events}`.
+SSE supports Last-Event-ID and emits `id`, `event` and JSON data
+`{sequence,type,playlist?,track?,count,target,message?}`; playlist is
+`{id,name,songCount}`, track uses the normalized Track DTO.
+States are running/completed/failed. DELETE and native device logout cancel
+generation, but already confirmed selections remain upstream. Restart marks
+interrupted jobs failed; reconnect replays durable events without resubmitting.
+Curator GET/PUT responds `{provider,url,model,hasKey}`. PUT and models POST accept
+`{provider:"off"|"ollama"|"vllm",url,model,apiKey:null|string}`; null preserves a
+saved key for the same endpoint, empty string clears it. Models response is
+`{models:[string]}`. Never return the saved API key. Admin installation
 settings remain browser-managed in this release.
 
 ## Flight Recorder scheduling and ownership
 
 | Method and route | Contract |
 | --- | --- |
-| GET `/flight-recorder/storage` | `{usedBytes,budgetBytes,availableBytes,reserveBytes,retention}` |
-| GET `/flight-recorder/schedules` | Owned schedule list |
+| GET `/flight-recorder/storage` | `{usedBytes,budgetBytes,availableBytes,reserveBytes,reservedBytes,accountUsedBytes,accountBudgetBytes,accountAvailableBytes,retention:{enabled,days}}` |
+| GET `/flight-recorder/schedules` | Owned paged schedule list |
 | POST `/flight-recorder/schedules` | Create schedule, 201 + Schedule |
 | PATCH `/flight-recorder/schedules/{id}` | If-Match, edit future occurrence(s), Schedule |
 | DELETE `/flight-recorder/schedules/{id}` | Cancel future occurrence(s), 204; does not delete recorded sessions |
@@ -192,7 +215,10 @@ Example one-off schedule (22:00–04:00 America/New_York):
 {"name":"Friday flight","stationIds":["radio-prendie","defcon"],"startsAt":"2026-10-04T02:00:00Z","endsAt":"2026-10-04T08:00:00Z","timeZone":"America/New_York","recurrence":{"kind":"once"}}
 ```
 
-Schedule response adds `{id,version,state,nextStartsAt,nextEndsAt,stationSnapshots}`.
+GET `/flight-recorder/schedules/{id}` returns an owned Schedule and ETag.
+Schedule response adds `{id,version,state,nextStartsAt,nextEndsAt,stationSnapshots,
+timeCorrections,username,libraryId,stateKey,error?}`. Treat additional fields as
+forward-compatible. States: active/cancelled/finished.
 Recurring request also includes recurrence `{kind:"daily"|"weekly",localStart:"22:00",
 localEnd:"04:00",weekdays:[1,2,3,4,5],endDate:null}`; ISO weekday 1=Monday. Equal
 start/end is invalid, not a silent 24-hour recording. For a one-off fold/gap the
@@ -202,7 +228,7 @@ uses its first occurrence; compute both UTC boundaries and show actual duration.
 If DST produces a window over duration/capacity limits, skip that occurrence with
 an explicit reason. Record occurrence identity so restart cannot fire it twice.
 
-Freeze selected station IDs, labels and resolved-input source URLs per occurrence;
+Freeze selected station IDs, labels and configured source URLs per occurrence;
 future recurring occurrences use the schedule's explicit station selection, not
 whatever later becomes the first six presets. Updated/deleted sources require an
 explicit schedule edit or show a validation failure. Before dispatch, revalidate
@@ -214,7 +240,9 @@ Session states: `scheduled → recording → finalizing → complete|partial|fai
 one session per occurrence. The schedule and its occurrence are distinct IDs.
 Session fields: `{id,scheduleId?,name,state,startsAt,endsAt,actualStartedAt?,
 durationMs,stationCount,capturedBytes,stations,stopReason?,manifestRevision?,version}`.
-Station progress includes `{stationId,state,capturedDurationMs,bytes,error?}`.
+Station progress includes `{stationId,station,state,capturedDurationMs,bytes,error?,segments,metadata}`.
+Session also returns `username`, `libraryId`, `deleted`, `reservedBytes`.
+Progress arrays may be null before capture; finalized manifest arrays are always arrays.
 
 ## Offline manifest and shared timeline
 
@@ -228,10 +256,14 @@ contains no expiring URLs or credentials. Resolve each asset through a media lea
 that asset. At timeline T select its containing segment and seek to
 `mediaStartMs + T - startMs`. Validate finite positive durations, coverage bounds,
 non-overlap, unique IDs and hashes. Partial capture lists explicit uncovered gaps;
-no station shifts earlier to close them. Metadata uses the same timeline.
+no station shifts earlier to close a detected disconnect/restart gap.
+Timeline anchors use first received audio time and exact media presentation
+durations. Sub-deadline stalls within one decoder attempt and broadcaster delivery
+delays are not sample-accurately reconstructed. The idle deadline is 15 seconds;
+reconnects create new anchors. Do not claim synchronized broadcaster clocks. Metadata uses the same timeline.
 
-Manifest revision and assets are immutable after finalization. Corrections publish
-a new revision. Download identity is installation/account/session/revision/asset;
+Manifest revision and assets are immutable after finalization. This release does
+not provide a correction mutation. Download identity is installation/account/session/revision/asset;
 validate bytes and SHA-256 before atomic promotion. Client readiness requires all
 assets referenced by its selected manifest, plus the manifest itself, locally
 verified. A partially captured session can be fully downloaded: show “Ready offline
@@ -246,10 +278,36 @@ No recorded radio scrobbles are submitted as Navidrome library tracks.
 
 ## Required shared fixtures and evidence
 
-S0 publishes sanitized JSON fixtures for every DTO/error and a fixture server
+Checked-in `fixtures/v1` provides sanitized DTO examples, errors, sample audio
+and manifests. Equivalent request/response contract tests live in
+`internal/server/v1*_test.go` and `recorder*_test.go`. `cmd/weazlfixture` provides
+a fixture server
 with two users, independent devices, repeat playlist entries, original/ranged
-media, expired/renewable leases, six tracks and a reconnect gap. Include 30-minute
+media, expired/renewable leases, six synthetic streams and a reconnect gap. The native handoff is
+`docs/NATIVE_HANDOFF.md`; recorder acceptance client is `scripts/recorder-client.py`. Include 30-minute
 leave/20-minute return timeline assertions, global pause, restart recovery,
 capacity failure, partial download and checksum failure. Contract changes require
 fixture and client-snapshot updates. Apple background transfer/AVPlayer support
 remains native-device evidence even when server tests pass.
+
+## Persistence and migration
+
+One process owns one durable data directory; an advisory lock rejects a second
+writer. Native credentials, idempotency results, stations, schedules and manifests
+are AES-GCM encrypted in SQLite WAL alongside the existing encrypted account store.
+Keep the encryption key, database/WAL and recordings together in backups. Browser
+cookies still expire at restart; native refresh and recording ownership survive.
+Ordinary device/browser login does not revoke other devices. Successful password
+or account-connection changes revoke native sessions and leases; failed changes
+preserve them. Changed library identity namespaces presets/queues/cache IDs anew,
+while existing recordings remain owned by the stable account.
+
+Native stations migrate lazily from legacy favorites with stable IDs. Browser
+station writes require the shared stationsVersion and return 409 when stale. Web
+queues use a browser-local device ID and do not overwrite native queues. Recorder
+workers belong to the application and survive logout/tab closure; shutdown leaves
+remaining windows recoverable. A stopped session retains its original logical
+duration with a stopped gap after the captured prefix. Missing whole windows become
+missed, never shifted. Default retention is disabled. Explicit server deletion or
+retention produces tombstones; already open transfers may finish, new leases fail.
+An offline phone copy is never deleted by a server retention operation.

@@ -1,6 +1,6 @@
 # WeazlTunes server workbook for Sol
 
-Created 2026-10-03. Source baseline: `75da1c5`. Status: **planned, not implemented**.
+Created 2026-10-03. Source baseline: `75da1c5`. Status: **implemented; release checks passed; overnight soak and Apple acceptance pending**.
 
 Implement WeazlTunes as the primary backend for the native Subweazl app and add
 Flight Recorder to the server and web UI. Read this workbook, `README.md`,
@@ -48,9 +48,10 @@ These are proposed engineering defaults, reversible without a new product gate:
 | Browser playback | One audible source; shared logical recorder timeline |
 | HLS | Advertise unavailable until implemented and tested; do not mislabel as supported |
 
-Make capacity, storage and retention visible before scheduling. Storage estimates
-are estimates: six 128 kbps streams for six hours use about 2.07 GB before metadata
-and container overhead; variable bitrates require headroom. Never silently delete
+Make capacity, storage and retention visible before scheduling. The user selected
+the iPod profile: FDK AAC-LC160 kbps/44100/stereo. Six streams for six hours encode
+roughly 2.59 GB before packaging; reserve 5.18 GB with headroom. A lower-bitrate
+input can grow. Never silently delete
 pinned phone downloads when server retention runs. Removing a phone copy and
 removing a server recording are distinct actions.
 
@@ -78,8 +79,11 @@ Work in reviewable commits. Preserve source and data migrations; do not replace
 working browser routes wholesale. Update this task board, `docs/VERIFICATION.md`
 and the final handoff with commands, commit IDs, evidence and limitations.
 Never use real users' playlists or listening history for mutation tests.
-Use synthetic radio, fake Navidrome and temporary storage. Do not publish/deploy
-or touch production data as a side effect of implementing this workbook.
+Use synthetic radio, fake Navidrome and temporary storage. The user explicitly
+authorized commit, push to main and production deployment on 2026-10-03, overriding
+the original no-deploy boundary. Preserve the existing volume/key and rollback
+image; do not mutate real playlists or listening history for tests. The user
+authorized Luna to run the six-hour isolated soak after implementation/deployment.
 
 Do not assume the iOS app can store a web cookie and be finished. Device refresh,
 server restarts, independent login and authenticated Apple media requests are
@@ -89,15 +93,15 @@ handoff. Do not change payloads silently while the native client is being built.
 
 ## S0 Contract and deterministic fixtures
 
-- [ ] Freeze the initial v1 contract in `docs/SUBWEAZL_API_V1.md`; turn its JSON
+- [x] Freeze the initial v1 contract in `docs/SUBWEAZL_API_V1.md`; turn its JSON
   shapes into checked-in sanitized fixtures and an OpenAPI document or equivalent
   request/response contract tests. Do not advertise endpoints before they work.
-- [ ] Add injectable wall/monotonic clocks, temporary media storage and radio
+- [x] Add injectable wall/monotonic clocks, temporary media storage and radio
   fixtures with known audio duration, metadata changes, stalls and reconnects.
-- [ ] Record Go/container/media-tool versions. Evaluate a maintained media
+- [x] Record Go/container/media-tool versions. Evaluate a maintained media
   demuxer/packager, including a pinned FFmpeg toolchain if chosen; record license,
   CPU and image impact. Do not implement byte-count-to-time seeking.
-- [ ] Test the proposed media output in a standard player and hand samples to the
+- [x] Test the proposed media output in a standard player and hand samples to the
   native owner for AVPlayer validation. Mark Apple acceptance pending on Linux.
 
 Exit: two users, two library identities, deterministic audio/manifest examples,
@@ -106,19 +110,19 @@ library/preset/schedule/partial/complete-manifest fixture examples early.
 
 ## S1 Native accounts and media authorization
 
-- [ ] Add v1 login, refresh, logout and device list/revoke. Store refresh verifiers
+- [x] Add v1 login, refresh, logout and device list/revoke. Store refresh verifiers
   durably; never store plaintext bearer credentials in logs or returned account
   objects. Store upstream tokens in the existing encrypted account store.
-- [ ] Login on one device must not revoke another. Explicit account security
+- [x] Login on one device must not revoke another. Explicit account security
   revocation still works. Existing browser cookies/CSRF protection remain valid.
-- [ ] Refresh rotation handles concurrent requests and a lost response using the
+- [x] Refresh rotation handles concurrent requests and a lost response using the
   contract's idempotency rule. Scope sessions to account and library identity.
-- [ ] Restart retains authorized device refresh sessions. Upstream downtime must
+- [x] Restart retains authorized device refresh sessions. Upstream downtime must
   not block valid local device refresh or access to owned recordings.
-- [ ] Add scoped media leases usable by native playback and resumable downloads.
+- [x] Add scoped media leases usable by native playback and resumable downloads.
   Exercise Range/HEAD/416, lease expiry/revocation and renewal. Logs redact lease
   URLs. Do not forward device credentials to Navidrome or radio destinations.
-- [ ] Preserve server-side upstream permission checks. Password/connection changes
+- [x] Preserve server-side upstream permission checks. Password/connection changes
   have an explicit revocation and library-identity migration policy.
 
 Exit: browser + two native devices remain signed in; revoke one independently;
@@ -127,19 +131,19 @@ header workaround or undocumented AVURLAsset keys are assumed.
 
 ## S2 Complete the music and preset API
 
-- [ ] Implement normalized v1 library read shapes, pagination, capabilities and
+- [x] Implement normalized v1 library read shapes, pagination, capabilities and
   library identity. Preserve optional metadata, repeat playlist entries and IDs.
-- [ ] Add artist/album/track favorites, durable scrobble idempotency and playlist
+- [x] Add artist/album/track favorites, durable scrobble idempotency and playlist
   ordered replacement with ownership/conflict checks. Never report upstream
   mutation success without confirmation; return ambiguous outcomes explicitly.
-- [ ] Add original-file download, cover and stream leases; declare quality/seek
+- [x] Add original-file download, cover and stream leases; declare quality/seek
   capabilities. Original download must not silently use a transcoded stream.
-- [ ] Migrate stations to stable IDs and ordered favorites. Provide dedicated
+- [x] Migrate stations to stable IDs and ordered favorites. Provide dedicated
   versioned station/preset CRUD; concurrent edits return conflicts, and changing
   presets cannot overwrite a playback queue.
-- [ ] Keep queue restore per device. Shared presets and library are account-wide;
+- [x] Keep queue restore per device. Shared presets and library are account-wide;
   do not force cross-device queue takeover as part of this feature.
-- [ ] Expose server Mood/directory capability and document its native contract,
+- [x] Expose server Mood/directory capability and document its native contract,
   including cancellation and stream events, so the client can support it without
   reverse-engineering browser internals. Admin UI may remain in the web app.
 
@@ -149,22 +153,22 @@ reorder/duplicates, scrobble retry and original download cannot regress.
 
 ## S3 Durable scheduler and recorder ownership
 
-- [ ] Introduce versioned durable job/session records and recovery migrations.
+- [x] Introduce versioned durable job/session records and recovery migrations.
   Prefer SQLite for transactional scheduler claims, manifests and quotas; record
   the dependency/toolchain choice. Keep encrypted account settings compatible.
-- [ ] Separate application-owned worker lifecycle from HTTP and login contexts.
+- [x] Separate application-owned worker lifecycle from HTTP and login contexts.
   Jobs belong to stable account IDs and freeze chosen station IDs/URLs at creation.
-- [ ] Implement create/edit/cancel/list schedules, immediate record, start/end
+- [x] Implement create/edit/cancel/list schedules, immediate record, start/end
   windows and capacity checks. Server enforces one to six unique owned presets.
-- [ ] Resolve local dates to UTC before saving one-off jobs. Persist zone/rule for
+- [x] Resolve local dates to UTC before saving one-off jobs. Persist zone/rule for
   recurrence. Return actual UTC instances and explain DST corrections. Never
   silently reinterpret a saved one-off job when the phone changes time zones.
-- [ ] Atomically claim jobs, limit streams, checkpoint progress and make retries
+- [x] Atomically claim jobs, limit streams, checkpoint progress and make retries
   idempotent. On restart, resume an active remaining window, mark downtime gaps,
   and mark fully missed windows missed; do not shift the original end time.
-- [ ] Stop finalizes the captured prefix; cancel-before-start records nothing.
+- [x] Stop finalizes the captured prefix; cancel-before-start records nothing.
   Cancel future repeats does not delete finished sessions. Delete is explicit.
-- [ ] Integrate clean worker shutdown with `cmd/weazltunes/main.go`; recover from
+- [x] Integrate clean worker shutdown with `cmd/weazltunes/main.go`; recover from
   forced termination without advertising unfinished files as complete.
 
 Exit: fake-clock tests cover 22:00–04:00, DST folds/skips, overlap rejection,
@@ -174,21 +178,21 @@ broadcast time while it is powered off.
 
 ## S4 Capture and seekable session files
 
-- [ ] Run bounded independent capture workers sharing one scheduled timeline.
+- [x] Run bounded independent capture workers sharing one scheduled timeline.
   Reuse radio connection validation and ICY parsing. Never attach library secrets
   to stations; retry with backoff inside the original recording window.
-- [ ] Timestamp media on a common server clock, mapping media presentation time
+- [x] Timestamp media on a common server clock, mapping media presentation time
   to session time. Record initial delay, disconnects, codec changes and gaps.
   Preserve the experience of simultaneously received streams; do not claim
   sample-accurate alignment of broadcasters with unrelated delivery delays.
-- [ ] Write durable, seekable segments with exact durations, byte sizes and SHA-256
+- [x] Write durable, seekable segments with exact durations, byte sizes and SHA-256
   checksums. Stage files, validate them, then atomically publish immutable assets.
-- [ ] Store ICY title changes at session offsets, never as library scrobbles.
-- [ ] Enforce disk reserve, user/installation budgets, per-station limits and
+- [x] Store ICY title changes at session offsets, never as library scrobbles.
+- [x] Enforce disk reserve, user/installation budgets, per-station limits and
   stalled-transfer deadlines. One failed station must not kill five healthy ones.
-- [ ] Finalize a manifest that distinguishes complete/partial/failed and describes
+- [x] Finalize a manifest that distinguishes complete/partial/failed and describes
   every track's coverage. A gap must not compress any station's elapsed time.
-- [ ] Retention/deletion cannot race downloads into silent corruption. Published
+- [x] Retention/deletion cannot race downloads into silent corruption. Published
   assets are immutable; use tombstones/conflict responses and documented leases.
 
 Exit: generated tone/cue streams prove switching at minute 30 and returning at
@@ -198,19 +202,19 @@ soak with disk/CPU/timing results before calling overnight recording validated.
 
 ## S5 Download and management surface
 
-- [ ] Serve owned session list/detail/manifests, conditional ETags, immutable
+- [x] Serve owned session list/detail/manifests, conditional ETags, immutable
   segment assets with HEAD/Range, checksums and renewable scoped media leases.
-- [ ] Add web Flight Recorder entry under Internet Radio plus upcoming recordings,
+- [x] Add web Flight Recorder entry under Internet Radio plus upcoming recordings,
   new/edit schedule, active capture, per-station failures, completed sessions,
   storage use and delete/cancel/stop controls.
-- [ ] Preset picker enforces six, preserves saved order, and freezes its selection.
+- [x] Preset picker enforces six, preserves saved order, and freezes its selection.
   Duration defaults to four hours; explicit end time controls overnight windows.
-- [ ] UI separates server capture status from any device's local download status.
+- [x] UI separates server capture status from any device's local download status.
   Server complete never means a phone has a usable offline copy.
-- [ ] If browser playback is included, implement one shared session clock, global
+- [x] If browser playback is included, implement one shared session clock, global
   pause/seek, preset switch at current time, gap handling and resume position.
   Keep browser background/offline claims separate from native device evidence.
-- [ ] Provide read-only status polling with backoff initially; SSE is optional.
+- [x] Provide read-only status polling with backoff initially; SSE is optional.
   Background recording must never depend on an open event-stream connection.
 
 Exit: browser fixture flow schedules, edits/cancels, records, sees partial capture,
@@ -219,22 +223,27 @@ mutate them. API client downloads assets, validates checksums and seeks locally.
 
 ## S6 Release and native handoff
 
-- [ ] `go test -race ./...`, `go vet ./...`, existing browser smoke and new recorder
+- [x] `go test -race ./...`, `go vet ./...`, existing browser smoke and new recorder
   browser/integration checks pass. Run with fresh and migrated temporary volumes.
-- [ ] Verify container shutdown/restart, volume backup/restore, retention, health
+- [x] Verify container shutdown/restart, volume backup/restore, retention, health
   versus recorder degradation and media-tool deployment. Preserve port 4000.
-- [ ] Document routes, final DTOs, errors, auth lifetimes, capability flags, limits,
+- [x] Document routes, final DTOs, errors, auth lifetimes, capability flags, limits,
   migration policy and tested media format. Commit fixtures and example clients.
 - [ ] Record six-hour soak evidence and any platform/format gaps. Update README,
   DEPLOYMENT, VERIFICATION and this workbook. No blanket "complete" from mocks.
-- [ ] Hand native owner the exact commit/contract revision, fixture account setup,
+- [x] Hand native owner the exact commit/contract revision, fixture account setup,
   sample manifests/audio and runnable fixture server. No production passwords.
 
 ## Progress and resume handoff
 
 | Stage | Status | Evidence |
 | --- | --- | --- |
-| S0–S6 | Planned | 2026-10-03 audit only; existing 20 Go tests passed with race detector |
+| S0 | Implemented | Contract2026-10-03.2, checked-in DTO/error/media fixtures, pinned tools, actual Chromium/FFmpeg decode; Apple pending |
+| S1–S2 | Implemented | Independent devices/restart/replay/revocation, leases/ranges, normalized library and confirmed mutation tests |
+| S3 | Implemented | Encrypted SQLite, app-owned workers, injected-clock/DST/capacity/ownership/missed/restart tests |
+| S4 | Implemented; overnight gate pending | Six-stream60s FDK run, AAC/VBR input tests, forced kill/recovery, checksum/seek; Luna6h soak pending |
+| S5 | Implemented | Browser overnight create/edit/cancel, tab-close capture, real AAC playback switch/pause/seek, deletion/mobile |
+| S6 | Release checks passed; soak/Apple pending | Race/vet, existing/new browser tests, image builds, volume recovery; see VERIFICATION.md |
 
 Sol resume prompt:
 
@@ -244,3 +253,10 @@ Sol resume prompt:
 > fixtures and native device authentication, then music/preset coverage and
 > durable Flight Recorder scheduling/capture. Test with isolated fixtures,
 > update evidence and report the API contract revision to the iOS owner.
+
+Evidence boundaries: physical ENOSPC was not induced on the shared filesystem;
+reserve exhaustion, quota rejection and invalid partial media are tested.
+Timestamp mapping preserves detected disconnect/restart gaps; it does not
+reconstruct sub-deadline stalls or synchronize independent broadcaster clocks.
+Recurrence capacity uses a one-year horizon and runtime enforcement. Apple
+acceptance and six-hour soak are explicit outstanding gates, not mock-based passes.
