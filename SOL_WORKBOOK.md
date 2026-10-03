@@ -241,7 +241,7 @@ mutate them. API client downloads assets, validates checksums and seeks locally.
 | S0 | Implemented | Contract2026-10-03.2, checked-in DTO/error/media fixtures, pinned tools, actual Chromium/FFmpeg decode; Apple pending |
 | S1–S2 | Implemented | Independent devices/restart/replay/revocation, leases/ranges, normalized library and confirmed mutation tests |
 | S3 | Implemented | Encrypted SQLite, app-owned workers, injected-clock/DST/capacity/ownership/missed/restart tests |
-| S4 | Implemented; overnight gate pending | Six-stream60s FDK run, AAC/VBR input tests, forced kill/recovery, checksum/seek; Luna6h soak pending |
+| S4 | Implemented; overnight gate pending | Six-stream60s FDK run, AAC/VBR input tests, forced kill/recovery, checksum/seek; Luna6h soak running (15:23:36–21:23:36 UTC; acceptance pending) |
 | S5 | Implemented | Browser overnight create/edit/cancel, tab-close capture, real AAC playback switch/pause/seek, deletion/mobile |
 | S6 | Release checks passed; soak/Apple pending | Race/vet, existing/new browser tests, image builds, volume recovery; see VERIFICATION.md |
 

@@ -83,8 +83,14 @@ production checkout is advanced to the documentation receipt without restarting.
 
 ## Outstanding acceptance
 
-The user explicitly delegated the six-stream, six-hour fixture soak to Luna after
-release. It must record compact resources, timing, bytes, all asset checksums,
+Luna's user-authorized six-stream, six-hour fixture soak started at
+**2026-10-03 15:23:36 UTC**, expected capture end21:23:36 UTC (17:23:36 EDT),
+followed by download/hash/decode checks. Container `weazl-luna-soak-20261003`,
+new isolated volume `weazl-luna-soak-20261003-data`, fixture session
+`848f9f0765eb0b5bc4a3435bb65a2175922731bd697da788f46562a3fbed97f2`,
+image `sha256:8f9856f28266b1ce2620e94d310249207e96bd374d542ab18db8fadd887e8bc8`.
+Artifacts/log are under `test-results/luna-soak-20261003`. Status: **running**,
+not yet accepted. The other local test containers were removed after verification. It must record compact resources, timing, bytes, all asset checksums,
 local seeking and decoded station/cue identity at shared minute30 and50 offsets.
 Use fixture production30-second segments and actual21600-second wall time.
 `overnightValidated:false` remains until that report is reviewed. AVPlayer,
