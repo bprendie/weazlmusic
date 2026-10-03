@@ -41,12 +41,19 @@ protect them with mode0700 directories and restricted access.
 # Substitute the actual Compose project's existing volume name.
 mkdir -m 700 -p ~/weazlmusic-backups/release
 # Retain the current image before a build replaces the local tag.
-docker tag weazltunes-web:local weazltunes-web:rollback-release
+# Tag the running image: a prior failed build may have changed the local tag.
+docker tag "$(docker inspect weazlmusic-weazltunes-1 --format '{{.Image}}')" \
+  weazltunes-web:rollback-release
 docker compose stop
 docker run --rm --user 0 --entrypoint tar \
   -v weazlmusic_weazltunes-data:/source:ro \
   -v "$HOME/weazlmusic-backups/release:/backup" alpine:3.23 \
   -czf /backup/data.tar.gz -C /source .
+# The root archive helper creates a root-owned file; assign it to this operator.
+docker run --rm --user 0 --entrypoint chown \
+  -v "$HOME/weazlmusic-backups/release:/backup" alpine:3.23 \
+  "$(id -u):$(id -g)" /backup/data.tar.gz
+chmod 600 ~/weazlmusic-backups/release/data.tar.gz
 sha256sum ~/weazlmusic-backups/release/data.tar.gz
 # Verify the archive before advancing the checkout.
 git pull --ff-only

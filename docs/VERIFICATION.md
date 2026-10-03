@@ -34,7 +34,7 @@ Alice/Bob accounts; production library mutations are excluded.
 The Now Playing footer now shows the recorder station/session and highlights the
 active recorder source. Footer and recorder play/pause controls share the same
 clock; footer seek controls the session and remains usable after navigation.
-Mood/favorites and library transport shortcuts are disabled for recorder playback.
+Mood/favorites and library transport buttons are disabled for recorder playback.
 Stopping or deleting the playing recording clears its playback selection.
 Saved recordings have individual/select-all checkboxes and a selected count;
 bulk deletion preserves unselected copies, uses each entity's ownership/version
@@ -101,6 +101,28 @@ remained live. Service stopped only for the full-volume archive and replacement.
 
 Documentation-only follow-up commits do not change this tested runtime image;
 production checkout is advanced to the documentation receipt without restarting.
+
+### Recorder web controls deployment
+
+The recorder web controls follow-up is deployed from source
+`f33caaaa8de2d0cef695ce4288105dcee52190bb`, runtime image
+`sha256:cbd92a82d2cccfb9158fc6da28704a55dee53c4814bb554c5dd6a1a89bb5bed7`.
+The container is healthy with zero restarts. HTTP health/root and anonymous
+authentication boundaries passed; the served JavaScript contains the recorder
+highlight and recording-selection controls. The installation ID, API revision
+and encryption-key digest remain unchanged. No production recordings or library
+data were created or deleted for these checks.
+
+The stopped-volume backup is
+`/home/bobp/weazlmusic-backups/20261003T154900Z/data.tar.gz`, mode0600 owned by
+the deployment operator, inside a mode0700 directory. Verified archive SHA-256:
+`1b42d6f6b0683aeb881902eec18cdd6d073e5de822a8159aa6890a6ac8b99e6e`.
+Rollback image `weazltunes-web:rollback-20261003T154900Z` retains the prior running
+image; the same directory contains its override and source/key receipts. An
+earlier attempt failed at archive checksum verification because the archive
+helper created a root-owned file; automatic rollback restored the prior service.
+Assigning the archive to the operator before checksum verification resolved the
+issue, and DEPLOYMENT.md now includes that step.
 
 ## Outstanding acceptance
 
