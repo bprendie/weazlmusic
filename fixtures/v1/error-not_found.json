@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": "not_found",
+    "message": "Sanitized not_found fixture.",
+    "retryable": false,
+    "details": {}
+  }
+}

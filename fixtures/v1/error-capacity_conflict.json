@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": "capacity_conflict",
+    "message": "Sanitized capacity_conflict fixture.",
+    "retryable": false,
+    "details": {}
+  }
+}

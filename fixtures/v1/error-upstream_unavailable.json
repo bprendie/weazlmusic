@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": "upstream_unavailable",
+    "message": "Sanitized upstream_unavailable fixture.",
+    "retryable": true,
+    "details": {}
+  }
+}

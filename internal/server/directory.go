@@ -65,7 +65,11 @@ func (s *Server) directory(w http.ResponseWriter, r *http.Request, se *session) 
 		}
 	} else {
 		d := xml.NewDecoder(io.LimitReader(res.Body, 32<<20))
-		for len(out) < 100 {
+		for len(out) < 100 || strings.HasPrefix(r.URL.Path, "/api/v1/") {
+			if len(out) > 100000 {
+				fail(w, 502, "Directory exceeds the installation limit")
+				return
+			}
 			tok, e := d.Token()
 			if e == io.EOF {
 				break

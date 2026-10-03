@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": "upstream_rejected",
+    "message": "Sanitized upstream_rejected fixture.",
+    "retryable": true,
+    "details": {}
+  }
+}

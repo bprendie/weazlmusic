@@ -1,0 +1,32 @@
+{
+  "data": [
+    {
+      "addedAt": null,
+      "artist": "Boards of Canada",
+      "artistId": null,
+      "coverId": "1",
+      "durationMs": 0,
+      "genre": null,
+      "id": "1",
+      "name": "Music Has the Right to Children",
+      "songCount": null,
+      "starred": false,
+      "year": 2001
+    },
+    {
+      "addedAt": null,
+      "artist": "Boards of Canada",
+      "artistId": null,
+      "coverId": "5",
+      "durationMs": 0,
+      "genre": null,
+      "id": "5",
+      "name": "Music Has the Right to Children / Archive 5",
+      "songCount": null,
+      "starred": false,
+      "year": 2005
+    }
+  ],
+  "nextCursor": "ODc0ZmEzYjAzYmZhOWE1MzBjYzY4MGQwMWZjODhjNTMyMmY3MzgyNzAwYWFjMTA4MWU2NzBjNmEyYjJhMzM3Mzoy",
+  "snapshotRevision": "874fa3b03bfa9a530cc680d01fc88c5322f7382700aac1081e670c6a2b2a3373"
+}

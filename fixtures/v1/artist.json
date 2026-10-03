@@ -1,0 +1,52 @@
+{
+  "data": {
+    "albums": [
+      {
+        "addedAt": null,
+        "artist": "Tycho",
+        "artistId": null,
+        "coverId": null,
+        "durationMs": 0,
+        "genre": null,
+        "id": "0",
+        "name": "Dive",
+        "songCount": null,
+        "starred": false,
+        "year": null
+      },
+      {
+        "addedAt": null,
+        "artist": "Tycho",
+        "artistId": null,
+        "coverId": null,
+        "durationMs": 0,
+        "genre": null,
+        "id": "4",
+        "name": "Dive",
+        "songCount": null,
+        "starred": false,
+        "year": null
+      },
+      {
+        "addedAt": null,
+        "artist": "Tycho",
+        "artistId": null,
+        "coverId": null,
+        "durationMs": 0,
+        "genre": null,
+        "id": "8",
+        "name": "Dive",
+        "songCount": null,
+        "starred": false,
+        "year": null
+      }
+    ],
+    "artist": {
+      "albumCount": null,
+      "coverId": null,
+      "id": "0",
+      "name": "Fixture artist",
+      "starred": false
+    }
+  }
+}

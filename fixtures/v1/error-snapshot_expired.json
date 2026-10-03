@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": "snapshot_expired",
+    "message": "Sanitized snapshot_expired fixture.",
+    "retryable": false,
+    "details": {}
+  }
+}

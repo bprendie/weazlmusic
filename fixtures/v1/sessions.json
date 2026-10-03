@@ -1,0 +1,978 @@
+{
+  "data": [
+    {
+      "id": "6832769f575f8ebd5e16c5a2dcbf2d21979e95b6e6f2a07bacafac00d3cc67d0-1791079200",
+      "scheduleId": "6832769f575f8ebd5e16c5a2dcbf2d21979e95b6e6f2a07bacafac00d3cc67d0",
+      "name": "Contract overnight fixture",
+      "state": "scheduled",
+      "username": "alice",
+      "libraryId": "library-8b47cfc7744302ff5a8c81d1",
+      "startsAt": "2026-10-04T02:00:00Z",
+      "endsAt": "2026-10-04T08:00:00Z",
+      "actualStartedAt": null,
+      "durationMs": 21600000,
+      "stationCount": 6,
+      "capturedBytes": 0,
+      "stations": [
+        {
+          "station": {
+            "id": "station-50d678052e4c3722f53c396b",
+            "name": "Fixture station 1",
+            "streamURL": "https://radio.fixture.invalid/station/0",
+            "preset": true,
+            "order": 0,
+            "version": 3
+          },
+          "stationId": "station-50d678052e4c3722f53c396b",
+          "state": "scheduled",
+          "capturedDurationMs": 0,
+          "bytes": 0,
+          "segments": [],
+          "metadata": []
+        },
+        {
+          "station": {
+            "id": "station-8bfcb62b15211cdf53085f8e",
+            "name": "Fixture station 2",
+            "streamURL": "https://radio.fixture.invalid/station/1",
+            "preset": true,
+            "order": 1,
+            "version": 3
+          },
+          "stationId": "station-8bfcb62b15211cdf53085f8e",
+          "state": "scheduled",
+          "capturedDurationMs": 0,
+          "bytes": 0,
+          "segments": [],
+          "metadata": []
+        },
+        {
+          "station": {
+            "id": "station-d5653b6033c050886ef01ed1",
+            "name": "Fixture station 3",
+            "streamURL": "https://radio.fixture.invalid/station/2",
+            "preset": true,
+            "order": 2,
+            "version": 3
+          },
+          "stationId": "station-d5653b6033c050886ef01ed1",
+          "state": "scheduled",
+          "capturedDurationMs": 0,
+          "bytes": 0,
+          "segments": [],
+          "metadata": []
+        },
+        {
+          "station": {
+            "id": "station-71699023da31810f83b72368",
+            "name": "Fixture station 4",
+            "streamURL": "https://radio.fixture.invalid/station/3",
+            "preset": true,
+            "order": 3,
+            "version": 3
+          },
+          "stationId": "station-71699023da31810f83b72368",
+          "state": "scheduled",
+          "capturedDurationMs": 0,
+          "bytes": 0,
+          "segments": [],
+          "metadata": []
+        },
+        {
+          "station": {
+            "id": "station-1286ed0e1b4ada82a0aa197b",
+            "name": "Fixture station 5",
+            "streamURL": "https://radio.fixture.invalid/station/4?reconnect=1",
+            "preset": true,
+            "order": 4,
+            "version": 3
+          },
+          "stationId": "station-1286ed0e1b4ada82a0aa197b",
+          "state": "scheduled",
+          "capturedDurationMs": 0,
+          "bytes": 0,
+          "segments": [],
+          "metadata": []
+        },
+        {
+          "station": {
+            "id": "station-0e8a0b6d7aa82019328069fb",
+            "name": "Fixture station 6",
+            "streamURL": "https://radio.fixture.invalid/station/5?stall=1",
+            "preset": true,
+            "order": 5,
+            "version": 3
+          },
+          "stationId": "station-0e8a0b6d7aa82019328069fb",
+          "state": "scheduled",
+          "capturedDurationMs": 0,
+          "bytes": 0,
+          "segments": [],
+          "metadata": []
+        }
+      ],
+      "version": 1,
+      "deleted": false,
+      "reservedBytes": 5184000000
+    },
+    {
+      "id": "c39b0581bffb656853034c9f2800c183d65ce350e64d2f79283bdc31db9d98f5",
+      "name": "180s six-stream fixture",
+      "state": "recording",
+      "username": "alice",
+      "libraryId": "library-8b47cfc7744302ff5a8c81d1",
+      "startsAt": "2026-10-03T14:58:39.739127036Z",
+      "endsAt": "2026-10-03T15:01:39.739127036Z",
+      "actualStartedAt": "2026-10-03T14:58:39.920160155Z",
+      "durationMs": 180000,
+      "stationCount": 6,
+      "capturedBytes": 5071738,
+      "stations": [
+        {
+          "station": {
+            "id": "station-50d678052e4c3722f53c396b",
+            "name": "Fixture station 1",
+            "streamURL": "https://radio.fixture.invalid/station/0",
+            "preset": true,
+            "order": 0,
+            "version": 2
+          },
+          "stationId": "station-50d678052e4c3722f53c396b",
+          "state": "recording",
+          "capturedDurationMs": 45000,
+          "bytes": 901526,
+          "segments": [
+            {
+              "id": "3950adbaee745b9e9b558a9d64acc822b1b4f323",
+              "assetId": "3950adbaee745b9e9b558a9d64acc822b1b4f323",
+              "startMs": 212,
+              "durationMs": 5016,
+              "mediaStartMs": 0,
+              "byteLength": 100477,
+              "sha256": "10ae027e1ee44cd54bc0cfc2aeafa88d390fca59e947a984b68e5628357b46d7",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "5d4af0fc9d216b9dda5fd90930a5c9d536f6a8ef",
+              "assetId": "5d4af0fc9d216b9dda5fd90930a5c9d536f6a8ef",
+              "startMs": 5228,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "7665bc15705ffa9260afbfda5a1bd41da4d660a13b0dad06d9615aa06410dbad",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "f78c3a21b804581c9177d5f437cbd71a0feaae10",
+              "assetId": "f78c3a21b804581c9177d5f437cbd71a0feaae10",
+              "startMs": 10220,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "96ce181e6e158ed339eced333984004244887da5c51314995bc4f9e61ffea196",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "f6a13a4dd55ba7b9f413a88209e51f14f6fb9e5d",
+              "assetId": "f6a13a4dd55ba7b9f413a88209e51f14f6fb9e5d",
+              "startMs": 15212,
+              "durationMs": 5016,
+              "mediaStartMs": 0,
+              "byteLength": 100477,
+              "sha256": "9a34626b403ef16a0f51d1d64351d365b37a32f3b6827b4bbcee9080d34b8e82",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "9cf0d892e10c30fdd8ee14ef7d7de86d55a0e718",
+              "assetId": "9cf0d892e10c30fdd8ee14ef7d7de86d55a0e718",
+              "startMs": 20228,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "3c060bed9072f29ae98b476aea33189548dad5aaa3d922e09468737bede7c113",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "fd53d7f212bcd9b6c797d96658cfa00885f8255d",
+              "assetId": "fd53d7f212bcd9b6c797d96658cfa00885f8255d",
+              "startMs": 25220,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "b503ee0eb89bc1bbad108c3580030981cc52588427caf255f6c631a2d2a750b6",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "97e786c06484f0cf164674c9981e7d61c0c98bd0",
+              "assetId": "97e786c06484f0cf164674c9981e7d61c0c98bd0",
+              "startMs": 30212,
+              "durationMs": 5016,
+              "mediaStartMs": 0,
+              "byteLength": 100477,
+              "sha256": "dbae279439dcb361c6f8a528e85c09ea73cb57a73beba57ddc1f02701d5f8a62",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "02f626c9010062d3a98ff5712d395b971aa3d5c9",
+              "assetId": "02f626c9010062d3a98ff5712d395b971aa3d5c9",
+              "startMs": 35228,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "984d6fddd7b5cb903eabbaf7e0696d388e806e62b96b3cf06355545fdd2ba6a2",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "9e8c39a797ad46458c0c39adb7cb5f065d986979",
+              "assetId": "9e8c39a797ad46458c0c39adb7cb5f065d986979",
+              "startMs": 40220,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100015,
+              "sha256": "b59131813d32ab09f7031d111a095cfa4371eeb5c484476d294d6585706a0811",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            }
+          ],
+          "metadata": [
+            {
+              "atMs": 1196,
+              "title": "Station 1 cue 0",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 10192,
+              "title": "Station 1 cue 1",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 20205,
+              "title": "Station 1 cue 2",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 30205,
+              "title": "Station 1 cue 3",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 40206,
+              "title": "Station 1 cue 4",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 53102,
+              "title": "Station 1 cue 0",
+              "artist": "Fixture Artist"
+            }
+          ]
+        },
+        {
+          "station": {
+            "id": "station-8bfcb62b15211cdf53085f8e",
+            "name": "Fixture station 2",
+            "streamURL": "https://radio.fixture.invalid/station/1",
+            "preset": true,
+            "order": 1,
+            "version": 2
+          },
+          "stationId": "station-8bfcb62b15211cdf53085f8e",
+          "state": "recording",
+          "capturedDurationMs": 45000,
+          "bytes": 901526,
+          "segments": [
+            {
+              "id": "6e17ff42cac7fd2dbe32f280654c5e5d9615bdc4",
+              "assetId": "6e17ff42cac7fd2dbe32f280654c5e5d9615bdc4",
+              "startMs": 212,
+              "durationMs": 5016,
+              "mediaStartMs": 0,
+              "byteLength": 100477,
+              "sha256": "e86e3dc0f583d9d6fd0aefae6650ce98d56459045bae7b1ed459dc5564186248",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "15174325006dcaf199cd43291726873ab85f6c5f",
+              "assetId": "15174325006dcaf199cd43291726873ab85f6c5f",
+              "startMs": 5228,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "e2b207b6e8aba3187658b4cb182fcdaeddb63f5da090967e2de5d43ca4fabad6",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "18eb3ebcb134b4f8d2ac3966ab072f0153ef2409",
+              "assetId": "18eb3ebcb134b4f8d2ac3966ab072f0153ef2409",
+              "startMs": 10220,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "5a4a35bfdd6f946051279eb2216526a4254dd2900e3a0476a7b6f4f65bcd62ec",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "15f9195c5c38cff5b715023741b42f60e9cb0887",
+              "assetId": "15f9195c5c38cff5b715023741b42f60e9cb0887",
+              "startMs": 15212,
+              "durationMs": 5016,
+              "mediaStartMs": 0,
+              "byteLength": 100477,
+              "sha256": "9db1f94eb0831e3c08cb8391e94bff93d1abf12b9f34e95379322d22c05335e2",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "62df6f680c5094c214724f0fcd82cb5c7f7b7ccc",
+              "assetId": "62df6f680c5094c214724f0fcd82cb5c7f7b7ccc",
+              "startMs": 20228,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "a5ef8a3ad8533e88b05a7911e7e00333c25c619dc0897f97b74c4735a5b19d03",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "36e621cad44a2ef8aad2ef573c37e3fa25c9e9c7",
+              "assetId": "36e621cad44a2ef8aad2ef573c37e3fa25c9e9c7",
+              "startMs": 25220,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "895de760e3b8c60f75f9eae8a92c945a85c800c187e27aee36a88ae5dd42f673",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "3e109faa4c102a25e18a638ce0beee1315092c33",
+              "assetId": "3e109faa4c102a25e18a638ce0beee1315092c33",
+              "startMs": 30212,
+              "durationMs": 5016,
+              "mediaStartMs": 0,
+              "byteLength": 100477,
+              "sha256": "94fa3f23f83f6233f24ba0c6b82f560517e63189ca66ba6c82c04c39ac278ff7",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "b0f038ec74c595e50cde2acd56cfd676f291340d",
+              "assetId": "b0f038ec74c595e50cde2acd56cfd676f291340d",
+              "startMs": 35228,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "a99bb7f21d3efd101717a8a3ff7cdbe822adb94f2f7d8384f882e4bad855eaab",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "5ce84ad61aea97fc9874b711875eb94811293d3e",
+              "assetId": "5ce84ad61aea97fc9874b711875eb94811293d3e",
+              "startMs": 40220,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100015,
+              "sha256": "512b4d22f2ffc0d5f45700eb4613d808785b163f1b516f2dd5cdf95b3a0b4f3b",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            }
+          ],
+          "metadata": [
+            {
+              "atMs": 1193,
+              "title": "Station 2 cue 0",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 10202,
+              "title": "Station 2 cue 1",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 20193,
+              "title": "Station 2 cue 2",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 30192,
+              "title": "Station 2 cue 3",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 40204,
+              "title": "Station 2 cue 4",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 53113,
+              "title": "Station 2 cue 0",
+              "artist": "Fixture Artist"
+            }
+          ]
+        },
+        {
+          "station": {
+            "id": "station-d5653b6033c050886ef01ed1",
+            "name": "Fixture station 3",
+            "streamURL": "https://radio.fixture.invalid/station/2",
+            "preset": true,
+            "order": 2,
+            "version": 2
+          },
+          "stationId": "station-d5653b6033c050886ef01ed1",
+          "state": "recording",
+          "capturedDurationMs": 45000,
+          "bytes": 901526,
+          "segments": [
+            {
+              "id": "c4d6f5b0fa18c0c1a65a7687fa9472a5d19737d5",
+              "assetId": "c4d6f5b0fa18c0c1a65a7687fa9472a5d19737d5",
+              "startMs": 212,
+              "durationMs": 5016,
+              "mediaStartMs": 0,
+              "byteLength": 100477,
+              "sha256": "cab75fee7aca567b7ad1d093c305d6a64319f3db8c3f031ca51ff905ea6ed41f",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "c36a26e61ed2d09cc49d5c302c77660a9542eb35",
+              "assetId": "c36a26e61ed2d09cc49d5c302c77660a9542eb35",
+              "startMs": 5228,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "85c2bd4774c75162c869c1d9db0b2cda243e16d8a9ac1f1216415c12fea1b87e",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "2330151f7b98cf5ccbf7c14a81fc50f540155b48",
+              "assetId": "2330151f7b98cf5ccbf7c14a81fc50f540155b48",
+              "startMs": 10220,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "8b18894a0414317b9077f5249d404be1bd17b85bd5071e87a35a6dddefee1a0d",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "08d9fd4890b4e2e4dee11e60c301ecb0cdc2cbb2",
+              "assetId": "08d9fd4890b4e2e4dee11e60c301ecb0cdc2cbb2",
+              "startMs": 15212,
+              "durationMs": 5016,
+              "mediaStartMs": 0,
+              "byteLength": 100477,
+              "sha256": "636505b33216dfbbf2856a0680001da240b0d27dd1cd6e4cae27722b61dd74ae",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "07f6f35c4aa9fbb54f204fed862d02f5a9fbbf64",
+              "assetId": "07f6f35c4aa9fbb54f204fed862d02f5a9fbbf64",
+              "startMs": 20228,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "a4c2b52c5ad10698f9e80c8e2938a1f1d61ccde7fd17aadab552598dcde4f453",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "b7b821c8e5a54972bb3d4580125cfa4bcb94c3b5",
+              "assetId": "b7b821c8e5a54972bb3d4580125cfa4bcb94c3b5",
+              "startMs": 25220,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "a7dbf8b0de1af3f840bce4bf479bec609124b84e65c042bd3d28b04430731402",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "c30c188a29395e232c04e965934e24773335af62",
+              "assetId": "c30c188a29395e232c04e965934e24773335af62",
+              "startMs": 30212,
+              "durationMs": 5016,
+              "mediaStartMs": 0,
+              "byteLength": 100477,
+              "sha256": "6dd435824ee30b455932a9ea8c01a22264ba6d23ff183bfee83d99f9fa3a9658",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "b580c98a40fbe4536efb8f46ed9147fc516c5473",
+              "assetId": "b580c98a40fbe4536efb8f46ed9147fc516c5473",
+              "startMs": 35228,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "ee5baa8127f3b88816625f956016ca7a60b42e8f5cff5a0156fc453e9afceca0",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "0db115eef36c737c2f6acbcec08c44699c5ed842",
+              "assetId": "0db115eef36c737c2f6acbcec08c44699c5ed842",
+              "startMs": 40220,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100015,
+              "sha256": "144568aa7e8d79f1f368b4b64b14df4f5cd96b9950a246e4cb278351e0046b04",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            }
+          ],
+          "metadata": [
+            {
+              "atMs": 1200,
+              "title": "Station 3 cue 0",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 10204,
+              "title": "Station 3 cue 1",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 20202,
+              "title": "Station 3 cue 2",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 30202,
+              "title": "Station 3 cue 3",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 40203,
+              "title": "Station 3 cue 4",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 53115,
+              "title": "Station 3 cue 0",
+              "artist": "Fixture Artist"
+            }
+          ]
+        },
+        {
+          "station": {
+            "id": "station-71699023da31810f83b72368",
+            "name": "Fixture station 4",
+            "streamURL": "https://radio.fixture.invalid/station/3",
+            "preset": true,
+            "order": 3,
+            "version": 2
+          },
+          "stationId": "station-71699023da31810f83b72368",
+          "state": "recording",
+          "capturedDurationMs": 45000,
+          "bytes": 901526,
+          "segments": [
+            {
+              "id": "253f29df2529f3560b16c60a9cf207b86b9a07f6",
+              "assetId": "253f29df2529f3560b16c60a9cf207b86b9a07f6",
+              "startMs": 212,
+              "durationMs": 5016,
+              "mediaStartMs": 0,
+              "byteLength": 100477,
+              "sha256": "aa5a49a778028cb1711a55b8077fdb65fb963c4da93190d802560b162c8a2720",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "e2e7391ad8d2441264e231b015b5045ba9a1d4cd",
+              "assetId": "e2e7391ad8d2441264e231b015b5045ba9a1d4cd",
+              "startMs": 5228,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "37856117c2711c08414c3040553289232c08426aec87a3452f0ad1fa9999ec75",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "cad88b88f31a97637d2b5c448c669e5543e0f29b",
+              "assetId": "cad88b88f31a97637d2b5c448c669e5543e0f29b",
+              "startMs": 10220,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "94990b66c8fd58b04e95d34cf7fdef9a84d4a751219bf7b80e079e330495cd95",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "10e0d35401d1d902291961ba66d13c5d208accae",
+              "assetId": "10e0d35401d1d902291961ba66d13c5d208accae",
+              "startMs": 15212,
+              "durationMs": 5016,
+              "mediaStartMs": 0,
+              "byteLength": 100477,
+              "sha256": "904ed0d57a40ba61862b2e5c9f999fa5a23906227a6b498eb71495391071c6f7",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "100bc5f8f122ccce8b9cd180c5e821ebdc1604ba",
+              "assetId": "100bc5f8f122ccce8b9cd180c5e821ebdc1604ba",
+              "startMs": 20228,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "9a45c916dab87b299351e4ae10f91b74da86c567dfe85c35aeb709e16308f2d1",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "2134ea745998ca379b8ccada27959a3edd212439",
+              "assetId": "2134ea745998ca379b8ccada27959a3edd212439",
+              "startMs": 25220,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "fc9e783b7d555210231cffe3efc8be2351d670f270badc17bc528a4aa63a4e2e",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "a65070d244fa525a462cd33ec153479721ee1afc",
+              "assetId": "a65070d244fa525a462cd33ec153479721ee1afc",
+              "startMs": 30212,
+              "durationMs": 5016,
+              "mediaStartMs": 0,
+              "byteLength": 100477,
+              "sha256": "787c75fa23eb70af6ff2aa53f6d637576e5b016e3eafbd7ba900728650899331",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "a2f71af3efe84d7cafd42bc7996ae0041031d306",
+              "assetId": "a2f71af3efe84d7cafd42bc7996ae0041031d306",
+              "startMs": 35228,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "8eae86e8da8cc274f6bd940174a54f157f81fe20590ffae29f62ad9fc41e24bc",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "904f8bb7fb399db322f7aecab28bfa29e2d662ea",
+              "assetId": "904f8bb7fb399db322f7aecab28bfa29e2d662ea",
+              "startMs": 40220,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100015,
+              "sha256": "e0a978aee20bc9db3bcba7e060afb916236858623e3512a274d426136314e4ea",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            }
+          ],
+          "metadata": [
+            {
+              "atMs": 1199,
+              "title": "Station 4 cue 0",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 10206,
+              "title": "Station 4 cue 1",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 20204,
+              "title": "Station 4 cue 2",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 30206,
+              "title": "Station 4 cue 3",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 40193,
+              "title": "Station 4 cue 4",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 53119,
+              "title": "Station 4 cue 0",
+              "artist": "Fixture Artist"
+            }
+          ]
+        },
+        {
+          "station": {
+            "id": "station-1286ed0e1b4ada82a0aa197b",
+            "name": "Fixture station 5",
+            "streamURL": "https://radio.fixture.invalid/station/4?reconnect=1",
+            "preset": true,
+            "order": 4,
+            "version": 2
+          },
+          "stationId": "station-1286ed0e1b4ada82a0aa197b",
+          "state": "recording",
+          "capturedDurationMs": 44071,
+          "bytes": 883071,
+          "segments": [
+            {
+              "id": "7981c9ed5a50eba6b3fcbf418602318b03a51686",
+              "assetId": "7981c9ed5a50eba6b3fcbf418602318b03a51686",
+              "startMs": 212,
+              "durationMs": 4063,
+              "mediaStartMs": 0,
+              "byteLength": 81560,
+              "sha256": "b2fe0796d50a8945fadc95f111f598f6bf9ec0a651bd0df5e3525a76f140f46a",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "88937e59ead9b554628a58ed585a217831146eea",
+              "assetId": "88937e59ead9b554628a58ed585a217831146eea",
+              "startMs": 5261,
+              "durationMs": 5016,
+              "mediaStartMs": 0,
+              "byteLength": 100477,
+              "sha256": "e03523ee6994e6c6e94fe38e16175c05cea1292c2b6c70883b15be51302a3b23",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "5e733fb93c9c73cd81c9b3715cc2f1f3f88dea5f",
+              "assetId": "5e733fb93c9c73cd81c9b3715cc2f1f3f88dea5f",
+              "startMs": 10277,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "6fe170422d1dbcf938134515bd63f03f33771a8995c4f462128b7b111fc78726",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "2af153061f5127f25e9ead28307099d0c87dca28",
+              "assetId": "2af153061f5127f25e9ead28307099d0c87dca28",
+              "startMs": 15269,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "30018d93e1ed83b0e3db8c7d9089d853cde2d601c244fb074711533c2049819d",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "00aab0fdf889389e5212c36105849bdb90140700",
+              "assetId": "00aab0fdf889389e5212c36105849bdb90140700",
+              "startMs": 20261,
+              "durationMs": 5016,
+              "mediaStartMs": 0,
+              "byteLength": 100477,
+              "sha256": "2c3994a4e0cde9b3d9b9867f2a4056d2701d1b10576644e21ae38108b4336784",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "1959d6993d4fbb426e7274c38aaf3357e62de3e9",
+              "assetId": "1959d6993d4fbb426e7274c38aaf3357e62de3e9",
+              "startMs": 25277,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "d658ed02927658730cb8e249c60d7c3b266392b6c267fe561f0064c05fa58d1b",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "71bd269b3b516de8a3566fe0cc9bcbe784d59d4f",
+              "assetId": "71bd269b3b516de8a3566fe0cc9bcbe784d59d4f",
+              "startMs": 30269,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "71ca55bda450031ca081fe1e5bc1ef62abba19203e2477bbc0cfe33062fbd718",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "60d6a909abf4d6bc0d7d1a5a93cd2e13fa77e184",
+              "assetId": "60d6a909abf4d6bc0d7d1a5a93cd2e13fa77e184",
+              "startMs": 35261,
+              "durationMs": 5016,
+              "mediaStartMs": 0,
+              "byteLength": 100477,
+              "sha256": "f5bcd3d7451c8c835627ec5d9a05a50bf8faa06ec1092a4b5d295c25390b9396",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "55c057e232d2acf1f92afb8693a5746502ff07d2",
+              "assetId": "55c057e232d2acf1f92afb8693a5746502ff07d2",
+              "startMs": 40277,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "288c6d2803fae3dfd483bfed422cfa68b3485985ff7788c4cc45de3b80632c6a",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            }
+          ],
+          "metadata": [
+            {
+              "atMs": 1202,
+              "title": "Station 5 cue 0",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 15240,
+              "title": "Station 5 cue 1",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 25242,
+              "title": "Station 5 cue 2",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 35241,
+              "title": "Station 5 cue 3",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 45242,
+              "title": "Station 5 cue 4",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 53116,
+              "title": "Station 5 cue 0",
+              "artist": "Fixture Artist"
+            }
+          ]
+        },
+        {
+          "station": {
+            "id": "station-0e8a0b6d7aa82019328069fb",
+            "name": "Fixture station 6",
+            "streamURL": "https://radio.fixture.invalid/station/5?stall=1",
+            "preset": true,
+            "order": 5,
+            "version": 2
+          },
+          "stationId": "station-0e8a0b6d7aa82019328069fb",
+          "state": "recording",
+          "capturedDurationMs": 29071,
+          "bytes": 582563,
+          "segments": [
+            {
+              "id": "03e5308eeac1b9ff304fcf1d11384bc768c1ea77",
+              "assetId": "03e5308eeac1b9ff304fcf1d11384bc768c1ea77",
+              "startMs": 212,
+              "durationMs": 4063,
+              "mediaStartMs": 0,
+              "byteLength": 81560,
+              "sha256": "863799ccd28be853ff46193fbfac095693f664e382dfaa3bc5919cce70a4b8d1",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "82fcc261cd66b76a0fda8d57f159080a066d22ea",
+              "assetId": "82fcc261cd66b76a0fda8d57f159080a066d22ea",
+              "startMs": 21257,
+              "durationMs": 5016,
+              "mediaStartMs": 0,
+              "byteLength": 100477,
+              "sha256": "d6fa63e0c10b1d0ce239c2f13940154a7639b2e01472b87d74be096cc3068fd7",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "89a6cde4785b9a2736dff8033fb4a9ee7a90520e",
+              "assetId": "89a6cde4785b9a2736dff8033fb4a9ee7a90520e",
+              "startMs": 26273,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100017,
+              "sha256": "39dac369cad4960c632aacdf90d0719f2298fe65b58045b59e3465b2880b1f0d",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "4b0673359750d86a7d6915c6386888bcbafae904",
+              "assetId": "4b0673359750d86a7d6915c6386888bcbafae904",
+              "startMs": 31265,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "53f2b4c6ec6321702b3e53ada234d393f3d092f77d79c4802751a89dcd251f13",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "c343ac60f006b7247057d92803ab2495705f257d",
+              "assetId": "c343ac60f006b7247057d92803ab2495705f257d",
+              "startMs": 36257,
+              "durationMs": 5016,
+              "mediaStartMs": 0,
+              "byteLength": 100477,
+              "sha256": "83368d5cd9c716ed3457438240d68865080b47ffaf8370ff5ad917498b8e8020",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            },
+            {
+              "id": "550a287f929454790ba0f6b7d5ca00e1f2f4d850",
+              "assetId": "550a287f929454790ba0f6b7d5ca00e1f2f4d850",
+              "startMs": 41273,
+              "durationMs": 4992,
+              "mediaStartMs": 0,
+              "byteLength": 100016,
+              "sha256": "c92963354565bb7559881f02aea41ad34c7b59586f64d5990044808913bc14c8",
+              "contentType": "audio/mp4",
+              "codec": "aac-lc"
+            }
+          ],
+          "metadata": [
+            {
+              "atMs": 1198,
+              "title": "Station 6 cue 0",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 31246,
+              "title": "Station 6 cue 1",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 41247,
+              "title": "Station 6 cue 2",
+              "artist": "Fixture Artist"
+            },
+            {
+              "atMs": 53118,
+              "title": "Station 6 cue 0",
+              "artist": "Fixture Artist"
+            }
+          ]
+        }
+      ],
+      "version": 90,
+      "deleted": false,
+      "reservedBytes": 43200000
+    }
+  ],
+  "nextCursor": null,
+  "snapshotRevision": "ec5c6f57b405c6022a4d07258a675fed098cd7317a88414a4e51c5b93813775b"
+}

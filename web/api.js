@@ -1,7 +1,8 @@
 import {state, toast} from './state.js';
+import {browserDevice} from './device.js';
 export async function api(path, method = 'GET', data, signal) {
   const response = await fetch('/api/' + path, {
-    method, signal, headers: method === 'GET' ? {} : {'Content-Type':'application/json', 'X-Weazl-Request':'1'},
+    method, signal, headers: {'X-Weazl-Device':browserDevice(),...(method === 'GET' ? {} : {'Content-Type':'application/json', 'X-Weazl-Request':'1'})},
     body: data === undefined ? undefined : JSON.stringify(data),
   });
   const body = await response.json();
@@ -18,10 +19,10 @@ export function flushState() {
   clearTimeout(saveTimer);
   const gen = generation;
   if (!state.user) return Promise.resolve();
-  const snapshot = structuredClone({stations: state.stations, queue: state.queue, current: state.current?.url ? state.resume : state.current});
+  const snapshot = structuredClone({stations: state.stations, stationsVersion:state.stationsVersion, queue: state.queue, current: state.current?.url ? state.resume : state.current});
   const write = saveChain.then(() => {
     if (gen !== generation) return;
-    return api('state', 'PUT', snapshot);
+    return api('state', 'PUT', {...snapshot,stationsVersion:state.stationsVersion}).then(out => {state.stationsVersion=out.stationsVersion; for (const saved of out.stations || []) {const current=state.stations.find(s=>s.url===saved.url);if(current){current.id=saved.id;current.version=saved.version;}}});
   });
   saveChain = write.catch(() => {});
   return write;

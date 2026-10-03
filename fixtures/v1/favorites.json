@@ -1,0 +1,18 @@
+{
+  "data": [
+    {
+      "id": "0",
+      "kind": "album"
+    },
+    {
+      "id": "0",
+      "kind": "artist"
+    },
+    {
+      "id": "0-0",
+      "kind": "track"
+    }
+  ],
+  "nextCursor": null,
+  "snapshotRevision": "349e50791aec84f52d8cd60aed451f3effd1ccee06365d53fde77660f411aee1"
+}

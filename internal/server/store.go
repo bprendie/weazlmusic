@@ -17,14 +17,17 @@ import (
 var defaults []byte
 
 type station struct {
-	Name   string `json:"name"`
-	URL    string `json:"url"`
-	Preset bool   `json:"preset"`
+	ID      string `json:"id,omitempty"`
+	Version int64  `json:"version,omitempty"`
+	Name    string `json:"name"`
+	URL     string `json:"url"`
+	Preset  bool   `json:"preset"`
 }
 type userState struct {
-	Stations []station         `json:"stations"`
-	Queue    []json.RawMessage `json:"queue"`
-	Current  json.RawMessage   `json:"current"`
+	StationsVersion int64             `json:"stationsVersion,omitempty"`
+	Stations        []station         `json:"stations"`
+	Queue           []json.RawMessage `json:"queue"`
+	Current         json.RawMessage   `json:"current"`
 }
 
 // globalConfig is the installation-wide configuration introduced by the
@@ -155,6 +158,22 @@ func (s *Server) getState(w http.ResponseWriter, r *http.Request, se *session) {
 		fail(w, 500, "Could not read saved settings")
 		return
 	}
+	s.v1.mu.Lock()
+	c, e := s.v1.collection(se)
+	s.v1.mu.Unlock()
+	if e != nil {
+		fail(w, 503, "Could not read saved stations")
+		return
+	}
+	if device := r.Header.Get("X-Weazl-Device"); uuidKey.MatchString(device) {
+		var queue userState
+		if e := s.v1.get("queue", se.stateKey()+":browser:"+device, accountID(se.User), &queue); e == nil {
+			state.Queue = queue.Queue
+			state.Current = queue.Current
+		}
+	}
+	state.StationsVersion = c.Version
+	state.Stations = legacyStations(c)
 	jsonOut(w, 200, state)
 }
 func (s *Server) putState(w http.ResponseWriter, r *http.Request, se *session) {
@@ -187,9 +206,74 @@ func (s *Server) putState(w http.ResponseWriter, r *http.Request, se *session) {
 		fail(w, 400, "Only eight radio presets are allowed")
 		return
 	}
-	if err := s.store.write(se.stateKey(), state); err != nil {
+	s.v1.mu.Lock()
+	defer s.v1.mu.Unlock()
+	c, err := s.v1.collection(se)
+	if err != nil {
+		fail(w, 503, "Could not read saved stations")
+		return
+	}
+	if (state.StationsVersion != 0 && state.StationsVersion != c.Version) || (state.StationsVersion == 0 && c.Version > 1) {
+		fail(w, 409, "Presets changed on another device. Reload before saving.")
+		return
+	}
+	next := stationCollection{Version: c.Version, Stations: []nativeStation{}}
+	for i, st := range state.Stations {
+		id := st.ID
+		version := int64(1)
+		for _, previous := range c.Stations {
+			if previous.ID == id || (id == "" && previous.URL == st.URL) {
+				id = previous.ID
+				version = previous.Version
+				if previous.Name != st.Name || previous.URL != st.URL || previous.Preset != st.Preset {
+					version++
+				}
+				break
+			}
+		}
+		if id == "" {
+			id = randomID()
+		}
+		next.Stations = append(next.Stations, nativeStation{id, st.Name, st.URL, st.Preset, i, version})
+	}
+	before, _ := json.Marshal(c.Stations)
+	after, _ := json.Marshal(next.Stations)
+	if string(before) != string(after) {
+		next.Version++
+	}
+	state.StationsVersion = next.Version
+	state.Stations = legacyStations(next)
+	archival := state
+	if device := r.Header.Get("X-Weazl-Device"); uuidKey.MatchString(device) {
+		queue := state
+		queue.Stations = nil
+		if e := s.v1.put("queue", se.stateKey()+":browser:"+device, accountID(se.User), queue); e != nil {
+			fail(w, 503, "Could not save device queue")
+			return
+		}
+		previous, e := s.store.read(se.stateKey())
+		if e != nil {
+			fail(w, 503, "Could not preserve saved settings")
+			return
+		}
+		archival.Queue = previous.Queue
+		archival.Current = previous.Current
+	}
+	if err := s.store.write(se.stateKey(), archival); err != nil {
 		fail(w, 500, "Could not save settings")
 		return
 	}
-	jsonOut(w, 200, map[string]bool{"ok": true})
+	if err := s.v1.put("stations", se.stateKey(), accountID(se.User), next); err != nil {
+		fail(w, 503, "Could not save stations")
+		return
+	}
+	jsonOut(w, 200, map[string]any{"ok": true, "stationsVersion": next.Version, "stations": state.Stations})
+}
+
+func legacyStations(c stationCollection) []station {
+	out := []station{}
+	for _, s := range c.Stations {
+		out = append(out, station{ID: s.ID, Version: s.Version, Name: s.Name, URL: s.URL, Preset: s.Preset})
+	}
+	return out
 }

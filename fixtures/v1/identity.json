@@ -1,0 +1,11 @@
+{
+  "data": {
+    "accountId": "account-2bd806c97f0e00af1a1fc332",
+    "libraryAvailable": true,
+    "libraryId": "library-8b47cfc7744302ff5a8c81d1",
+    "roles": [
+      "user"
+    ],
+    "username": "alice"
+  }
+}

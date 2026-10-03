@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": "forbidden",
+    "message": "Sanitized forbidden fixture.",
+    "retryable": false,
+    "details": {}
+  }
+}

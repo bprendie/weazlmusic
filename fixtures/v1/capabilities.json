@@ -1,0 +1,49 @@
+{
+  "data": {
+    "contractRevision": "2026-10-03.2",
+    "favorites": [
+      "track",
+      "album",
+      "artist"
+    ],
+    "flightRecorder": {
+      "appleValidated": false,
+      "defaultDurationMs": 14400000,
+      "enabled": true,
+      "inputFormats": [
+        "mp3",
+        "aac"
+      ],
+      "maxConcurrentStreams": 6,
+      "maxDurationMs": 43200000,
+      "maxStations": 6,
+      "outputEncoding": {
+        "bitRateKbps": 160,
+        "channels": 2,
+        "encoder": "fdkaac",
+        "profile": "AAC-LC",
+        "sampleRateHz": 44100
+      },
+      "outputProfiles": [
+        "aac-lc-m4a"
+      ],
+      "overnightValidated": false,
+      "recurrence": [
+        "once",
+        "daily",
+        "weekly"
+      ]
+    },
+    "library": true,
+    "maxPlaylistTracks": 1000,
+    "mood": true,
+    "originalDownloads": true,
+    "playlistReplace": true,
+    "radio": true,
+    "radioDirectory": [
+      "somafm",
+      "icecast"
+    ],
+    "scrobble": true
+  }
+}

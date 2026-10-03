@@ -1,0 +1,68 @@
+{
+  "data": {
+    "canEdit": true,
+    "entries": [
+      {
+        "entryId": "40dc1d82410f613a754ce096",
+        "track": {
+          "album": "Dive",
+          "albumId": "0",
+          "artist": "Tycho",
+          "artistId": "0",
+          "bitRateKbps": 128,
+          "contentType": "audio/wav",
+          "coverId": "0",
+          "discNumber": 1,
+          "durationMs": 6000,
+          "id": "0-0",
+          "mediaRevision": null,
+          "starred": false,
+          "title": "Track 1",
+          "trackNumber": 1
+        }
+      },
+      {
+        "entryId": "efabc26df6dca754a161ba2e",
+        "track": {
+          "album": "Music Has the Right to Children",
+          "albumId": "1",
+          "artist": "Boards of Canada",
+          "artistId": "1",
+          "bitRateKbps": 128,
+          "contentType": "audio/wav",
+          "coverId": "1",
+          "discNumber": 1,
+          "durationMs": 6000,
+          "id": "1-0",
+          "mediaRevision": null,
+          "starred": false,
+          "title": "Track 4",
+          "trackNumber": 1
+        }
+      },
+      {
+        "entryId": "054f791d4ee1043832383245",
+        "track": {
+          "album": "Dive",
+          "albumId": "0",
+          "artist": "Tycho",
+          "artistId": "0",
+          "bitRateKbps": 128,
+          "contentType": "audio/wav",
+          "coverId": "0",
+          "discNumber": 1,
+          "durationMs": 6000,
+          "id": "0-0",
+          "mediaRevision": null,
+          "starred": false,
+          "title": "Track 1",
+          "trackNumber": 1
+        }
+      }
+    ],
+    "id": "1",
+    "name": "Contract duplicate fixture",
+    "owner": "alice",
+    "version": "pbfa240ffc61c21e756abefbca49b99c9a14bcdfdd609aa4cac88d0ad26c5c2c1"
+  }
+}

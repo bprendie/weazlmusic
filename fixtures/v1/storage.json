@@ -1,0 +1,16 @@
+{
+  "data": {
+    "accountUsedBytes": 5071738,
+    "accountBudgetBytes": 10737418240,
+    "accountAvailableBytes": 10694218240,
+    "usedBytes": 5071738,
+    "budgetBytes": 21474836480,
+    "availableBytes": 21431636480,
+    "reserveBytes": 1073741824,
+    "reservedBytes": 38128262,
+    "retention": {
+      "days": 0,
+      "enabled": false
+    }
+  }
+}

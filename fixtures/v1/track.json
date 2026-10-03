@@ -1,0 +1,18 @@
+{
+  "data": {
+    "album": "Dive",
+    "albumId": "0",
+    "artist": "Tycho",
+    "artistId": "0",
+    "bitRateKbps": 128,
+    "contentType": "audio/wav",
+    "coverId": "0",
+    "discNumber": 1,
+    "durationMs": 6000,
+    "id": "0-0",
+    "mediaRevision": null,
+    "starred": false,
+    "title": "Track 1",
+    "trackNumber": 1
+  }
+}

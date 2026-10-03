@@ -1,0 +1,83 @@
+{
+  "data": [
+    {
+      "name": "Contract overnight fixture",
+      "stationIds": [
+        "station-50d678052e4c3722f53c396b",
+        "station-8bfcb62b15211cdf53085f8e",
+        "station-d5653b6033c050886ef01ed1",
+        "station-71699023da31810f83b72368",
+        "station-1286ed0e1b4ada82a0aa197b",
+        "station-0e8a0b6d7aa82019328069fb"
+      ],
+      "startsAt": "2026-10-04T02:00:00Z",
+      "endsAt": "2026-10-04T08:00:00Z",
+      "timeZone": "America/New_York",
+      "recurrence": {
+        "kind": "once",
+        "endDate": null
+      },
+      "id": "6832769f575f8ebd5e16c5a2dcbf2d21979e95b6e6f2a07bacafac00d3cc67d0",
+      "version": 1,
+      "state": "active",
+      "username": "alice",
+      "libraryId": "library-8b47cfc7744302ff5a8c81d1",
+      "stateKey": "state:alice:http://127.0.0.1:4536/alice",
+      "nextStartsAt": "2026-10-04T02:00:00Z",
+      "nextEndsAt": "2026-10-04T08:00:00Z",
+      "stationSnapshots": [
+        {
+          "id": "station-50d678052e4c3722f53c396b",
+          "name": "Fixture station 1",
+          "streamURL": "https://radio.fixture.invalid/station/0",
+          "preset": true,
+          "order": 0,
+          "version": 3
+        },
+        {
+          "id": "station-8bfcb62b15211cdf53085f8e",
+          "name": "Fixture station 2",
+          "streamURL": "https://radio.fixture.invalid/station/1",
+          "preset": true,
+          "order": 1,
+          "version": 3
+        },
+        {
+          "id": "station-d5653b6033c050886ef01ed1",
+          "name": "Fixture station 3",
+          "streamURL": "https://radio.fixture.invalid/station/2",
+          "preset": true,
+          "order": 2,
+          "version": 3
+        },
+        {
+          "id": "station-71699023da31810f83b72368",
+          "name": "Fixture station 4",
+          "streamURL": "https://radio.fixture.invalid/station/3",
+          "preset": true,
+          "order": 3,
+          "version": 3
+        },
+        {
+          "id": "station-1286ed0e1b4ada82a0aa197b",
+          "name": "Fixture station 5",
+          "streamURL": "https://radio.fixture.invalid/station/4?reconnect=1",
+          "preset": true,
+          "order": 4,
+          "version": 3
+        },
+        {
+          "id": "station-0e8a0b6d7aa82019328069fb",
+          "name": "Fixture station 6",
+          "streamURL": "https://radio.fixture.invalid/station/5?stall=1",
+          "preset": true,
+          "order": 5,
+          "version": 3
+        }
+      ],
+      "timeCorrections": []
+    }
+  ],
+  "nextCursor": null,
+  "snapshotRevision": "1946fe0fee985279e847ad9a7b30dfe6d998e8b1c7d6d8ff2c766df4b22e756b"
+}

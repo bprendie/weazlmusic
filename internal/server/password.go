@@ -15,7 +15,13 @@ func (s *Server) changePassword(w http.ResponseWriter, r *http.Request, se *sess
 		return
 	}
 	s.accountsMu.Lock()
-	defer s.accountsMu.Unlock()
+	revoke := false
+	defer func() {
+		s.accountsMu.Unlock()
+		if revoke {
+			s.v1.revokeDevices(se.User)
+		}
+	}()
 	a, err := s.loadAccount(se.User)
 	if err != nil {
 		fail(w, 500, "Could not load account")
@@ -37,5 +43,6 @@ func (s *Server) changePassword(w http.ResponseWriter, r *http.Request, se *sess
 		fail(w, 500, "Could not save password")
 		return
 	}
-	jsonOut(w, 200, map[string]bool{"ok": true})
+	revoke = true
+	s.startSession(w, r, a, true)
 }

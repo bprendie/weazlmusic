@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": "outcome_unknown",
+    "message": "Sanitized outcome_unknown fixture.",
+    "retryable": false,
+    "details": {}
+  }
+}

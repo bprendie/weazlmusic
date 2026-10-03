@@ -200,7 +200,7 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 		fail(w, 500, "Could not save account")
 		return
 	}
-	s.startSession(w, r, a, true)
+	s.startSession(w, r, a, false)
 }
 func identity(se *session) map[string]any {
 	out := map[string]any{"username": se.User, "admin": se.Admin, "connection": nil}

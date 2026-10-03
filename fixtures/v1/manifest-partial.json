@@ -1,0 +1,1049 @@
+{
+  "data": {
+    "schemaVersion": 1,
+    "sessionId": "f72ea608ddcf63b72f26b1bec75c49f441080cd2f15c82d7860df43fb45694da",
+    "revision": "36ab35cd84e99c91647b96c1a4eebe7294355f1a73297f495b3300c0954c1494",
+    "name": "60s six-stream fixture",
+    "startsAt": "2026-10-03T14:54:41.630216282Z",
+    "durationMs": 60000,
+    "state": "partial",
+    "totalBytes": 6769131,
+    "tracks": [
+      {
+        "stationId": "station-50d678052e4c3722f53c396b",
+        "name": "Fixture station 1",
+        "order": 0,
+        "segments": [
+          {
+            "id": "9d08a2d43605cb62f9e0b64a23b6be7ef950b711",
+            "assetId": "9d08a2d43605cb62f9e0b64a23b6be7ef950b711",
+            "startMs": 778,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100477,
+            "sha256": "68a5a4ee46f8964a28199503989343d11fe0bda30c34649d1e5084f0ff6f527d",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "2b9fe6458cee9fef5bb6312ae6f138957a4bb4e7",
+            "assetId": "2b9fe6458cee9fef5bb6312ae6f138957a4bb4e7",
+            "startMs": 5794,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "aa8809ae63221ee856421244ade0f10b3a77de1647da45f85a7111b019df622b",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "89df9a84cd2d560f7c2aca182b98629d4136ed49",
+            "assetId": "89df9a84cd2d560f7c2aca182b98629d4136ed49",
+            "startMs": 10786,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "e6df7c3a030afeba3f7c6633849bbb1f8edd090925daec8c4e26f9891ab9d513",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "8d4fbbca490c9df90073dd3403bb6a11bf4d6b8c",
+            "assetId": "8d4fbbca490c9df90073dd3403bb6a11bf4d6b8c",
+            "startMs": 15778,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100477,
+            "sha256": "35e1e2f33957799930ea3051a8b8324cf11f95fa4450a54bb12a20b02f4cc212",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "2294b3a5b00533b6044eac680e0c9cd601d4f0cb",
+            "assetId": "2294b3a5b00533b6044eac680e0c9cd601d4f0cb",
+            "startMs": 20794,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "3646f46f1b7d1bc8544afef87872893a7fabaef4ed5d7c80eefbb1cafa1c8539",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "72a64fa490a8906f878f17bc795ef36773393208",
+            "assetId": "72a64fa490a8906f878f17bc795ef36773393208",
+            "startMs": 25786,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "d44b92c5810fb275cc289e15a18aa85bbe074611f68231218f630b3cf8ea1697",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "ad4bd3ed04fa099ef064b0c4efc7bbc6b10a33cb",
+            "assetId": "ad4bd3ed04fa099ef064b0c4efc7bbc6b10a33cb",
+            "startMs": 30778,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100477,
+            "sha256": "c92ed73e723c15fd710c18ee0f61a18f747268747334c04769947570c685ead5",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "0db449a52e51f1321f35adbb02ab97077a38c206",
+            "assetId": "0db449a52e51f1321f35adbb02ab97077a38c206",
+            "startMs": 35794,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "29d49f190339894cb75a2e4fa413db1b97a2551a17a37e80baee079051f74de8",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "1eeb216a9e0a38af16a69b1869408e8739576c27",
+            "assetId": "1eeb216a9e0a38af16a69b1869408e8739576c27",
+            "startMs": 40786,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100015,
+            "sha256": "d9696ae678afa2e7257ba0bf8767a235390edfe735137852c9b64a153cecab82",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "c82e5b8f1e26194dc2f9bb8749a138d7f39938ca",
+            "assetId": "c82e5b8f1e26194dc2f9bb8749a138d7f39938ca",
+            "startMs": 45778,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100478,
+            "sha256": "3d48ef3bdf206a2ca47c442b72be91195b2bad92bf1cdebab77c44cd54c6d2a9",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "1ff50e27b28c2623043c2bd010d3419af0d6960b",
+            "assetId": "1ff50e27b28c2623043c2bd010d3419af0d6960b",
+            "startMs": 50794,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100015,
+            "sha256": "0376fdede3c89eefd246ead313343d3e654ba844ef303486c56e25ecb3b5ae83",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "a9236e178e8f26b20dcdf91de23dce77d09e7593",
+            "assetId": "a9236e178e8f26b20dcdf91de23dce77d09e7593",
+            "startMs": 55786,
+            "durationMs": 4214,
+            "mediaStartMs": 0,
+            "byteLength": 86174,
+            "sha256": "59ed0560301f9458829a67673b047fdf6b60513ebc221740a41ce8a89d497975",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          }
+        ],
+        "gaps": [
+          {
+            "startMs": 0,
+            "durationMs": 778,
+            "reason": "station_unavailable"
+          }
+        ],
+        "metadata": [
+          {
+            "atMs": 1757,
+            "title": "Station 1 cue 0",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 10759,
+            "title": "Station 1 cue 1",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 20758,
+            "title": "Station 1 cue 2",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 30758,
+            "title": "Station 1 cue 3",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 40759,
+            "title": "Station 1 cue 4",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 50758,
+            "title": "Station 1 cue 5",
+            "artist": "Fixture Artist"
+          }
+        ]
+      },
+      {
+        "stationId": "station-8bfcb62b15211cdf53085f8e",
+        "name": "Fixture station 2",
+        "order": 1,
+        "segments": [
+          {
+            "id": "6a7917a9e477ac20c31fda0f52df5dcb61baf1db",
+            "assetId": "6a7917a9e477ac20c31fda0f52df5dcb61baf1db",
+            "startMs": 778,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100477,
+            "sha256": "f0190cd46a64639d61435ab5d49cf5596aaa063edbe26ed27a222a38296dc2e5",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "628621184b532e2081cce240415dcb28e9001a3b",
+            "assetId": "628621184b532e2081cce240415dcb28e9001a3b",
+            "startMs": 5794,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "f0afb90e54966cb224225081e174914c7221459b2b7d3a5db3a3117d7527ec15",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "6358beaa9887695d6bc9faec3873406ad66da9e1",
+            "assetId": "6358beaa9887695d6bc9faec3873406ad66da9e1",
+            "startMs": 10786,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "bb2ddc9001a6247725f4e6972c799232b64ac26b94f2e592809a99f2de8f4e00",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "6ebc27af19bfdafe49023a6f760fd66d634b11d0",
+            "assetId": "6ebc27af19bfdafe49023a6f760fd66d634b11d0",
+            "startMs": 15778,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100477,
+            "sha256": "db2df342933b0fc5365440b8bbcd5a915dce2eb2f298119ebe5d44e23aeddcd8",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "834177edd41d0e7a27bbaa42546cc5c6e2bce140",
+            "assetId": "834177edd41d0e7a27bbaa42546cc5c6e2bce140",
+            "startMs": 20794,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "57c7748a1e8c710e4d67bab93dccf1f057551b3b34d1d4effb8289badf8c3a87",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "f8e594f15b313fd37b7b61b189cdcef7a3e243b6",
+            "assetId": "f8e594f15b313fd37b7b61b189cdcef7a3e243b6",
+            "startMs": 25786,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "d4cb7b078e196f6912e47a75ec21878bb0dbb1bf658185cbbeeb4244dc62c846",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "0ea8ca1788e7323e7bb173345f26ddfdea459b38",
+            "assetId": "0ea8ca1788e7323e7bb173345f26ddfdea459b38",
+            "startMs": 30778,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100477,
+            "sha256": "4246d38385d9aadf003964eb794f15a833ef6bd84cc26557c4be012f7b07dccc",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "8f9289e9ce128c588c472403750ef536cf042be6",
+            "assetId": "8f9289e9ce128c588c472403750ef536cf042be6",
+            "startMs": 35794,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "58a04060c549300859da41b75ea727b80365e0c607fa0bab2000cee965ca4cd5",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "5ef8fe445b1c93536f783cd094f2ec80f35007d1",
+            "assetId": "5ef8fe445b1c93536f783cd094f2ec80f35007d1",
+            "startMs": 40786,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100015,
+            "sha256": "0fe0db273d3aef6f4915d6b4359dac6bdf22978ccf58bc3f1e3c2edcaf491be5",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "0cea3f0bf1a32c2d605fb7737e73e1170ef031e6",
+            "assetId": "0cea3f0bf1a32c2d605fb7737e73e1170ef031e6",
+            "startMs": 45778,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100478,
+            "sha256": "857ec716094a9db288e25d6d320e05e5fdb29584dbe762c659b78b8cafdbee88",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "176fe52e3c7d4e3be8bb5c6c12d100ec2aa99f95",
+            "assetId": "176fe52e3c7d4e3be8bb5c6c12d100ec2aa99f95",
+            "startMs": 50794,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100015,
+            "sha256": "2e5a080633cdf88eff23f2b13edb13d12fa4cdb8e1efcd89e6fd9ab906f0d421",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "9ed240be63eacb0dff261de2acfe5556e7e0b3cc",
+            "assetId": "9ed240be63eacb0dff261de2acfe5556e7e0b3cc",
+            "startMs": 55786,
+            "durationMs": 4214,
+            "mediaStartMs": 0,
+            "byteLength": 86175,
+            "sha256": "8cd41867f6b292ec20fbf45dc7b247b0a5dccb8a5be87cffbcb2b45903e62837",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          }
+        ],
+        "gaps": [
+          {
+            "startMs": 0,
+            "durationMs": 778,
+            "reason": "station_unavailable"
+          }
+        ],
+        "metadata": [
+          {
+            "atMs": 1757,
+            "title": "Station 2 cue 0",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 10759,
+            "title": "Station 2 cue 1",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 20758,
+            "title": "Station 2 cue 2",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 30758,
+            "title": "Station 2 cue 3",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 40759,
+            "title": "Station 2 cue 4",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 50759,
+            "title": "Station 2 cue 5",
+            "artist": "Fixture Artist"
+          }
+        ]
+      },
+      {
+        "stationId": "station-d5653b6033c050886ef01ed1",
+        "name": "Fixture station 3",
+        "order": 2,
+        "segments": [
+          {
+            "id": "e338173f14b63d0c59068a51cd7f60d37b4b5af6",
+            "assetId": "e338173f14b63d0c59068a51cd7f60d37b4b5af6",
+            "startMs": 778,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100477,
+            "sha256": "613e07ef2a1fc19229c2e371287e4ec9d9a1c107d118ac5e88fb7eb16cfa84ef",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "3898b4e87bb16ce6013a949878aa431adf6b1e30",
+            "assetId": "3898b4e87bb16ce6013a949878aa431adf6b1e30",
+            "startMs": 5794,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "dd4c003cb1c7f7bcab2918b21480bcae07f31da81d65c8f9df09c048aa0b1e28",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "2db6f65510df57a845ac1cde822d495aa2d0972b",
+            "assetId": "2db6f65510df57a845ac1cde822d495aa2d0972b",
+            "startMs": 10786,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "e535ddc15314b9c0b591d359d39ea1a2f24c7d4764a191ce2db7715e5d00daec",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "e528268b86c0a9d84b882436ef7e4b55153f5c57",
+            "assetId": "e528268b86c0a9d84b882436ef7e4b55153f5c57",
+            "startMs": 15778,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100477,
+            "sha256": "3fb3f4769e53c72278d95f7aeba7c36d628b62840644f084e4b0b7835e50a418",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "db06d511c5a08991bd9051f0ec8b6b64d390c608",
+            "assetId": "db06d511c5a08991bd9051f0ec8b6b64d390c608",
+            "startMs": 20794,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "22aa38b5cef79770eb724e38513e761c36393a5d11e3d42732a6bc0688660392",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "95ff68327829b3b5a16a20dd8e76741ea3f0faa4",
+            "assetId": "95ff68327829b3b5a16a20dd8e76741ea3f0faa4",
+            "startMs": 25786,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "80b4c2277e47feb807e982398a652b55d0678b5dc3905e4e3a7255ec1fc81a37",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "6c0fdeaa65d517e930f407ad8363189e9f0f4d32",
+            "assetId": "6c0fdeaa65d517e930f407ad8363189e9f0f4d32",
+            "startMs": 30778,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100477,
+            "sha256": "0f814157f02e3faa025112260c0eb0c6f395e1036f14371d6e069656dde47252",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "18880065cab02a6ac9975c7dd398ed24740741a7",
+            "assetId": "18880065cab02a6ac9975c7dd398ed24740741a7",
+            "startMs": 35794,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "a351d52330a6018a6951534327dd2795be4e3ba0cf8bdbc6eac637e58a709f64",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "64dcde5268244af0e01ea33e93f7353f340503f1",
+            "assetId": "64dcde5268244af0e01ea33e93f7353f340503f1",
+            "startMs": 40786,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100015,
+            "sha256": "c5113d9708f92184aed0ae4410c4425eead14d9d6c59ccf1d5cc40225fb452db",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "192692811e9317395a880355a841d35cf32f150c",
+            "assetId": "192692811e9317395a880355a841d35cf32f150c",
+            "startMs": 45778,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100478,
+            "sha256": "3fb9186fdd3911668c3ee8bd927b772b3656f8de2dd34be6f63e9cca3e1020a2",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "cf1fdf2aadc702b60ec95655957f0e84ad21b47b",
+            "assetId": "cf1fdf2aadc702b60ec95655957f0e84ad21b47b",
+            "startMs": 50794,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100015,
+            "sha256": "9cf483eb0faf0ac9b6a78aa61bc878d05cf441f37686bab89bd61a4b4312ee78",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "baedcc9d930ff300f22c8bee8b8b82894b6056d9",
+            "assetId": "baedcc9d930ff300f22c8bee8b8b82894b6056d9",
+            "startMs": 55786,
+            "durationMs": 4214,
+            "mediaStartMs": 0,
+            "byteLength": 86174,
+            "sha256": "c66f79e5b4e336c6189e77c9e0d12d971f276567c23a2af46501677178c82f93",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          }
+        ],
+        "gaps": [
+          {
+            "startMs": 0,
+            "durationMs": 778,
+            "reason": "station_unavailable"
+          }
+        ],
+        "metadata": [
+          {
+            "atMs": 1757,
+            "title": "Station 3 cue 0",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 10758,
+            "title": "Station 3 cue 1",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 20758,
+            "title": "Station 3 cue 2",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 30758,
+            "title": "Station 3 cue 3",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 40758,
+            "title": "Station 3 cue 4",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 50760,
+            "title": "Station 3 cue 5",
+            "artist": "Fixture Artist"
+          }
+        ]
+      },
+      {
+        "stationId": "station-71699023da31810f83b72368",
+        "name": "Fixture station 4",
+        "order": 3,
+        "segments": [
+          {
+            "id": "3016afaf34aee5507b77d11cef0575127efbf86c",
+            "assetId": "3016afaf34aee5507b77d11cef0575127efbf86c",
+            "startMs": 778,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100477,
+            "sha256": "0bd2e439fdc56527b39842ae5ce8bc9a5224bc994edb533d1509908d07007955",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "cf064556bd719371bfd8e141d203e838da07205f",
+            "assetId": "cf064556bd719371bfd8e141d203e838da07205f",
+            "startMs": 5794,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "9f1db9f51833c59841096c10e411615641c87a48b1542d25885bd6e87da2db59",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "eaa29839ab7db260548731c0ae85a012735dbcbb",
+            "assetId": "eaa29839ab7db260548731c0ae85a012735dbcbb",
+            "startMs": 10786,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "af77f9fa14c66a121ae6ace0147d2069b2f7bf2a0bfea7b511e3e01ae7f7c277",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "d2888c1f2fe7d98e5af37ece61227044fd4d0021",
+            "assetId": "d2888c1f2fe7d98e5af37ece61227044fd4d0021",
+            "startMs": 15778,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100477,
+            "sha256": "bf9f5634fea38c81b9e9de26e69e4b51da33e2708686915744220e54e609d936",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "a77a5f9a122d4dc958b01201f5add6d73aaa1f86",
+            "assetId": "a77a5f9a122d4dc958b01201f5add6d73aaa1f86",
+            "startMs": 20794,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "25207e8a8cf4360f9271bd172957c2334114d3a99ac3972151a87b6fb9dda8c6",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "943603657ccd81fd8f4983239d9a5f065d46106f",
+            "assetId": "943603657ccd81fd8f4983239d9a5f065d46106f",
+            "startMs": 25786,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "a10b18f8d1dbefadd59af2a668267a7210f24ebe79708859ede56b2eadb7f52f",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "2204d55bda19aff109263a12750cf78317a113e0",
+            "assetId": "2204d55bda19aff109263a12750cf78317a113e0",
+            "startMs": 30778,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100477,
+            "sha256": "241d89967aae36be34f747398080a78947646191288aca3e6a95092811a106c2",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "f7011ce57b831f4004e68d9c68d0c95b5677b149",
+            "assetId": "f7011ce57b831f4004e68d9c68d0c95b5677b149",
+            "startMs": 35794,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "cce2de097b3bf84834165ab22a058b05dfc9bd1c869c9440d2c0a0ce6ee86f66",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "cc623e679dcdfe3d65a212f20c8c45d54f6c8c11",
+            "assetId": "cc623e679dcdfe3d65a212f20c8c45d54f6c8c11",
+            "startMs": 40786,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100015,
+            "sha256": "565a487338995052de15aeeac963ac599dd7eca3c7d8bbd8b3672b49de16ce5e",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "4335fb21e75870b30050a0a6f8517bae364178b6",
+            "assetId": "4335fb21e75870b30050a0a6f8517bae364178b6",
+            "startMs": 45778,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100478,
+            "sha256": "1a9f4621045cd3d17b542953512549b2e0086c66f1355500e1c7c0637e45ba6f",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "defec3f8783ba5ae83243c7a36947dbf2ccc229a",
+            "assetId": "defec3f8783ba5ae83243c7a36947dbf2ccc229a",
+            "startMs": 50794,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100015,
+            "sha256": "1e2bae0384aa634b545a131455a09df2990a7355b94c8e9af1954fdf479ee130",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "ed34441ff025793c3cdc83a915642bd2fbf690e4",
+            "assetId": "ed34441ff025793c3cdc83a915642bd2fbf690e4",
+            "startMs": 55786,
+            "durationMs": 4214,
+            "mediaStartMs": 0,
+            "byteLength": 86174,
+            "sha256": "48dbac472cf54c570b603da729faef2d3a3b6c7df5a50964316de4d85248f744",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          }
+        ],
+        "gaps": [
+          {
+            "startMs": 0,
+            "durationMs": 778,
+            "reason": "station_unavailable"
+          }
+        ],
+        "metadata": [
+          {
+            "atMs": 1758,
+            "title": "Station 4 cue 0",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 10758,
+            "title": "Station 4 cue 1",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 20758,
+            "title": "Station 4 cue 2",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 30758,
+            "title": "Station 4 cue 3",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 40759,
+            "title": "Station 4 cue 4",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 50759,
+            "title": "Station 4 cue 5",
+            "artist": "Fixture Artist"
+          }
+        ]
+      },
+      {
+        "stationId": "station-1286ed0e1b4ada82a0aa197b",
+        "name": "Fixture station 5",
+        "order": 4,
+        "segments": [
+          {
+            "id": "4225ef8301b7ef568bcbe54dc9b86470a0f1bce3",
+            "assetId": "4225ef8301b7ef568bcbe54dc9b86470a0f1bce3",
+            "startMs": 778,
+            "durationMs": 4063,
+            "mediaStartMs": 0,
+            "byteLength": 81560,
+            "sha256": "66cc96209f019d24d397585e3b3fe018849fbe1bebe1c72080c14bcc9d514cfa",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "6ff21368b06fa23527216c4bec9eedc5a5d4d6fa",
+            "assetId": "6ff21368b06fa23527216c4bec9eedc5a5d4d6fa",
+            "startMs": 5819,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100477,
+            "sha256": "fe2b0ec60ec945189e1985ee9cca4c78736d8ac07184d090d8ae54fcb24e227c",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "25f6a579b53e21451c2bb7e970be38fc1294df53",
+            "assetId": "25f6a579b53e21451c2bb7e970be38fc1294df53",
+            "startMs": 10835,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "d6c1422c4110c13b6cbb027d7753bebc71c04185b8f8464c656729c8ceb4cfae",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "975d983f260be7c1385e428ffee2ce594ad15359",
+            "assetId": "975d983f260be7c1385e428ffee2ce594ad15359",
+            "startMs": 15827,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "a18ae3f3a38c651fbef0a179ea7c10a48096852a1872a0e5b4a767c61d327332",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "1ec943639b71e0673cc3aee5c28019963c803f11",
+            "assetId": "1ec943639b71e0673cc3aee5c28019963c803f11",
+            "startMs": 20819,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100477,
+            "sha256": "e02d2b6f09dd51a98bbe093ae3e594dab4f22768c2e7ca67352c991bdb3affc4",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "0d86aac4bff4695aa9875deb91f7b07df57ba457",
+            "assetId": "0d86aac4bff4695aa9875deb91f7b07df57ba457",
+            "startMs": 25835,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "2ff652026988806aed7ed1375c18e4a0921d2363401ebaf966dae2a9df97a3ce",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "8ffd1e5e4f970083e1720982ce739a52fc771386",
+            "assetId": "8ffd1e5e4f970083e1720982ce739a52fc771386",
+            "startMs": 30827,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "6222a81f7b61b88f64a1ef0ec6ff6563f9651236de99be28e2f756ee108119c2",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "bb1378afb5cad3fe1bd0d9b08d9f00af40f6cffc",
+            "assetId": "bb1378afb5cad3fe1bd0d9b08d9f00af40f6cffc",
+            "startMs": 35819,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100477,
+            "sha256": "09a336b1b03f5222d164ee7a6439e08ad999ea74f0aca864240dbad350de6455",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "e35fce800fd5f3b66dd5b0df880dbcec70a4a806",
+            "assetId": "e35fce800fd5f3b66dd5b0df880dbcec70a4a806",
+            "startMs": 40835,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "123f6b2f2908fb2fc3577f28cc7d5f6f5dfcd7cc2862aad0da3a1f70585dad95",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "274a225da711bd199d376e131a13a26de91aa3e2",
+            "assetId": "274a225da711bd199d376e131a13a26de91aa3e2",
+            "startMs": 45827,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100015,
+            "sha256": "1d212520113ed6a066b05a392b45cd27535ca7e0bb493e6d4ca8bd4963da01fe",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "2849f72fc4042694882646cde3a620ab15e4cb21",
+            "assetId": "2849f72fc4042694882646cde3a620ab15e4cb21",
+            "startMs": 50819,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100478,
+            "sha256": "3d9f456792970cdb64f2a6556e763343c46c54b05dfe1c350d56c042d2089b91",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "eac1bd70e6c00360812ad400c2e2f562e0703f75",
+            "assetId": "eac1bd70e6c00360812ad400c2e2f562e0703f75",
+            "startMs": 55835,
+            "durationMs": 4165,
+            "mediaStartMs": 0,
+            "byteLength": 85251,
+            "sha256": "40fa9fc7bf27faa5687d3568075257ec681721567f0b4f9a9d86e6960e705ef1",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          }
+        ],
+        "gaps": [
+          {
+            "startMs": 0,
+            "durationMs": 778,
+            "reason": "station_unavailable"
+          },
+          {
+            "startMs": 4841,
+            "durationMs": 978,
+            "reason": "station_unavailable"
+          }
+        ],
+        "metadata": [
+          {
+            "atMs": 1757,
+            "title": "Station 5 cue 0",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 15800,
+            "title": "Station 5 cue 1",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 25800,
+            "title": "Station 5 cue 2",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 35799,
+            "title": "Station 5 cue 3",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 45800,
+            "title": "Station 5 cue 4",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 55800,
+            "title": "Station 5 cue 5",
+            "artist": "Fixture Artist"
+          }
+        ]
+      },
+      {
+        "stationId": "station-0e8a0b6d7aa82019328069fb",
+        "name": "Fixture station 6",
+        "order": 5,
+        "segments": [
+          {
+            "id": "54cd23ba2adefbbeac2f02e66d2da6d9bd0c2c43",
+            "assetId": "54cd23ba2adefbbeac2f02e66d2da6d9bd0c2c43",
+            "startMs": 778,
+            "durationMs": 4063,
+            "mediaStartMs": 0,
+            "byteLength": 81560,
+            "sha256": "f096520bdc79bd31f9d136d21b3bb9af96bf4b4585505c64340f83195859b050",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "830357138fb9f47846bfe007855094b7d2a70c36",
+            "assetId": "830357138fb9f47846bfe007855094b7d2a70c36",
+            "startMs": 21873,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100477,
+            "sha256": "3052be8670892f42bf92c7b4bfb85a8b3c3fc3c0f00f3cf02fcc624b1cdf862a",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "dd52cd050c5c299a1c7cb77b23c6b645c7ee0c5a",
+            "assetId": "dd52cd050c5c299a1c7cb77b23c6b645c7ee0c5a",
+            "startMs": 26889,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "dbde1000f892fdff3679c7f3b791342e98132178adc70e12d53a0d1dec23edd5",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "1a3655fc6910e2fe93c75df423598813d5e229d2",
+            "assetId": "1a3655fc6910e2fe93c75df423598813d5e229d2",
+            "startMs": 31881,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "1e1e160f0f5462cd6ed70e8cc856a9badad24ae556d96db9edf044dec901427f",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "af5228473d726f049f368bcad2ef3cf3e9d049e6",
+            "assetId": "af5228473d726f049f368bcad2ef3cf3e9d049e6",
+            "startMs": 36873,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100477,
+            "sha256": "ff836b2916b1e182256914df9e435b62fa9e231a7d97406c84b5c3654eb8c107",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "a18de6846945a92d8ce8a3f620a511007bd80f00",
+            "assetId": "a18de6846945a92d8ce8a3f620a511007bd80f00",
+            "startMs": 41889,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "2b5ac0a5d7e6413dfa9da0d21557a8373b91f9b34939899eac650710ee9ea61f",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "5e740d7fe3bf5eb2f09a5862a5648e873d7c4bef",
+            "assetId": "5e740d7fe3bf5eb2f09a5862a5648e873d7c4bef",
+            "startMs": 46881,
+            "durationMs": 4992,
+            "mediaStartMs": 0,
+            "byteLength": 100016,
+            "sha256": "d5dfb2c0af594be2b5833359476601858c14d4377a87e3d1b33459abe4281d0c",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "e0a354280e6cab0b9e2e679d04605f45d6550666",
+            "assetId": "e0a354280e6cab0b9e2e679d04605f45d6550666",
+            "startMs": 51873,
+            "durationMs": 5016,
+            "mediaStartMs": 0,
+            "byteLength": 100477,
+            "sha256": "0ade47a6c260ac286e5250ed95a112e375e57339b6b7b109dc44529e09d7f464",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          },
+          {
+            "id": "b050da82de25c001e01f023774df147e5a7f7e77",
+            "assetId": "b050da82de25c001e01f023774df147e5a7f7e77",
+            "startMs": 56889,
+            "durationMs": 3111,
+            "mediaStartMs": 0,
+            "byteLength": 64488,
+            "sha256": "4094754599982c1fb4ddfee37ff533a24d53b3d6c20fc88d8266547abeb9bc01",
+            "contentType": "audio/mp4",
+            "codec": "aac-lc"
+          }
+        ],
+        "gaps": [
+          {
+            "startMs": 0,
+            "durationMs": 778,
+            "reason": "station_unavailable"
+          },
+          {
+            "startMs": 4841,
+            "durationMs": 17032,
+            "reason": "station_unavailable"
+          }
+        ],
+        "metadata": [
+          {
+            "atMs": 1758,
+            "title": "Station 6 cue 0",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 31853,
+            "title": "Station 6 cue 1",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 41853,
+            "title": "Station 6 cue 2",
+            "artist": "Fixture Artist"
+          },
+          {
+            "atMs": 51852,
+            "title": "Station 6 cue 3",
+            "artist": "Fixture Artist"
+          }
+        ]
+      }
+    ]
+  }
+}

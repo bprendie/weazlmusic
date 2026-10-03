@@ -1,0 +1,22 @@
+{
+  "contract": "2026-10-03.2",
+  "installationId": "eaebde574f0e87d2428d3df6e42e05fa430a282de70559efb61bf2b798ca2b49",
+  "sessionId": "f72ea608ddcf63b72f26b1bec75c49f441080cd2f15c82d7860df43fb45694da",
+  "wallSeconds": 60.36,
+  "state": "partial",
+  "bytes": 6769131,
+  "coverage": [
+    0.9870333333333333,
+    0.9870333333333333,
+    0.9870333333333333,
+    0.9870333333333333,
+    0.9707333333333333,
+    0.7031666666666667
+  ],
+  "assetCount": 69,
+  "checksumsVerified": true,
+  "localSeekDecoded": true,
+  "forcedRestart": false,
+  "overnightValidated": false,
+  "appleValidated": false
+}

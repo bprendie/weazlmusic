@@ -23,6 +23,7 @@ type harness struct {
 	dir      string
 	upstream string
 	t        *testing.T
+	navHTTP  *httptest.Server
 }
 
 func setup(t *testing.T) *harness {
@@ -35,9 +36,10 @@ func setup(t *testing.T) *harness {
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Cleanup(handler.(interface{ Close() }).Close)
 	app := httptest.NewServer(handler)
 	t.Cleanup(app.Close)
-	return &harness{app: app, nav: nav, dir: dir, upstream: up.URL, t: t}
+	return &harness{app: app, nav: nav, dir: dir, upstream: up.URL, t: t, navHTTP: up}
 }
 func (h *harness) request(method, path string, body any, cookie *http.Cookie) (int, []byte, *http.Response) {
 	h.t.Helper()

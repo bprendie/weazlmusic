@@ -12,7 +12,7 @@ async function loadAccount(user) {
   $('#username').innerHTML = `${esc(state.user)}<small>Web-app account</small>`;
   $('.avatar').textContent = state.user[0].toUpperCase();
   const saved = await api('state');
-  state.stations = saved.stations || [];state.queue = saved.queue || [];state.current = saved.current || null;
+  state.stationsVersion=saved.stationsVersion;state.stations = saved.stations || [];state.queue = saved.queue || [];state.current = saved.current || null;
   $('#login-screen').hidden = true;$('.app').hidden = false;
   renderQueue();renderPlayer();
   if (!user.connection) {

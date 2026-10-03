@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": "version_conflict",
+    "message": "Sanitized version_conflict fixture.",
+    "retryable": false,
+    "details": {}
+  }
+}

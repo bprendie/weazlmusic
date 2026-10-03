@@ -1,0 +1,60 @@
+{
+  "data": [
+    {
+      "id": "station-50d678052e4c3722f53c396b",
+      "name": "Fixture station 1",
+      "streamURL": "https://radio.fixture.invalid/station/0",
+      "preset": true,
+      "order": 0,
+      "version": 3
+    },
+    {
+      "id": "station-8bfcb62b15211cdf53085f8e",
+      "name": "Fixture station 2",
+      "streamURL": "https://radio.fixture.invalid/station/1",
+      "preset": true,
+      "order": 1,
+      "version": 3
+    },
+    {
+      "id": "station-d5653b6033c050886ef01ed1",
+      "name": "Fixture station 3",
+      "streamURL": "https://radio.fixture.invalid/station/2",
+      "preset": true,
+      "order": 2,
+      "version": 3
+    },
+    {
+      "id": "station-71699023da31810f83b72368",
+      "name": "Fixture station 4",
+      "streamURL": "https://radio.fixture.invalid/station/3",
+      "preset": true,
+      "order": 3,
+      "version": 3
+    },
+    {
+      "id": "station-1286ed0e1b4ada82a0aa197b",
+      "name": "Fixture station 5",
+      "streamURL": "https://radio.fixture.invalid/station/4?reconnect=1",
+      "preset": true,
+      "order": 4,
+      "version": 3
+    },
+    {
+      "id": "station-0e8a0b6d7aa82019328069fb",
+      "name": "Fixture station 6",
+      "streamURL": "https://radio.fixture.invalid/station/5?stall=1",
+      "preset": true,
+      "order": 5,
+      "version": 3
+    },
+    {
+      "id": "station-6b94aaf6b8b4b691f4cc1706",
+      "name": "Freestlye-Rhythm 98 WTHM-DB Miami",
+      "streamURL": "https://cast6.my-control-panel.com/proxy/rhythm98/stream",
+      "preset": true,
+      "order": 6,
+      "version": 1
+    }
+  ]
+}

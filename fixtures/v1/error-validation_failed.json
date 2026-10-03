@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": "validation_failed",
+    "message": "Sanitized validation_failed fixture.",
+    "retryable": false,
+    "details": {}
+  }
+}

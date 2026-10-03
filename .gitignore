@@ -5,3 +5,5 @@ data/
 bin/
 node_modules/
 test-results/
+
+__pycache__/

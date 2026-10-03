@@ -40,7 +40,7 @@ func songs() []map[string]any {
 	titles := []string{"Dive", "Music Has the Right to Children", "In Rainbows", "Mezzanine"}
 	for a := 0; a < 12; a++ {
 		for i := 0; i < 3; i++ {
-			out = append(out, map[string]any{"id": fmt.Sprintf("%d-%d", a, i), "title": fmt.Sprintf("Track %d", a*3+i+1), "artist": names[a%4], "album": titles[a%4], "albumId": strconv.Itoa(a), "coverArt": strconv.Itoa(a), "duration": 6})
+			out = append(out, map[string]any{"id": fmt.Sprintf("%d-%d", a, i), "title": fmt.Sprintf("Track %d", a*3+i+1), "artist": names[a%4], "album": titles[a%4], "albumId": strconv.Itoa(a), "coverArt": strconv.Itoa(a), "duration": 6, "artistId": strconv.Itoa(a % 4), "track": i + 1, "discNumber": 1, "contentType": "audio/wav", "bitRate": 128})
 		}
 	}
 	return out
@@ -83,6 +83,21 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			albums = append(albums, map[string]any{"id": strconv.Itoa(i), "name": albumName(all[i*3]["album"].(string), i), "artist": all[i*3]["artist"], "year": 2000 + i, "coverArt": strconv.Itoa(i)})
 		}
 		out["albumList2"] = map[string]any{"album": albums}
+	case "getArtists":
+		artists := []map[string]any{}
+		for i, name := range []string{"Tycho", "Boards of Canada", "Radiohead", "Massive Attack"} {
+			artists = append(artists, map[string]any{"id": strconv.Itoa(i), "name": name, "albumCount": 3})
+		}
+		out["artists"] = map[string]any{"index": []any{map[string]any{"name": "Fixture", "artist": artists}}}
+	case "getArtist":
+		albums := []map[string]any{}
+		for i := 0; i < 12; i++ {
+			if strconv.Itoa(i%4) == q.Get("id") {
+				albums = append(albums, map[string]any{"id": strconv.Itoa(i), "name": all[i*3]["album"], "artist": all[i*3]["artist"]})
+			}
+		}
+		out["artist"] = map[string]any{"id": q.Get("id"), "name": "Fixture artist", "album": albums}
+	case "scrobble":
 	case "getSong":
 		for _, t := range all {
 			if t["id"] == q.Get("id") {
@@ -125,12 +140,32 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				entries = append(entries, t)
 			}
 		}
-		out["starred2"] = map[string]any{"song": entries}
+		albums := []map[string]any{}
+		artists := []map[string]any{}
+		for id, enabled := range s.Stars[user] {
+			if !enabled {
+				continue
+			}
+			if strings.HasPrefix(id, "album:") {
+				albums = append(albums, map[string]any{"id": strings.TrimPrefix(id, "album:")})
+			}
+			if strings.HasPrefix(id, "artist:") {
+				artists = append(artists, map[string]any{"id": strings.TrimPrefix(id, "artist:")})
+			}
+		}
+		out["starred2"] = map[string]any{"song": entries, "album": albums, "artist": artists}
 	case "star", "unstar":
 		if s.Stars[user] == nil {
 			s.Stars[user] = map[string]bool{}
 		}
-		s.Stars[user][q.Get("id")] = method == "star"
+		id := q.Get("id")
+		if q.Get("albumId") != "" {
+			id = "album:" + q.Get("albumId")
+		}
+		if q.Get("artistId") != "" {
+			id = "artist:" + q.Get("artistId")
+		}
+		s.Stars[user][id] = method == "star"
 	case "getPlaylists":
 		list := []*Playlist{}
 		for _, p := range s.Playlists {
@@ -201,7 +236,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			out["status"] = "failed"
 			out["error"] = map[string]int{"code": 50}
 		}
-	case "stream":
+	case "stream", "download":
 		w.Header().Set("Content-Type", "audio/wav")
 		http.ServeContent(w, r, "track.wav", time.Time{}, bytes.NewReader(wav()))
 		return

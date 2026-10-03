@@ -1,0 +1,49 @@
+{
+  "events": [
+    {
+      "sequence": 1,
+      "type": "progress",
+      "playlist": {
+        "id": "fixture-playlist",
+        "name": "Mood",
+        "songCount": 0
+      },
+      "count": 0,
+      "target": 20
+    },
+    {
+      "sequence": 2,
+      "type": "selection",
+      "playlist": {
+        "id": "fixture-playlist",
+        "name": "Mood",
+        "songCount": 1
+      },
+      "track": {
+        "album": "Dive",
+        "albumId": "0",
+        "artist": "Tycho",
+        "artistId": "0",
+        "bitRateKbps": 128,
+        "contentType": "audio/wav",
+        "coverId": "0",
+        "discNumber": 1,
+        "durationMs": 6000,
+        "id": "0-0",
+        "mediaRevision": null,
+        "starred": false,
+        "title": "Track 1",
+        "trackNumber": 1
+      },
+      "count": 1,
+      "target": 20
+    },
+    {
+      "sequence": 3,
+      "type": "failed",
+      "count": 1,
+      "target": 20,
+      "message": "Fixture interruption; confirmed tracks remain saved."
+    }
+  ]
+}

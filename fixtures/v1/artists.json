@@ -1,0 +1,20 @@
+{
+  "data": [
+    {
+      "albumCount": 3,
+      "coverId": null,
+      "id": "0",
+      "name": "Tycho",
+      "starred": false
+    },
+    {
+      "albumCount": 3,
+      "coverId": null,
+      "id": "1",
+      "name": "Boards of Canada",
+      "starred": false
+    }
+  ],
+  "nextCursor": "ZDU5ZDZlNjVlODFlMDc4OTc1MDQ0ZTgzNTU2NDNkMzg5NDgyZjc4ZmUxZGYyYTdiNWVjYmRkNTljNzBhMGNjMToy",
+  "snapshotRevision": "d59d6e65e81e078975044e8355643d389482f78fe1df2a7b5ecbdd59c70a0cc1"
+}

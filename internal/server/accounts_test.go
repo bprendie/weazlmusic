@@ -51,10 +51,13 @@ func TestLocalAccountAndSavedConnection(t *testing.T) {
 		t.Fatal("failed update lost valid connection")
 	}
 	// A new application instance must restore both the local account and its connection.
+	h.app.Close()
+	h.app.Config.Handler.(interface{ Close() }).Close()
 	handler, err := New(Config{DataDir: h.dir}, fstest.MapFS{"index.html": {Data: []byte("Weazl")}})
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer handler.(interface{ Close() }).Close()
 	restarted := httptest.NewServer(handler)
 	defer restarted.Close()
 	old := h.app
@@ -96,10 +99,13 @@ func TestNavidromeUsersSignInAgainstGlobalServer(t *testing.T) {
 	if code != http.StatusOK || h.nav.Playlists["1"].Owner != "bob" {
 		t.Fatalf("playlist did not use Navidrome identity: %d", code)
 	}
+	h.app.Close()
+	h.app.Config.Handler.(interface{ Close() }).Close()
 	handler, err := New(Config{DataDir: h.dir}, fstest.MapFS{"index.html": {Data: []byte("Weazl")}})
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer handler.(interface{ Close() }).Close()
 	restarted := httptest.NewServer(handler)
 	defer restarted.Close()
 	h.app = restarted

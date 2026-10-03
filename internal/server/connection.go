@@ -37,7 +37,13 @@ func (s *Server) configureConnection(w http.ResponseWriter, r *http.Request, se 
 	candidate := *se
 	candidate.ServerURL, candidate.NavUser, candidate.Salt, candidate.Token = c.URL, c.Username, c.Salt, c.Token
 	s.accountsMu.Lock()
-	defer s.accountsMu.Unlock()
+	revoke := false
+	defer func() {
+		s.accountsMu.Unlock()
+		if revoke {
+			s.v1.revokeDevices(se.User)
+		}
+	}()
 	a, err := s.loadAccount(se.User)
 	if err != nil {
 		fail(w, 500, "Could not load your web-app account")
@@ -57,6 +63,7 @@ func (s *Server) configureConnection(w http.ResponseWriter, r *http.Request, se 
 		fail(w, 500, "Could not migrate installation settings")
 		return
 	}
+	revoke = true
 	s.startSession(w, r, a, true)
 }
 

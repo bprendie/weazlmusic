@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": "asset_expired",
+    "message": "Sanitized asset_expired fixture.",
+    "retryable": false,
+    "details": {}
+  }
+}

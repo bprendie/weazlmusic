@@ -1,6 +1,6 @@
 .PHONY: dev mockup test build docker
 -include .env
-export COOKIE_SECURE
+export COOKIE_SECURE CAPTURE_BUDGET_BYTES CAPTURE_ACCOUNT_BUDGET_BYTES CAPTURE_RESERVE_BYTES CAPTURE_RETENTION_DAYS
 
 dev:
 	go run ./cmd/weazltunes

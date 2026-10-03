@@ -1,0 +1,13 @@
+{
+  "data": [
+    {
+      "canEdit": true,
+      "id": "1",
+      "name": "Contract duplicate fixture",
+      "owner": "alice",
+      "version": "pbfa240ffc61c21e756abefbca49b99c9a14bcdfdd609aa4cac88d0ad26c5c2c1"
+    }
+  ],
+  "nextCursor": null,
+  "snapshotRevision": "704fd34c350b105cf2631180769f5899cea7005ba91ab5105a6d0e1ec6e6f742"
+}

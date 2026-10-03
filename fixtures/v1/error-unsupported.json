@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": "unsupported",
+    "message": "Sanitized unsupported fixture.",
+    "retryable": false,
+    "details": {}
+  }
+}

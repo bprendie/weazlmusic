@@ -1,0 +1,28 @@
+{
+  "data": [
+    {
+      "current": false,
+      "id": "16d4a15abf83c9305a6af7c4041dce39fcc4b6152c3eb700b6350d3d1ffd03fe",
+      "lastSeen": "2026-10-03T14:58:39.733637456Z",
+      "name": "recorder acceptance"
+    },
+    {
+      "current": true,
+      "id": "55e54e59206d1c5b8bc97e2a63b46b1b69efa9ee5d00b9baf35f519aab9034ca",
+      "lastSeen": "2026-10-03T14:59:34.989489731Z",
+      "name": "recorder acceptance"
+    },
+    {
+      "current": false,
+      "id": "66f69af6c732a31939878993564e3f3a8b2e796bf446fd2630f74f00aa4d3441",
+      "lastSeen": "2026-10-03T14:59:31.93463856Z",
+      "name": "fixture setup"
+    },
+    {
+      "current": false,
+      "id": "e03a9c7b60037c8da069d07d5b308483d07d0282daf4ba33cd7d0f5124ef934f",
+      "lastSeen": "2026-10-03T14:57:11.99643334Z",
+      "name": "fixture setup"
+    }
+  ]
+}

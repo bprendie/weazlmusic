@@ -1,0 +1,67 @@
+{
+  "data": {
+    "album": {
+      "addedAt": null,
+      "artist": "Tycho",
+      "artistId": null,
+      "coverId": null,
+      "durationMs": 0,
+      "genre": null,
+      "id": "0",
+      "name": "Dive",
+      "songCount": null,
+      "starred": false,
+      "year": null
+    },
+    "tracks": [
+      {
+        "album": "Dive",
+        "albumId": "0",
+        "artist": "Tycho",
+        "artistId": "0",
+        "bitRateKbps": 128,
+        "contentType": "audio/wav",
+        "coverId": "0",
+        "discNumber": 1,
+        "durationMs": 6000,
+        "id": "0-0",
+        "mediaRevision": null,
+        "starred": false,
+        "title": "Track 1",
+        "trackNumber": 1
+      },
+      {
+        "album": "Dive",
+        "albumId": "0",
+        "artist": "Tycho",
+        "artistId": "0",
+        "bitRateKbps": 128,
+        "contentType": "audio/wav",
+        "coverId": "0",
+        "discNumber": 1,
+        "durationMs": 6000,
+        "id": "0-1",
+        "mediaRevision": null,
+        "starred": false,
+        "title": "Track 2",
+        "trackNumber": 2
+      },
+      {
+        "album": "Dive",
+        "albumId": "0",
+        "artist": "Tycho",
+        "artistId": "0",
+        "bitRateKbps": 128,
+        "contentType": "audio/wav",
+        "coverId": "0",
+        "discNumber": 1,
+        "durationMs": 6000,
+        "id": "0-2",
+        "mediaRevision": null,
+        "starred": false,
+        "title": "Track 3",
+        "trackNumber": 3
+      }
+    ]
+  }
+}

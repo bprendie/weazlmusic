@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": "storage_full",
+    "message": "Sanitized storage_full fixture.",
+    "retryable": true,
+    "details": {}
+  }
+}

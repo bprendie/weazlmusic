@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": "session_revoked",
+    "message": "Sanitized session_revoked fixture.",
+    "retryable": false,
+    "details": {}
+  }
+}
