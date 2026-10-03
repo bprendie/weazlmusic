@@ -185,3 +185,11 @@ button[aria-pressed=true]{color:var(--yellow)}
 .auth-form select{padding:12px;background:#141518;border:1px solid #49464f;color:var(--text)}
 .auth-form .check-label{display:flex;align-items:center}
 #mood-progress{color:var(--yellow);white-space:nowrap}
+
+.flight-list article{padding:18px 0;border-bottom:1px solid var(--border,#303137)}
+.flight-list article p{line-height:1.6}
+.flight-choice{display:flex!important;align-items:center;gap:8px; padding:4px 0}
+.flight-choice input{width:auto!important}
+#flight-form fieldset{border:1px solid #303137;padding:12px}
+#flight-playback{margin-top:24px}
+#flight-playback input[type=range]{width:100%}

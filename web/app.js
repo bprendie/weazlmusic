@@ -8,8 +8,10 @@ import {bindAuth, openConnection} from './auth.js';
 import {openLLMSettings} from './llm-settings.js';
 import {openAdminSettings} from './admin-settings.js';
 import {buildMood, cancelMood} from './mood.js';
+import {closeFlightRecorder} from './flight-recorder.js';
 let searchTimer;
 function signedOut() {
+ closeFlightRecorder();
  cancelMood(true);
   cancelNavigation(); cancelSave(); clearTimeout(searchTimer); resetPlayer();
   state.user = '';state.admin = false;state.connection = null;state.queue = [];state.stations = [];state.tracks = [];state.albums = [];state.playlists = [];state.directory = [];state.favorites.clear();

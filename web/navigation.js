@@ -1,6 +1,7 @@
 import {state, $, esc, track} from './state.js';
 import {api, library} from './api.js';
 import {renderMain, renderPlayer} from './render.js';
+import {renderFlightRecorder,closeFlightRecorder} from './flight-recorder.js';
 let requestID = 0, controller;
 export function cancelNavigation() { requestID++; controller?.abort(); }
 export async function refreshPlaylists() {
@@ -9,7 +10,9 @@ export async function refreshPlaylists() {
 
 }
 export async function navigate(view = state.view, query = '', more = false) {
-  controller?.abort(); controller = new AbortController();
+  closeFlightRecorder();
+ if(view==='flight-recorder'){state.view=view;state.query='';state.loading=false;renderMain();await renderFlightRecorder();return;}
+ controller?.abort(); controller = new AbortController();
   const id = ++requestID, signal = controller.signal;
   state.view = view; state.query = query; state.loading = true; state.error = '';
   if (!query) $('#search').value = '';
