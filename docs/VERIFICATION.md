@@ -126,20 +126,7 @@ issue, and DEPLOYMENT.md now includes that step.
 
 ## Outstanding acceptance
 
-Luna's user-authorized six-stream, six-hour fixture soak started at
-**2026-10-03 15:23:36 UTC**, expected capture end21:23:36 UTC (17:23:36 EDT),
-followed by download/hash/decode checks. Container `weazl-luna-soak-20261003`,
-new isolated volume `weazl-luna-soak-20261003-data`, fixture session
-`848f9f0765eb0b5bc4a3435bb65a2175922731bd697da788f46562a3fbed97f2`,
-image `sha256:8f9856f28266b1ce2620e94d310249207e96bd374d542ab18db8fadd887e8bc8`.
-Artifacts/log are under `test-results/luna-soak-20261003`. Status: **running**,
-not yet accepted. The other local test containers were removed after verification. It must record compact resources, timing, bytes, all asset checksums,
-local seeking and decoded station/cue identity at shared minute30 and50 offsets.
-Use fixture production30-second segments and actual21600-second wall time.
-`overnightValidated:false` remains until that report is reviewed. AVPlayer,
-background URLSession/proxy-header paths, locked-screen playback and Apple
-interruptions remain device-side acceptance; `appleValidated:false` stays explicit.
-
+Luna's user-authorized six-stream, six-hour local fixture soak completed on 2026-10-03. The scheduled 21,600-second session finalized `partial` as expected for the deliberate station 5 reconnect and station 6 stall fixtures. Actual start tolerance was201ms; 4,322 assets / 2,578,402,060 bytes passed size and SHA-256 verification, local seek decoded, and all twelve station/cue checks at shared minute30 and50 offsets passed. Coverage ranged99.9196–99.9984%; sampled memory was179.6–286.0MiB, sampled Docker CPU16.3–113.46%, and the container had zero restarts. Container `weazl-luna-soak-20261003` was removed after completion; volume `weazl-luna-soak-20261003-data` and ignored artifacts under `test-results/luna-soak-20261003/` are preserved. Full per-station coverage, resource trends, tone readings, image/source IDs and limitations: [SOAK_2026-10-03.md](SOAK_2026-10-03.md). This evidence awaits root review: product `overnightValidated:false` remains unchanged, and `appleValidated:false` stays explicit. AVPlayer, background URLSession/proxy-header paths, locked-screen playback and Apple interruptions remain device-side acceptance.
 Physical ENOSPC was not induced on this shared filesystem; reserve/quota rejection
 and incomplete media are tested. Timestamp anchors preserve detected restart/
 disconnect gaps, but do not reconstruct sub-deadline stalls or synchronize
