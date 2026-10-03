@@ -56,22 +56,29 @@ export function renderQueue() {
   if (state.view === 'queue') renderMain();
 }
 export function renderPlayer() {
-  const t = state.current;
-  $('#build-mood').disabled = !t || !!t.url || !!state.mood?.running;
+  const flight = state.flightPlayback;
+  const station = flight?.manifest.tracks.find(t => t.stationId === flight.station);
+  const t = flight ? {title:station.name,artist:"Flight Recorder",album:flight.manifest.name,duration:flight.manifest.durationMs/1000} : state.current;
+  const playing = flight ? !flight.paused : state.playing;
+  $('.player').classList.toggle("recorder-active",!!flight);
+  $('#build-mood').disabled = !!flight || !t || !!t.url || !!state.mood?.running;
   const meta = t?.url ? state.radioMetadata : null;
   const title = meta?.title || t?.title || 'Ready when you are.';
-  const subtitle = t?.url ? (meta?.title ? [meta.artist,t.title].filter(Boolean).join(' · ') : 'Live radio') : t ? [t.artist,t.album].filter(Boolean).join(' · ') : 'Pick a track or a frequency.';
+  const subtitle = flight ? [flight.manifest.name,flight.inGap?'No recording at this time':''].filter(Boolean).join(' · ') : t?.url ? (meta?.title ? [meta.artist,t.title].filter(Boolean).join(' · ') : 'Live radio') : t ? [t.artist,t.album].filter(Boolean).join(' · ') : 'Pick a track or a frequency.';
   $('#now-title').textContent = title;$('#now-title').title = title;
   $('#now-artist').textContent = subtitle;$('#now-artist').title = subtitle;
   if ('mediaSession' in navigator && 'MediaMetadata' in window) navigator.mediaSession.metadata = t ? new MediaMetadata({title,artist:meta?.artist || (t.url ? t.title : t.artist),album:t.url ? t.title : t.album}) : null;
-  $('#now-cover').innerHTML = t ? cover(t,true) : '<img src="weazlhead.png" alt="" class="mini-cover">';
-  $('#play').textContent = state.playing ? 'Ⅱ' : '▶';
-  $('#play').setAttribute('aria-label',state.playing ? 'Pause' : 'Play');
+  $('#now-cover').innerHTML = t && !flight ? cover(t,true) : '<img src="weazlhead.png" alt="" class="mini-cover">';
+  $('#play').textContent = playing ? 'Ⅱ' : '▶';
+  $('#play').setAttribute('aria-label',playing ? 'Pause' : 'Play');
   $('#duration').textContent = t ? duration(t.duration) : '0:00';
-  $('#source').textContent = t?.url ? 'RADIO' : 'LIBRARY';
+  $('#source').textContent = flight ? 'RECORDER' : t?.url ? 'RADIO' : 'LIBRARY';
+  if (flight) {const offset=Math.min(flight.manifest.durationMs,flight.offset+(flight.paused?0:performance.now()-flight.anchor));$('#elapsed').textContent=duration(offset/1000);$('#seek').value=offset/flight.manifest.durationMs*100;}
   $('#seek').disabled = !t || !!t.url;
-  $('#favorite').textContent = t && state.favorites.has(t.id) ? '♥' : '♡';
-  $('#favorite').disabled = !t || !!t.url;
-  $('#favorite').setAttribute('aria-pressed',String(!!t && state.favorites.has(t.id)));
-  $('#next').disabled = !state.queue.length;
+  $('#favorite').textContent = !flight && t && state.favorites.has(t.id) ? '♥' : '♡';
+  $('#favorite').disabled = !!flight || !t || !!t.url;
+  $('#favorite').setAttribute('aria-pressed',String(!flight && !!t && state.favorites.has(t.id)));
+  $('#next').disabled = !!flight || !state.queue.length;
+  $('#previous').disabled = !!flight;$('#shuffle').disabled=!!flight;
+  if ('mediaSession' in navigator) navigator.mediaSession.playbackState = t ? (playing?'playing':'paused') : 'none';
 }

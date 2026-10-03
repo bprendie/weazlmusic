@@ -196,7 +196,11 @@ and `CAPTURE_RETENTION_DAYS` in Compose's environment. Storage is checked before
 reservation and during capture; one failed station does not stop the others.
 
 Listen through one shared session timeline: switch presets at the current
-offset, pause globally, or seek all stations together. Server capture status
+offset, pause globally, or seek all stations together. The highlighted Now Playing
+footer shows the selected station and recording, with play/pause and seeking
+available even after navigating away from Flight Recorder. Keep multiple saved
+recordings; select their checkboxes and use **Delete selected** to remove only
+the chosen server copies. Server capture status
 and phone offline readiness are separate. Server deletion/retention never
 silently removes phone copies. Native download leases support HEAD/Range,
 renewal, immutable checksums and verified atomic download promotion.

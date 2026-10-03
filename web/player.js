@@ -2,28 +2,28 @@ import {state, $, toast, duration} from './state.js';
 import {saveState} from './api.js';
 import {renderPlayer, renderQueue} from './render.js';
 import {closeRadioMetadata, watchRadioMetadata} from './radio-metadata.js';
-import {stopFlightPlayback,toggleFlight} from './flight-playback.js';
+import {stopFlightPlayback,toggleFlight,seekFlight} from './flight-playback.js';
 export const audio = new Audio();
 audio.preload = 'none';
 audio.volume = 0.7;
 let previousTracks = [], playVersion = 0;
 function rememberPosition() {
-  if (state.current && !state.current.url && Number.isFinite(audio.currentTime)) state.current.position = audio.currentTime;
+  if (!state.flightPlayback && state.current && !state.current.url && Number.isFinite(audio.currentTime)) state.current.position = audio.currentTime;
 }
 export function stop() {
- stopFlightPlayback();
-  closeRadioMetadata();
   rememberPosition();
+  stopFlightPlayback();
+  closeRadioMetadata();
   playVersion++; audio.pause(); audio.removeAttribute('src'); audio.load(); state.playing = false;
 }
 export function resetPlayer() { stop(); previousTracks = []; state.current = null; state.resume = null; renderPlayer(); }
 export async function play(t, remember = true) {
   if (!t) return;
+ rememberPosition();
  stopFlightPlayback();
   closeRadioMetadata();
   const version = ++playVersion;
   if (remember && state.current && !state.current.url) previousTracks.push(state.current);
-  rememberPosition();
   if (t.url && state.current && !state.current.url) state.resume = {...state.current};
   audio.pause(); audio.removeAttribute('src'); audio.load();
   state.current = t; state.playing = false;
@@ -57,7 +57,7 @@ audio.addEventListener('timeupdate',() => {
   $('#elapsed').textContent = duration(audio.currentTime);
   $('#seek').value = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.currentTime / audio.duration * 100 : 0;
 });
-$('#seek').addEventListener('input',event => {if (Number.isFinite(audio.duration) && !state.current?.url) audio.currentTime = audio.duration * Number(event.target.value) / 100;});
+$('#seek').addEventListener('input',event => {if(state.flightPlayback){seekFlight(state.flightPlayback.manifest.durationMs*Number(event.target.value)/100);return;}if (Number.isFinite(audio.duration) && !state.current?.url) audio.currentTime = audio.duration * Number(event.target.value) / 100;});
 $('#volume').addEventListener('input',event => {audio.volume = Number(event.target.value) / 100;});
 if ('mediaSession' in navigator) {
   navigator.mediaSession.setActionHandler('play',toggle);

@@ -29,6 +29,27 @@ Alice/Bob accounts; production library mutations are excluded.
   recorded in MEDIA_TOOLCHAIN.md. Existing encrypted files remain readable;
   preset migration retains stable IDs and prevents stale browser overwrites.
 
+## Flight Recorder web controls follow-up
+
+The Now Playing footer now shows the recorder station/session and highlights the
+active recorder source. Footer and recorder play/pause controls share the same
+clock; footer seek controls the session and remains usable after navigation.
+Mood/favorites and library transport shortcuts are disabled for recorder playback.
+Stopping or deleting the playing recording clears its playback selection.
+Saved recordings have individual/select-all checkboxes and a selected count;
+bulk deletion preserves unselected copies, uses each entity's ownership/version
+checks, and reports per-recording failures without dropping failed selections.
+
+`tests/run-browser.sh`: existing music/radio/Mood browser checks passed.
+`node tests/recorder.cjs` against a fresh isolated fixture volume: passed actual AAC
+playback, station metadata/highlight, footer/local play/pause synchronization,
+footer seek/stop after navigating away, three retained recordings, checkbox
+selection across status refreshes, cancel then delete-two preserving the third,
+select-all/unselect-all and mobile layout. No JavaScript errors. Screenshot:
+`test-results/recorder-browser-mobile.png`. Recorder backend/API/encoding is
+unchanged; Luna's six-hour fixture container continues uninterrupted on its
+original release image. This UI follow-up does not establish overnight acceptance.
+
 ## Real synthetic capture evidence
 
 `scripts/run-recorder-fixture.sh 60 test-results/recorder-aac160` passed with six

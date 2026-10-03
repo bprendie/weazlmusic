@@ -1,18 +1,28 @@
 import {state,$,esc,toast} from './state.js';
-import {flightAPI,listFlights} from './flight-api.js';
+import {flightAPI,listFlights,flightIdentity} from './flight-api.js';
 import {openFlightPlayback,stopFlightPlayback,refreshFlightPlayback} from './flight-playback.js';
-let timer,generation=0,delay=5000;
+let timer,generation=0,delay=5000,deleting=false,selectionIdentity='';
+const selected=new Set();
+const deletable=j=>!['scheduled','recording','finalizing'].includes(j.state);
+function updateSelection(){
+ const count=selected.size,available=state.flight?.sessions.filter(deletable)||[];
+ const button=$('#flight-delete-selected');if(button){button.disabled=count===0||deleting;button.textContent=`Delete selected (${count})`;}
+ const all=$('#flight-select-all');if(all){all.checked=available.length>0&&count===available.length;all.indeterminate=count>0&&count<available.length;}
+}
 export function closeFlightRecorder(){clearTimeout(timer);generation++;}
 const bytes=n=>`${(Number(n)/(1024**3)).toFixed(2)} GB`;
 const instant=t=>new Date(t).toLocaleString();
 export async function renderFlightRecorder(){
+ if(deleting)return;
  closeFlightRecorder();const gen=generation;
  try{
  const [sessions,schedules,storage,stations]=await Promise.all([listFlights('flight-recorder/sessions'),listFlights('flight-recorder/schedules'),flightAPI('flight-recorder/storage'),flightAPI('radio/stations')]);
  if(gen!==generation||state.view!=='flight-recorder')return;
  state.flight={sessions,schedules,storage:storage.data,stations:stations.data};delay=5000;
- $('#content').innerHTML=`<p class="eyebrow purple">INTERNET RADIO</p><h1>Flight Recorder</h1><p>Record your presets here. Download recordings in Subweazl for offline listening.</p><div class="hero-actions"><button class="primary" data-flight="new">+ Schedule recording</button><button class="secondary" data-flight="now">Record now</button></div><p>${bytes(storage.data.usedBytes)} stored · ${bytes(storage.data.accountAvailableBytes)} available · ${bytes(storage.data.reserveBytes)} disk reserve. Up to six streams at once. ${storage.data.retention.enabled?`Server copies kept ${storage.data.retention.days} days.`:'Server copies kept until deleted.'}</p><h2>Upcoming recordings</h2><div class="flight-list">${schedules.filter(s=>s.state==='active').map(s=>`<article><strong>${esc(s.name)}</strong><p>${instant(s.nextStartsAt)} → ${instant(s.nextEndsAt)} · ${esc(s.timeZone)} · ${esc(s.recurrence.kind)}</p><p>${s.stationSnapshots.map(x=>esc(x.name)).join(' · ')}</p>${(s.timeCorrections||[]).map(x=>`<p>${esc(x)}</p>`).join('')}${s.error?`<p role="status">${esc(s.error)}</p>`:''}<button class="secondary" data-flight="edit" data-id="${esc(s.id)}">Edit</button> <button class="secondary" data-flight="cancel" data-id="${esc(s.id)}">Cancel future recordings</button></article>`).join('')||'<p>No upcoming recordings.</p>'}</div><h2>Sessions</h2><div class="flight-list">${sessions.slice().sort((a,b)=>b.startsAt.localeCompare(a.startsAt)).map(j=>`<article><strong>${esc(j.name)}</strong> <span class="tag">${esc(j.state)}</span><p>${instant(j.startsAt)} · ${j.stationCount} presets · ${bytes(j.capturedBytes)}</p><p>${j.stations.map(s=>`${esc(s.station.name)}: ${esc(s.state)}${s.error?' · '+esc(s.error):''}`).join('<br>')}</p>${['scheduled','recording','finalizing'].includes(j.state)?`<button class="secondary" data-flight="stop" data-id="${esc(j.id)}">Stop recording</button>`:`${j.manifestRevision?`<button class="primary" data-flight="play" data-id="${esc(j.id)}">Listen</button> `:''}<button class="secondary" data-flight="delete" data-id="${esc(j.id)}">Delete server recording</button>`}</article>`).join('')||'<p>No recorded sessions yet.</p>'}</div><div id="flight-playback"></div>`;
- refreshFlightPlayback();
+ if(selectionIdentity!==flightIdentity()){selected.clear();selectionIdentity=flightIdentity();}
+ const removable=new Set(sessions.filter(deletable).map(j=>j.id));for(const id of selected)if(!removable.has(id))selected.delete(id);
+ $('#content').innerHTML=`<p class="eyebrow purple">INTERNET RADIO</p><h1>Flight Recorder</h1><p>Record your presets here. Download recordings in Subweazl for offline listening.</p><div class="hero-actions"><button class="primary" data-flight="new">+ Schedule recording</button><button class="secondary" data-flight="now">Record now</button></div><p>${bytes(storage.data.usedBytes)} stored · ${bytes(storage.data.accountAvailableBytes)} available · ${bytes(storage.data.reserveBytes)} disk reserve. Up to six streams at once. ${storage.data.retention.enabled?`Server copies kept ${storage.data.retention.days} days.`:'Server copies kept until deleted.'}</p><h2>Upcoming recordings</h2><div class="flight-list">${schedules.filter(s=>s.state==='active').map(s=>`<article><strong>${esc(s.name)}</strong><p>${instant(s.nextStartsAt)} → ${instant(s.nextEndsAt)} · ${esc(s.timeZone)} · ${esc(s.recurrence.kind)}</p><p>${s.stationSnapshots.map(x=>esc(x.name)).join(' · ')}</p>${(s.timeCorrections||[]).map(x=>`<p>${esc(x)}</p>`).join('')}${s.error?`<p role="status">${esc(s.error)}</p>`:''}<button class="secondary" data-flight="edit" data-id="${esc(s.id)}">Edit</button> <button class="secondary" data-flight="cancel" data-id="${esc(s.id)}">Cancel future recordings</button></article>`).join('')||'<p>No upcoming recordings.</p>'}</div><h2>Saved recordings</h2><p>Select the recordings you want to delete from the server.</p>${sessions.some(deletable)?'<div class="flight-selection"><label><input type="checkbox" id="flight-select-all"> Select all finished recordings</label><button class="secondary" id="flight-delete-selected" data-flight="delete-selected" disabled>Delete selected (0)</button></div>':''}<div class="flight-list">${sessions.slice().sort((a,b)=>b.startsAt.localeCompare(a.startsAt)).map(j=>`<article data-flight-session="${esc(j.id)}"><div class="flight-recording-title">${deletable(j)?`<input type="checkbox" data-flight-select="${esc(j.id)}" aria-label="Select ${esc(j.name)}" ${selected.has(j.id)?'checked':''}>`:''}<strong>${esc(j.name)}</strong> <span class="tag">${esc(j.state)}</span></div><p>${instant(j.startsAt)} · ${j.stationCount} presets · ${bytes(j.capturedBytes)}</p><p>${j.stations.map(s=>`${esc(s.station.name)}: ${esc(s.state)}${s.error?' · '+esc(s.error):''}`).join('<br>')}</p>${['scheduled','recording','finalizing'].includes(j.state)?`<button class="secondary" data-flight="stop" data-id="${esc(j.id)}">Stop recording</button>`:`${j.manifestRevision?`<button class="primary" data-flight="play" data-id="${esc(j.id)}">Listen</button> `:''}<button class="secondary" data-flight="delete" data-id="${esc(j.id)}">Delete server recording</button>`}</article>`).join('')||'<p>No recorded sessions yet.</p>'}</div><div id="flight-playback"></div>`;
+ updateSelection();refreshFlightPlayback();
  timer=setTimeout(()=>{if(state.view==='flight-recorder'&&!$('#flight-form'))renderFlightRecorder();},delay);
  }catch(error){if(gen===generation){toast(error.message);delay=Math.min(delay*2,60000);timer=setTimeout(renderFlightRecorder,delay);}}
 }
@@ -29,6 +39,23 @@ function form(schedule,now){
 }
 document.addEventListener('click',async event=>{const b=event.target.closest('[data-flight]');if(!b)return;const action=b.dataset.flight,id=b.dataset.id;try{
  if(action==='new'||action==='now'){form(null,action==='now');return;}if(action==='edit'){form(state.flight.schedules.find(s=>s.id===id),false);return;}if(action==='back'){await renderFlightRecorder();return;}if(action==='play'){await openFlightPlayback(id);return;}
+ if(action==='delete'||action==='delete-selected'){await deleteRecordings(action==='delete'?[id]:[...selected]);return;}
  if(action==='cancel'){const s=state.flight.schedules.find(s=>s.id===id);await flightAPI('flight-recorder/schedules/'+id,'DELETE',undefined,s.version);}if(action==='stop')await flightAPI('flight-recorder/sessions/'+id+'/stop','POST',{});
- if(action==='delete'){const j=state.flight.sessions.find(s=>s.id===id);if(!confirm(`Delete “${j.name}” from the server? Phone copies are managed separately.`))return;stopFlightPlayback(id);await flightAPI('flight-recorder/sessions/'+id,'DELETE',undefined,j.version);}await renderFlightRecorder();
+ await renderFlightRecorder();
  }catch(error){toast(error.message);}});
+
+document.addEventListener('change',event=>{
+ const input=event.target;if(input.id==='flight-select-all'){
+  for(const j of state.flight.sessions.filter(deletable)){if(input.checked)selected.add(j.id);else selected.delete(j.id);}
+  document.querySelectorAll('[data-flight-select]').forEach(box=>box.checked=selected.has(box.dataset.flightSelect));
+ }else if(input.matches('[data-flight-select]')){if(input.checked)selected.add(input.dataset.flightSelect);else selected.delete(input.dataset.flightSelect);}else return;
+ updateSelection();
+});
+async function deleteRecordings(ids){
+ if(deleting)return;const jobs=state.flight.sessions.filter(j=>ids.includes(j.id)&&deletable(j));if(!jobs.length)return;
+ if(!confirm(`Delete ${jobs.length===1?'“'+jobs[0].name+'”':jobs.length+' selected recordings'} from the server? Phone copies are managed separately.`))return;
+ deleting=true;closeFlightRecorder();updateSelection();const failures=[];let removed=0;
+ try{for(const j of jobs){try{await flightAPI('flight-recorder/sessions/'+j.id,'DELETE',undefined,j.version);stopFlightPlayback(j.id);selected.delete(j.id);removed++;}catch(error){failures.push(`${j.name}: ${error.message}`);}}}
+ finally{deleting=false;await renderFlightRecorder();}
+ toast(failures.length?`${removed} deleted. ${failures.join(' · ')}`:`${removed} recording${removed===1?'':'s'} deleted from the server.`);
+}
