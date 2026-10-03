@@ -245,14 +245,16 @@ mutate them. API client downloads assets, validates checksums and seeks locally.
 | S5 | Implemented | Browser overnight create/edit/cancel, tab-close capture, real AAC playback switch/pause/seek, deletion/mobile |
 | S6 | Release checks passed; soak/Apple pending | Race/vet, existing/new browser tests, image builds, volume recovery; see VERIFICATION.md |
 
-Sol resume prompt:
+Post-release resume prompt:
 
-> Read SOL_WORKBOOK.md and docs/SUBWEAZL_API_V1.md. Implement S0 through S6 in
-> reviewable commits. WeazlTunes becomes Subweazl's primary backend; Navidrome
-> remains upstream. Keep existing browser flows working. Start with contract
-> fixtures and native device authentication, then music/preset coverage and
-> durable Flight Recorder scheduling/capture. Test with isolated fixtures,
-> update evidence and report the API contract revision to the iOS owner.
+> Read SOL_WORKBOOK.md, docs/VERIFICATION.md and docs/NATIVE_HANDOFF.md. The
+> implementation is deployed from55c005e; preserve production data and the
+> recorded rollback backup. Review Luna's six-hour isolated soak report and
+> coordinate Apple AVPlayer/background-transfer acceptance with the native owner.
+> Do not infer overnight or Apple validation from short fixture runs.
+
+Runtime release `55c005e1dad800a0cebad7ce32b12874c1cc7dab` is committed, pushed to
+main and deployed; production health and encryption-key preservation verified.
 
 Evidence boundaries: physical ENOSPC was not induced on the shared filesystem;
 reserve exhaustion, quota rejection and invalid partial media are tested.

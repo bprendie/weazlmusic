@@ -2,8 +2,9 @@
 
 Canonical contract: [SUBWEAZL_API_V1.md](SUBWEAZL_API_V1.md). The identical native
 snapshot is `~/Code/iOS/subweazl_app/docs/WEAZLTUNES_API_V1.md`; no native source
-was edited or built here. Release commit is recorded in VERIFICATION.md and the
-release commit immediately preceding that evidence update. The implemented
+was edited or built here. Runtime release commit: `55c005e1dad800a0cebad7ce32b12874c1cc7dab`
+(backend `f1ee390`, web UI `981cb2b`). Production is healthy on this release;
+VERIFICATION.md records its backup and deployment receipt. The implemented
 server preserves legacy browser routes and serves the native `/api/v1` surface.
 
 ## Isolated server

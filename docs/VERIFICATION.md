@@ -1,7 +1,7 @@
 # Verification — native API and Flight Recorder, 2026-10-03
 
-Contract revision **2026-10-03.2**. Implementation release commit and production
-receipt are added below when deployment finishes. Tests use isolated synthetic
+Contract revision **2026-10-03.2**. Implementation release: `55c005e1dad800a0cebad7ce32b12874c1cc7dab`.
+Backend/fixtures commit `f1ee390`; web UI commit `981cb2b`. Tests use isolated synthetic
 Alice/Bob accounts; production library mutations are excluded.
 
 ## Release checks
@@ -55,6 +55,31 @@ volume/key, restored into a new named volume, and verified identical installatio
 owned sessions, exact encrypted refresh-replay response and media checksum.
 Local evidence is under test-results/volume-recovery. Production rollback uses
 its own restricted backup; this fixture test does not modify production data.
+
+## Production deployment receipt
+
+Deployed via `bobp@jumpbox.prendie.io` → `bobp@weazlmusic.teralab.local`, checkout
+`/home/bobp/weazlmusic`, source `55c005e1dad800a0cebad7ce32b12874c1cc7dab`.
+The clean main branch fast-forwarded; the new image built while the prior service
+remained live. Service stopped only for the full-volume archive and replacement.
+
+- Container `weazlmusic-weazltunes-1`: healthy, zero restarts, user weazl/UID10001,
+  port4000, existing `weazlmusic_weazltunes-data` volume retained.
+- `/healthz`200; `/`200; legacy `/api/me`401; native `/api/v1/me`401.
+  Public info returns revision2026-10-03.2 and installation
+  `a185535e72bc82b7eef2dca766a4161ea5cc45cb8cd195ac6aeeefd6e424c3ad`.
+- ffmpeg, ffprobe and fdkaac present. Encryption-key SHA-256 identical before/after.
+  No production login/password, library mutation, scrobble or recording was used
+  as an acceptance test.
+- Backup: `/home/bobp/weazlmusic-backups/20261003T151855Z/data.tar.gz`, restricted
+  parent directory0700. Archive contents and SHA-256 verified:
+  `d1c2e7a964be20bfbc96d0d04b4716ee9e199cb84399ec5e511e3b8ded032396`.
+- Rollback image: `weazltunes-web:rollback-20261003T151855Z`; override YAML and old
+  source/image receipts are in that same backup directory. Runtime image:
+  `sha256:0bafa4f89a63112f71381a71c32804970c403c1fb8040cdd27dd9ecc006712db`.
+
+Documentation-only follow-up commits do not change this tested runtime image;
+production checkout is advanced to the documentation receipt without restarting.
 
 ## Outstanding acceptance
 
