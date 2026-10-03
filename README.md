@@ -169,3 +169,9 @@ API contracts follow OpenSubsonic's
 and [updatePlaylist](https://opensubsonic.netlify.app/docs/endpoints/updateplaylist/)
 endpoints. Container connectivity follows
 [Docker Compose networking](https://docs.docker.com/compose/how-tos/networking/).
+
+## Subweazl backend and Flight Recorder development
+
+The next implementation assignment is [SOL_WORKBOOK.md](SOL_WORKBOOK.md).
+Its versioned native API target is [docs/SUBWEAZL_API_V1.md](docs/SUBWEAZL_API_V1.md).
+These are planned server additions; the routes and recording capability are not yet implemented.
