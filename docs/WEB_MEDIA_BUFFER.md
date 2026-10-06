@@ -57,3 +57,26 @@ builds need neither npm nor a CDN. The module loads only for recorder playback.
 The earlier six-hour soak validated server capture and media integrity. It did
 not test continuous browser playback across segment boundaries. This follow-up
 adds that missing browser coverage; it is not a new six-hour browser soak.
+
+## Production deployment
+
+Deployed source `37899427d39de9b8e70a10e152cb0876b6972961` through the jumpbox on
+2026-10-06. No production capture was active. The new image built before stopping
+the service for a full-volume backup and container replacement.
+
+- Runtime image:
+  `sha256:28086a0f538d3ae0e08858fb20ee3597aeb219866cccd9e9a6387a058f67fd58`.
+  Container healthy, zero restarts; health endpoint passed and anonymous native
+  identity access remained 401. Served buffering code, the exact vendored module
+  and the media CSP were verified over HTTP.
+- Installation info and encryption-key digest matched before/after. The existing
+  recording volume was retained; no production recording or library mutation was
+  used as a playback test.
+- Backup directory: `/home/bobp/weazlmusic-backups/20261006T130556Z` (mode0700).
+  Full archive `data.tar.gz` is operator-owned mode0600, with verified SHA-256
+  `951dc3b900a7fc0287e0d44d75c88cc7bffd14c89b91258683b770ce85e6f9eb`.
+- Rollback image: `weazltunes-web:rollback-20261006T130556Z`. Its Compose override,
+  prior image/source, key digests and deployment receipts are in that directory.
+
+Documentation-only receipt commits advance the production checkout without
+rebuilding or restarting this tested runtime image.
