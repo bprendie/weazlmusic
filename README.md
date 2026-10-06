@@ -198,7 +198,13 @@ reservation and during capture; one failed station does not stop the others.
 Listen through one shared session timeline: switch presets at the current
 offset, pause globally, or seek all stations together. The highlighted Now Playing
 footer shows the selected station and recording, with play/pause and seeking
-available even after navigating away from Flight Recorder. Keep multiple saved
+available even after navigating away from Flight Recorder. The web player buffers
+**five minutes ahead**, refilling to five minutes when less than **four minutes
+remain**. Buffer ahead offers 1, 3, 5 or 10 minutes and remembers this browser’s
+choice. Supported browsers play the AAC segments on one continuous media timeline;
+network buffering freezes playback instead of skipping unheard audio. Old
+recordings benefit immediately. See [web media buffering](docs/WEB_MEDIA_BUFFER.md)
+for browser support and verification. Keep multiple saved
 recordings; select their checkboxes and use **Delete selected** to remove only
 the chosen server copies. Server capture status
 and phone offline readiness are separate. Server deletion/retention never

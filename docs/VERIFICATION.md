@@ -1,5 +1,9 @@
 # Verification — native API and Flight Recorder, 2026-10-03
 
+Web buffering follow-up, 2026-10-06: see [WEB_MEDIA_BUFFER.md](WEB_MEDIA_BUFFER.md)
+for the five-minute/four-minute refill policy, continuous AAC browser playback,
+Freestyle diagnosis, dependency provenance and regression evidence.
+
 Contract revision **2026-10-03.2**. Implementation release: `55c005e1dad800a0cebad7ce32b12874c1cc7dab`.
 Backend/fixtures commit `f1ee390`; web UI commit `981cb2b`. Tests use isolated synthetic
 Alice/Bob accounts; production library mutations are excluded.

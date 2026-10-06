@@ -73,7 +73,7 @@ export function renderPlayer() {
   $('#play').setAttribute('aria-label',playing ? 'Pause' : 'Play');
   $('#duration').textContent = t ? duration(t.duration) : '0:00';
   $('#source').textContent = flight ? 'RECORDER' : t?.url ? 'RADIO' : 'LIBRARY';
-  if (flight) {const offset=Math.min(flight.manifest.durationMs,flight.offset+(flight.paused?0:performance.now()-flight.anchor));$('#elapsed').textContent=duration(offset/1000);$('#seek').value=offset/flight.manifest.durationMs*100;}
+  if (flight) {const offset=flight.position();$('#elapsed').textContent=duration(offset/1000);$('#seek').value=offset/flight.manifest.durationMs*100;}
   $('#seek').disabled = !t || !!t.url;
   $('#favorite').textContent = !flight && t && state.favorites.has(t.id) ? '♥' : '♡';
   $('#favorite').disabled = !!flight || !t || !!t.url;
