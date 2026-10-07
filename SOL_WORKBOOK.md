@@ -262,3 +262,20 @@ Timestamp mapping preserves detected disconnect/restart gaps; it does not
 reconstruct sub-deadline stalls or synchronize independent broadcaster clocks.
 Recurrence capacity uses a one-year horizon and runtime enforcement. Apple
 acceptance and six-hour soak are explicit outstanding gates, not mock-based passes.
+
+
+## Native follow-up request — 2026-10-07, S04 quality delivery
+
+The native workbook has landed recovery, strict offline policy, shared ranged
+media caching and headless command services at `fa919a7`, with Apple adapters at
+`abb1ecd`. Its new S04 is a separate server deliverable; the recorder workbook's
+existing completed items do not close it. See
+[SUBWEAZL_QUALITY_HANDOFF.md](docs/SUBWEAZL_QUALITY_HANDOFF.md) for the requested
+profiles, immutable representation/seek/integrity contract and isolated fixtures.
+
+Current server `35a3eca` still provides original-only media quality. The native
+snapshot remains `2026-10-03.2`; cellular AAC controls await a versioned delivery.
+Native cached originals request trackOriginal to bypass upstream stream defaults.
+No deployment is requested for this follow-up. Implement and validate in isolated
+fixtures, commit the server delivery and coordinate its canonical revision with
+the native owner before enabling profiles. Physical Apple acceptance stays open.
