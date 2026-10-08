@@ -63,3 +63,23 @@ The synthetic fixture retains the previous 160 kbps profile to exercise existing
 media compatibility. Native source inspection confirms manifest timing is used;
 a real iPhone sync benchmark and another six-hour soak were not performed for
 this change. Production checks are read-only and do not create/delete recordings.
+
+## Production receipt
+
+Source `01630d1` deployed on 2026-10-08 to `weazlmusic.teralab.local` through
+`jumpbox.teralab.local`, verifying the trusted `jumpbox.prendie.io` host-key alias.
+The misspelled `weazlmuisic` name did not resolve. No capture was active before
+build or immediately before stopping the service.
+
+Runtime image:
+`sha256:f8d5e1c09a782c0c59f27fe2b23746bacced722559a2cb18a44ce07e42a88260`.
+Container healthy, zero restarts; health and root HTTP checks passed, anonymous
+native identity returned 401, and installation info and key digest were unchanged.
+Existing data and recordings were retained.
+
+Verified full-volume backup: `/home/bobp/weazlmusic-backups/20261008T135035Z`
+(directory0700, archive0600, operator-owned). Archive SHA-256:
+`2065ebce1f3573fa2f85fc7ca2e6ba2c65f2cc8b47fab4d3dc648ac9fc7850da`.
+Rollback image: `weazltunes-web:rollback-20261008T135035Z`; the directory contains
+the compose override, old image/source receipts, build log and health evidence.
+Documentation-only receipt commits do not require another runtime restart.
