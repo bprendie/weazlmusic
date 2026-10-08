@@ -60,7 +60,7 @@ func (a *apiV1) storage() (storageStatus, error) {
 	return v, nil
 }
 func estimateBytes(duration time.Duration, stations int) int64 {
-	return int64(duration.Seconds()) * 40000 * int64(stations)
+	return int64(duration.Seconds()) * (recorderBitrateKbps * 1000 / 8 * 2) * int64(stations)
 }
 func overlapValid(windows []recordingWindow) bool {
 	type edge struct {

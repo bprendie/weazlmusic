@@ -4,10 +4,12 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"testing"
 )
 
-func TestRecorderAACAndVBRInputsExactFDKProfile(t *testing.T) {
+func TestRecorderAACAndVBRInputs128kFDKProfile(t *testing.T) {
 	if !mediaToolsAvailable() {
 		t.Fatal("ffmpeg, ffprobe and fdkaac required")
 	}
@@ -40,6 +42,14 @@ func TestRecorderAACAndVBRInputsExactFDKProfile(t *testing.T) {
 				t.Fatal("segments missing", files, err)
 			}
 			for _, file := range files {
+				bitrate, err := exec.Command("ffprobe", "-v", "error", "-select_streams", "a:0", "-show_entries", "stream=bit_rate", "-of", "csv=p=0", file).Output()
+				if err != nil {
+					t.Fatal(err)
+				}
+				rate, err := strconv.Atoi(strings.TrimSpace(string(bitrate)))
+				if err != nil || rate < 115000 || rate > 141000 {
+					t.Fatalf("expected approximately 128 kbps AAC, got %s (%v)", bitrate, err)
+				}
 				if _, err := probeMedia(file); err != nil {
 					t.Fatal("not seekable AAC-LC 44100 stereo", err)
 				}

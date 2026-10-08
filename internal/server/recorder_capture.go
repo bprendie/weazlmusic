@@ -96,7 +96,8 @@ func (a *apiV1) captureAttempt(ctx context.Context, j recordingJob, index int, r
 	}
 	defer res.Body.Close()
 	// Network access is confined to the validated Go relay. FFmpeg sees a pipe, never a URL or credential.
-	g := &guardedAudio{Reader: res.Body, ctx: ctx, max: estimateBytes(j.Ends.Sub(a.now()), 1) * 2, check: func() bool {
+	// Bound upstream input independently of the lower output bitrate (up to 640 kbps).
+	g := &guardedAudio{Reader: res.Body, ctx: ctx, max: int64(j.Ends.Sub(a.now()).Seconds()) * 80000, check: func() bool {
 		a.mu.Lock()
 		defer a.mu.Unlock()
 		v, e := a.storage()

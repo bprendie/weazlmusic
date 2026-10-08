@@ -186,10 +186,11 @@ crosses midnight, with actual UTC boundaries and DST corrections returned.
 Logout and closing a tab do not stop server capture. Restart resumes the
 remaining original window and records unavailable time as gaps.
 
-The output matches profile 1 in `~/ipod_script/ipod.py`: **FDK AAC-LC, 160 kbps,
-44.1 kHz, stereo, M4A**. Six stations for six hours use roughly 2.59 GB before
-packaging; reservations include twice the nominal rate. Encoding a 128 kbps
-source at this profile increases its size. Defaults: 20 GiB installation budget,
+The output uses the AAC profile from `~/ipod_script/ipod.py` with a reduced bitrate:
+**FDK AAC-LC, 128 kbps,
+44.1 kHz, stereo, M4A**. Six stations for six hours use roughly 2.07 GB before
+packaging; reservations include twice the nominal rate. Previously saved 160 kbps recordings remain playable and retain their original
+bytes; only newly encoded audio uses 128 kbps. Defaults: 20 GiB installation budget,
 10 GiB per account, 1 GiB disk-free reserve, retention off. Configure
 `CAPTURE_BUDGET_BYTES`, `CAPTURE_ACCOUNT_BUDGET_BYTES`, `CAPTURE_RESERVE_BYTES`,
 and `CAPTURE_RETENTION_DAYS` in Compose's environment. Storage is checked before

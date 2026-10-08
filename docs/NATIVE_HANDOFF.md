@@ -1,5 +1,14 @@
 # Subweazl handoff — 2026-10-03.2
 
+2026-10-08 follow-up: new captures now use 128 kbps AAC-LC. See
+[FLIGHT_SYNC_PERFORMANCE.md](FLIGHT_SYNC_PERFORMANCE.md) for the encoding change
+and read-only native sync review. Canonical capabilities/fixtures now advertise
+128; refresh the native documentation snapshot when adopting this handoff. Native
+source and its historical 160 kbps snapshot were not edited in this pass. Existing
+assets keep their bytes, hashes and codec. No API shape/revision change is needed.
+
+The original release receipt follows.
+
 Canonical contract: [SUBWEAZL_API_V1.md](SUBWEAZL_API_V1.md). The identical native
 snapshot is `~/Code/iOS/subweazl_app/docs/WEAZLTUNES_API_V1.md`; no native source
 was edited or built here. Runtime release commit: `55c005e1dad800a0cebad7ce32b12874c1cc7dab`

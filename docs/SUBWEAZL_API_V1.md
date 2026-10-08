@@ -2,7 +2,7 @@
 
 Revision: **2026-10-03.2**. Status: implemented; six-hour fixture soak and Apple
 media acceptance remain pending. Canonical copy: WeazlTunes `docs/SUBWEAZL_API_V1.md`.
-The iOS repository carries an identical review snapshot at
+The iOS repository carries a review snapshot at
 `docs/WEAZLTUNES_API_V1.md`. Change the canonical contract and fixtures together;
 update the native snapshot before consuming a changed contract.
 
@@ -82,17 +82,19 @@ Account/security revocation remains authoritative over idempotency replay.
 Capabilities shape:
 
 ```json
-{"data":{"library":true,"originalDownloads":true,"favorites":["track","album","artist"],"playlistReplace":true,"scrobble":true,"radio":true,"mood":true,"flightRecorder":{"enabled":true,"maxStations":6,"defaultDurationMs":14400000,"maxDurationMs":43200000,"maxConcurrentStreams":6,"recurrence":["once","daily","weekly"],"inputFormats":["mp3","aac"],"outputProfiles":["aac-lc-m4a"],"outputEncoding":{"encoder":"fdkaac","profile":"AAC-LC","bitRateKbps":160,"sampleRateHz":44100,"channels":2},"overnightValidated":false,"appleValidated":false}}}
+{"data":{"library":true,"originalDownloads":true,"favorites":["track","album","artist"],"playlistReplace":true,"scrobble":true,"radio":true,"mood":true,"flightRecorder":{"enabled":true,"maxStations":6,"defaultDurationMs":14400000,"maxDurationMs":43200000,"maxConcurrentStreams":6,"recurrence":["once","daily","weekly"],"inputFormats":["mp3","aac"],"outputProfiles":["aac-lc-m4a"],"outputEncoding":{"encoder":"fdkaac","profile":"AAC-LC","bitRateKbps":128,"sampleRateHz":44100,"channels":2},"overnightValidated":false,"appleValidated":false}}}
 ```
 
 Recorder enabled is false when ffmpeg, ffprobe or fdkaac is absent.
-The output matches profile 1 in `~/ipod_script/ipod.py`: FDK AAC-LC, 160 kbps,
+New captures use the AAC profile from `~/ipod_script/ipod.py` at the reduced
+128 kbps rate (from 2026-10-08): FDK AAC-LC,
 44.1 kHz, stereo, M4A. ADTS is an internal pipe transport only. Assets use
 `audio/mp4` and `codec:"aac-lc"`. Ordinary FFmpeg decode/seek and Chromium playback
 are tested; AVPlayer/background transfers await Apple device validation.
-The server reserves 40,000 bytes/second/station (twice the nominal encoded rate).
-Six streams for six hours encode roughly 2.59 GB plus packaging and reserve
-5.18 GB of capacity. A 128 kbps input grows at this profile. Capabilities also
+The server reserves 32,000 bytes/second/station (twice the nominal encoded rate).
+Six streams for six hours encode roughly 2.07 GB plus packaging and reserve
+4.15 GB of capacity. Existing 160 kbps assets remain immutable and valid; clients
+use manifest byteLength/hash rather than deriving sizes from the current encoding. Capabilities also
 include `maxPlaylistTracks:1000`, `radioDirectory:["somafm","icecast"]`, and
 `contractRevision`. Library streams/downloads currently offer original quality only.
 

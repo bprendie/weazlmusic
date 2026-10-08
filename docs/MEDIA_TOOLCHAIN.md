@@ -1,7 +1,8 @@
 # Recorder media toolchain
 
 The user's `~/ipod_script/ipod.py` profile1 decodes s16 WAV at44100Hz/stereo and
-uses fdkaac profile2 at160k. The recorder matches that encode path, then carries
+uses fdkaac profile2 at160k. From 2026-10-08, the recorder uses the same AAC-LC
+profile at the user-requested **128 kbps**, retaining 44100 Hz/stereo, then carries
 AAC over ADTS pipes to FFmpeg's copy-only M4A segment muxer. Published segments
 are faststart, seekable, independently validated with ffprobe for AAC LC/44100/2,
 exact duration, bytes and SHA-256. This is lossy transcoding; it can save space

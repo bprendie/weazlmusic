@@ -18,7 +18,7 @@
       "maxDurationMs": 43200000,
       "maxStations": 6,
       "outputEncoding": {
-        "bitRateKbps": 160,
+        "bitRateKbps": 128,
         "channels": 2,
         "encoder": "fdkaac",
         "profile": "AAC-LC",

@@ -9,7 +9,9 @@ import (
 	"sync"
 )
 
-// Match ~/ipod_script/ipod.py profile 1: WAV s16/44100/stereo -> FDK AAC-LC 160k.
+// Use the ipod.py AAC-LC/44100/stereo profile with the user-requested 128 kbps rate.
+const recorderBitrateKbps = 128
+
 // ADTS is only the pipe transport; published files are seekable faststart M4A.
 type recorderEncoder struct {
 	Commands []*exec.Cmd
@@ -31,7 +33,7 @@ func startRecorderEncoder(dir string, seconds int) (*recorderEncoder, error) {
 	defer aacRead.Close()
 	defer aacWrite.Close()
 	decode := exec.Command("ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin", "-protocol_whitelist", "pipe,file", "-probesize", "32768", "-analyzeduration", "1000000", "-i", "pipe:0", "-map", "0:a:0", "-vn", "-threads", "1", "-f", "wav", "-ar", "44100", "-ac", "2", "-sample_fmt", "s16", "pipe:1")
-	encode := exec.Command("fdkaac", "-S", "-I", "-p", "2", "-b", "160k", "-f", "2", "-o", "-", "-")
+	encode := exec.Command("fdkaac", "-S", "-I", "-p", "2", "-b", strconv.Itoa(recorderBitrateKbps)+"k", "-f", "2", "-o", "-", "-")
 	pack := exec.Command("ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin", "-protocol_whitelist", "pipe,file", "-f", "aac", "-probesize", "32768", "-analyzeduration", "1000000", "-i", "pipe:0", "-map", "0:a:0", "-c:a", "copy", "-bsf:a", "aac_adtstoasc", "-f", "segment", "-segment_time", strconv.Itoa(seconds), "-reset_timestamps", "1", "-segment_format", "mp4", "-segment_format_options", "movflags=+faststart", "-segment_list", filepath.Join(dir, "segments.csv"), "-segment_list_type", "csv", filepath.Join(dir, "%06d.m4a"))
 	decode.Stdout = pcmWrite
 	encode.Stdin = pcmRead

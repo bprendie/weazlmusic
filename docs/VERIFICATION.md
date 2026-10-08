@@ -1,5 +1,9 @@
 # Verification — native API and Flight Recorder, 2026-10-03
 
+Encoding follow-up, 2026-10-08: new captures use 128 kbps AAC-LC.
+[FLIGHT_SYNC_PERFORMANCE.md](FLIGHT_SYNC_PERFORMANCE.md) records the actual encode
+test and native sync findings; earlier 160 kbps evidence below is historical.
+
 Web buffering follow-up, 2026-10-06: see [WEB_MEDIA_BUFFER.md](WEB_MEDIA_BUFFER.md)
 for the five-minute/four-minute refill policy, continuous AAC browser playback,
 Freestyle diagnosis, dependency provenance and regression evidence.
