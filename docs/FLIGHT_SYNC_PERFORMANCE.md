@@ -65,3 +65,24 @@ route. Benchmark on a real iPhone with the same recording: elapsed time to full
 verified offline readiness, bytes/sec, lease time, active task count, CPU,
 checksum time, disk work, retry/relaunch behavior and network conditions. Do not
 claim a particular speedup from concurrency or bundling before this measurement.
+
+## Production receipt
+
+Deployed source `ca8ddab` on 2026-10-08, after checking that no capture was active
+both before the image build and before stopping the service. Access used the
+jumpbox's LAN name `jumpbox.teralab.local` with its previously trusted
+`jumpbox.prendie.io` host-key alias, then the usual nested production SSH hop.
+
+Runtime image:
+`sha256:0ec89af7ed4aabfb577ca504bccd51ccb06e371bb6f5b3aefa15464cd841facc`.
+Container healthy with zero restarts; health/root HTTP checks passed, anonymous
+native identity remained 401, and installation info/key digest matched before
+and after. The original data volume and recordings were retained.
+
+Full-volume backup and rollback receipts:
+`/home/bobp/weazlmusic-backups/20261008T130843Z` (directory0700, archive0600,
+operator-owned). Verified `data.tar.gz` SHA-256:
+`91e0c0c2ba8a3826c1d83cd2df176ea166c27587586183173a2514bb453cc51e`.
+Rollback image: `weazltunes-web:rollback-20261008T130843Z`; override YAML and old
+source/image receipts are in the backup directory. Documentation-only follow-up
+commits advance the checkout without another runtime restart.
