@@ -69,6 +69,11 @@ export class FlightBuffer {
   }
   this.active=seg;this.audio.currentTime=this.continuous?position/1000:(seg.mediaStartMs+position-seg.startMs)/1000;
  }
+ canSeek(position){
+  const seg=this.track.segments.find(s=>position>=s.startMs&&position<s.startMs+s.durationMs);if(!seg)return false;
+  if(!this.continuous)return this.cache.has(seg.assetId);
+  const ranges=this.audio.buffered;for(let i=0;i<ranges.length;i++)if(ranges.start(i)*1000<=position&&ranges.end(i)*1000>position)return true;return false;
+ }
  position(){return this.continuous?this.audio.currentTime*1000:(this.active?.startMs||0)+this.audio.currentTime*1000-(this.active?.mediaStartMs||0);}
  has(seg){
   if(!this.continuous)return this.cache.has(seg.assetId);

@@ -28,6 +28,7 @@ type apiV1 struct {
 	installation string
 	now          func() time.Time
 	active       map[string]context.CancelFunc
+	packaging    map[string]bool
 	moodCancel   map[string]context.CancelFunc
 	snapshot     map[string]*librarySnapshot
 	mediaEnabled bool
@@ -69,7 +70,7 @@ func newV1(s *Server) (*apiV1, error) {
 	if now == nil {
 		now = time.Now
 	}
-	a := &apiV1{s: s, db: db, lock: lock, ctx: ctx, cancel: cancel, now: now, active: map[string]context.CancelFunc{}, snapshot: map[string]*librarySnapshot{}}
+	a := &apiV1{s: s, db: db, lock: lock, ctx: ctx, cancel: cancel, now: now, active: map[string]context.CancelFunc{}, packaging: map[string]bool{}, snapshot: map[string]*librarySnapshot{}}
 	if err = a.get("meta", "installation", "", &a.installation); errors.Is(err, sql.ErrNoRows) {
 		a.installation = randomID()
 		err = a.put("meta", "installation", "", a.installation)

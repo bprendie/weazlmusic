@@ -32,7 +32,14 @@ function render(){
  $('#flight-toggle').onclick=toggleFlight;$('#flight-seek').oninput=event=>seekFlight(Number(event.target.value));update();
 }
 export async function seekFlight(offset){
- if(!playback)return;playback.offset=Math.max(0,Math.min(playback.manifest.durationMs,offset));playback.loading=true;await selectAudio();remember();
+ const p=playback;if(!p)return;offset=Math.max(0,Math.min(p.manifest.durationMs,offset));
+ if(!p.loading&&p.buffer?.canSeek(offset)){
+  const buffer=p.buffer;p.offset=offset;p.loading=true;p.gap=false;p.waitingFor=null;
+  try{await buffer.activate(buffer.track.segments.find(s=>offset>=s.startMs&&offset<s.startMs+s.durationMs),offset);
+   if(playback!==p||p.buffer!==buffer)return;p.loading=false;buffer.fill(offset);if(!p.paused)await playAudio(p);render();schedule();remember();return;
+  }catch(e){if(playback!==p||p.buffer!==buffer||e.name==='AbortError')return;}
+ }
+ p.offset=offset;p.loading=true;await selectAudio();remember();
 }
 export async function toggleFlight(){
  const p=playback;if(!p)return;
@@ -66,10 +73,11 @@ async function tick(){
  if(!p.loading&&!p.paused){
   const t=position(),segments=p.buffer.track.segments;
   if(p.gap||p.waitingFor){const next=p.waitingFor||segments.find(s=>s.startMs>=p.offset-2);if(next&&t>=next.startMs)await leaveGapOrAdvance(p,next);}
-  else if(audio.readyState<3||audio.ended){
-   const previous=segments.find(s=>Math.abs(s.startMs+s.durationMs-t)<80);
+  else if(!audio.seeking&&(audio.readyState<3||audio.ended)){
+   // MSE can stop its clock slightly before a gap while queued audio drains.
+   const previous=segments.find(s=>Math.abs(s.startMs+s.durationMs-t)<250);
    if(previous){const end=previous.startMs+previous.durationMs,next=segments.find(s=>s.startMs>=end-2&&s!==previous);
-    if(!next||next.startMs>end+2){p.offset=end;p.anchor=performance.now();p.gap=true;audio.pause();}
+    if(!next||next.startMs>end+2){p.offset=t;p.anchor=performance.now();p.gap=true;}
     else if(!p.buffer.continuous&&audio.ended)await leaveGapOrAdvance(p,next);
    }
   }

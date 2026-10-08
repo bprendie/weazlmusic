@@ -313,3 +313,7 @@ duration with a stopped gap after the captured prefix. Missing whole windows bec
 missed, never shifted. Default retention is disabled. Explicit server deletion or
 retention produces tombstones; already open transfers may finish, new leases fail.
 An offline phone copy is never deleted by a server retention operation.
+
+## Ten-minute recorder assets (2026-10-08)
+
+New recordings retain short capture checkpoints, then finalize contiguous audio into approximately ten-minute AAC M4A assets. Gaps and tails yield shorter assets; failures can retain the original short files. Clients must use startMs, durationMs and mediaStartMs, never assume a fixed segment length. Existing finalized IDs, hashes and bytes remain unchanged. The schema and revision remain 2026-10-03.2. See [chunk policy](RECORDER_CHUNKS.md).

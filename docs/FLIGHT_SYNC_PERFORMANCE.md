@@ -45,20 +45,19 @@ this pass, and native code has not been changed.
    for individual lease and media authorization; profile this before increasing
    concurrency, and retain authoritative ownership/deletion checks in any index.
 
-## Recommended order
+## Implemented chunk reduction and remaining candidates
 
-First add a bounded batch-lease endpoint and a bounded native transfer pool;
-request URLs only for missing assets. Keep each URL scoped and revocable and
-verify every downloaded asset against its manifest. Existing Range/If-Range
-support already provides the server side of resumable transfers.
+Finalization now combines contiguous AAC into approximately ten-minute immutable
+M4A assets with stream copy. Thirty-second capture checkpoints remain intact
+until the final manifest commits. A continuous six-station, six-hour recording
+normally needs about 216 transfers instead of 4,320 (20 times fewer). This uses
+the existing variable-duration manifest and lease API; no archive unpacking or
+new contract is required. Existing finalized recordings retain their original
+assets. See [implementation and evidence](RECORDER_CHUNKS.md).
 
-Then consider immutable five-minute **download bundles**. This could reduce
-about 4,320 transfers to 432 without changing the 30-second capture format or
-AAC encoding. Packages should be prepared/reused server-side, downloaded with
-background URLSession and Range support, and unpacked into the same individually
-verified assets. AAC is already compressed; ZIP compression is not the intended
-saving. Bundles reduce request, task, filesystem and bookkeeping overhead. A new
-bundle endpoint/manifest requires a coordinated versioned native contract.
+Batch leases, a bounded native transfer pool, skipping already verified assets
+before lease acquisition, and coalescing native bookkeeping remain candidates.
+Existing Range/If-Range support provides the server side of resumable transfers.
 
 Use the verified home endpoint when available to avoid an unnecessary remote
 route. Benchmark on a real iPhone with the same recording: elapsed time to full

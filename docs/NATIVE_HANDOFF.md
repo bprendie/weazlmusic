@@ -86,3 +86,7 @@ Apple hardware. `appleValidated:false` and `overnightValidated:false` remain
 explicit until reviewed evidence warrants changing them. Luna runs the six-hour
 local fixture soak after deployment; see VERIFICATION.md for status/artifacts.
 No production passwords or real playlist mutation tests are part of this handoff.
+
+## Ten-minute chunks (2026-10-08)
+
+New server recordings finalize into approximately ten-minute AAC assets through the existing variable-duration manifest. Native FlightRecorder/FlightPlayback source was reviewed read-only and uses manifest timing; no native changes were made. Existing short assets remain valid. Server packet preservation, seeking, publication rollback and browser playback passed; physical iPhone/background-download throughput and relaunch acceptance are not claimed. See [chunk verification](RECORDER_CHUNKS.md).

@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-func (a *apiV1) finalize(j *recordingJob) {
+func (a *apiV1) finalize(j *recordingJob, replacements ...recordingReplacement) {
 	m := recordingManifest{Schema: 1, Session: j.ID, Revision: randomID(), Name: j.Name, Starts: j.Starts, Duration: j.Duration, Tracks: []recordingTrack{}}
 	gaps := false
 	for i, p := range j.Stations {
@@ -69,6 +69,9 @@ func (a *apiV1) finalize(j *recordingJob) {
 		return
 	}
 	defer tx.Rollback()
+	if a.commitRecordingReplacements(tx, j, replacements) != nil {
+		return
+	}
 	if _, e = tx.Exec("INSERT INTO records VALUES('manifest',?,?,?) ON CONFLICT(kind,id) DO UPDATE SET body=excluded.body", j.ID, accountID(j.Username), mb); e != nil {
 		return
 	}

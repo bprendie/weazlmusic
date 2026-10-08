@@ -31,9 +31,9 @@ function json(res,value){res.setHeader('Content-Type','application/json');res.en
  assert.ok(await page.evaluate(()=>audio.currentTime)>71.5);assert.deepEqual(await page.evaluate(()=>events),[],'segment boundary must not reload, seek, pause or wait');
  await page.evaluate(()=>flight.toggleFlight());const paused=await page.evaluate(()=>state.flightPlayback.position());await page.waitForTimeout(400);assert.ok(Math.abs(await page.evaluate(()=>state.flightPlayback.position())-paused)<20,'pause freezes the audio clock');
  fail=false;
- // Smaller preference is persisted and a seek rebuilds a bounded new buffer.
- await page.locator('#flight-buffer').selectOption('1');await page.evaluate(()=>flight.seekFlight(0));await page.waitForFunction(()=>state.flightPlayback.buffer.ahead(0)>59000);
- assert.equal(await page.evaluate(()=>localStorage.getItem('flight-buffer-minutes')),'1');assert.ok(await page.evaluate(()=>audio.buffered.end(audio.buffered.length-1))<66);
+ // Smaller preference is persisted and an uncached seek rebuilds a bounded new buffer.
+ await page.locator('#flight-buffer').selectOption('1');await page.evaluate(()=>flight.seekFlight(400000));await page.waitForFunction(()=>state.flightPlayback.buffer.ahead(400000)>59000);
+ assert.equal(await page.evaluate(()=>localStorage.getItem('flight-buffer-minutes')),'1');assert.ok(await page.evaluate(()=>audio.buffered.end(audio.buffered.length-1))<466);
  // Exhaust a buffer under network failure: time must stop, then resume without skipping.
  fail=true;await page.evaluate(async()=>{audio.currentTime=audio.buffered.end(audio.buffered.length-1)-0.6;await flight.toggleFlight();});await page.waitForTimeout(2000);
  const stalled=await page.evaluate(()=>state.flightPlayback.position());await page.waitForTimeout(1300);assert.ok(Math.abs(await page.evaluate(()=>state.flightPlayback.position())-stalled)<80,'network stall cannot advance the session clock');
@@ -42,7 +42,7 @@ function json(res,value){res.setHeader('Content-Type','application/json');res.en
  await page.evaluate(()=>flight.toggleFlight());await page.evaluate(()=>flight.seekFlight(400000));assert.ok(Math.abs(await page.evaluate(()=>state.flightPlayback.position())-400000)<50);
  await page.locator('[data-flight-station="b"]').click();assert.ok(Math.abs(await page.evaluate(()=>state.flightPlayback.position())-400000)<100);assert.equal(await page.locator('#now-title').innerText(),'Second station');
  // Real capture gaps keep their original timeline and resume at the next segment.
- await page.evaluate(()=>flight.seekFlight(9400));await page.evaluate(()=>flight.toggleFlight());await page.waitForTimeout(1100);assert.equal(await page.evaluate(()=>state.flightPlayback.gap),true);await page.waitForTimeout(2300);assert.equal(await page.evaluate(()=>state.flightPlayback.gap),false);assert.ok(await page.evaluate(()=>state.flightPlayback.position())>12032);
+ await page.evaluate(()=>flight.seekFlight(9400));await page.evaluate(()=>flight.toggleFlight());await page.waitForFunction(()=>state.flightPlayback.gap===true,{},{timeout:3000});await page.waitForFunction(()=>state.flightPlayback.gap===false&&state.flightPlayback.position()>12032,{},{timeout:5000});
  delay=400;await page.evaluate(()=>{flight.seekFlight(600000);});await page.waitForTimeout(50);await page.evaluate(()=>flight.stopFlightPlayback());await page.waitForTimeout(600);assert.equal(await page.evaluate(()=>state.flightPlayback),null);assert.equal(await page.evaluate(()=>audio.getAttribute('src')),null);
  // Compatibility path still prefetches larger buffers without requiring MSE.
  delay=0;const legacy=await browser.newPage();await legacy.addInitScript(()=>{window.MediaSource=undefined;window.ManagedMediaSource=undefined;});await legacy.goto('http://127.0.0.1:'+server.address().port);

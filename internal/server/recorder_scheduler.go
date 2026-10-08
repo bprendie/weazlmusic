@@ -71,6 +71,7 @@ func (a *apiV1) tick() {
 	if a.ctx.Err() != nil {
 		return
 	}
+	a.cleanupRecordingGarbage(128)
 	a.advanceSchedules()
 	rows, e := a.list("job", "*")
 	if e != nil {
@@ -79,7 +80,7 @@ func (a *apiV1) tick() {
 	streams := 0
 	for id := range a.active {
 		var j recordingJob
-		if a.get("job", id, "*", &j) == nil {
+		if a.get("job", id, "*", &j) == nil && !a.packaging[id] {
 			streams += j.StationCount
 		}
 	}
@@ -97,12 +98,15 @@ func (a *apiV1) tick() {
 			_ = a.put("job", j.ID, accountID(j.Username), j)
 			continue
 		}
-		if streams+j.StationCount > 6 {
+		if j.State != "finalizing" && streams+j.StationCount > 6 {
 			continue
 		}
 		ctx, cancel := context.WithCancel(a.ctx)
 		a.active[j.ID] = cancel
-		streams += j.StationCount
+		a.packaging[j.ID] = j.State == "finalizing"
+		if j.State != "finalizing" {
+			streams += j.StationCount
+		}
 		a.wg.Add(1)
 		go a.runJob(ctx, j)
 	}
@@ -176,7 +180,7 @@ func (a *apiV1) advanceSchedules() {
 }
 func (a *apiV1) runJob(ctx context.Context, initial recordingJob) {
 	defer a.wg.Done()
-	defer func() { a.mu.Lock(); delete(a.active, initial.ID); a.mu.Unlock() }()
+	defer func() { a.mu.Lock(); delete(a.active, initial.ID); delete(a.packaging, initial.ID); a.mu.Unlock() }()
 	a.mu.Lock()
 	var j recordingJob
 	if a.get("job", initial.ID, "*", &j) != nil {
@@ -217,14 +221,29 @@ func (a *apiV1) runJob(ctx context.Context, initial recordingJob) {
 		return
 	} // Startup resumes remaining windows; shutdown never labels unfinished capture complete.
 	a.mu.Lock()
-	defer a.mu.Unlock()
 	if a.get("job", j.ID, "*", &j) != nil {
+		a.mu.Unlock()
 		return
 	}
 	j.State = "finalizing"
 	j.Version++
 	if a.put("job", j.ID, accountID(j.Username), j) != nil {
+		a.mu.Unlock()
 		return
 	}
-	a.finalize(&j)
+	a.packaging[j.ID] = true // Capture workers have exited; finalization must not consume stream slots.
+	a.mu.Unlock()
+	replacements := a.compactRecording(a.ctx, &j)
+	if a.ctx.Err() != nil {
+		return
+	}
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	var latest recordingJob
+	if a.get("job", j.ID, "*", &latest) != nil || latest.Tombstone || latest.State != "finalizing" {
+		return
+	}
+	// A repeated Stop during packaging must retain the newest version/reason.
+	j.Version, j.StopReason = latest.Version, latest.StopReason
+	a.finalize(&j, replacements...)
 }

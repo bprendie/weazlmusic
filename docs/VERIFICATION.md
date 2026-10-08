@@ -240,3 +240,7 @@ radio title/artist rendering and metadata connection cleanup when paused.
 A bounded live read of the installed 80s/90s station returned ICY metadata for
 Michael Jackson — Billie Jean. LLM generation is tested with isolated streaming
 fixtures; the user's actual model endpoint remains a smoke-test boundary.
+
+## Ten-minute recorder finalization (2026-10-08)
+
+Go race tests and vet, real AAC packet/seek checks, transactional rollback and cleanup checks, ten-minute browser playback, buffer/gap tests, recorder UI acceptance and the general browser suite passed. See [evidence and limits](RECORDER_CHUNKS.md).

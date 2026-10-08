@@ -196,13 +196,20 @@ bytes; only newly encoded audio uses 128 kbps. Defaults: 20 GiB installation bud
 and `CAPTURE_RETENTION_DAYS` in Compose's environment. Storage is checked before
 reservation and during capture; one failed station does not stop the others.
 
+Capture retains 30-second recovery checkpoints. Finalization combines contiguous
+audio into approximately **10-minute M4A files**, without re-encoding. Six stations
+for six hours normally produce about 216 files instead of 4,320; gaps and final
+tails produce shorter files. Previously finalized recordings remain unchanged.
+See [recording chunks](docs/RECORDER_CHUNKS.md) for recovery and verification.
+
 Listen through one shared session timeline: switch presets at the current
 offset, pause globally, or seek all stations together. The highlighted Now Playing
 footer shows the selected station and recording, with play/pause and seeking
 available even after navigating away from Flight Recorder. The web player buffers
 **five minutes ahead**, refilling to five minutes when less than **four minutes
 remain**. Buffer ahead offers 1, 3, 5 or 10 minutes and remembers this browser’s
-choice. Supported browsers play the AAC segments on one continuous media timeline;
+choice. Downloads use whole files, so the actual buffer can exceed the selected
+target by a chunk. Seeking within cached audio reuses it. Supported browsers play the AAC segments on one continuous media timeline;
 network buffering freezes playback instead of skipping unheard audio. Old
 recordings benefit immediately. See [web media buffering](docs/WEB_MEDIA_BUFFER.md)
 for browser support and verification. Keep multiple saved
