@@ -13,16 +13,17 @@ import (
 )
 
 type Config struct {
-	DataDir            string
-	SecureCookie       bool
-	Now                func() time.Time
-	DisableWorkers     bool
-	CaptureBudgetBytes int64
-	AccountBudgetBytes int64
-	ReserveBytes       int64
-	RetentionDays      int
-	SegmentSeconds     int
-	RadioClient        *http.Client
+	DataDir             string
+	SecureCookie        bool
+	Now                 func() time.Time
+	DisableWorkers      bool
+	CaptureBudgetBytes  int64
+	AccountBudgetBytes  int64
+	ReserveBytes        int64
+	RetentionDays       int
+	SegmentSeconds      int
+	RadioClient         *http.Client
+	RadioPrivateOrigins string
 }
 type Server struct {
 	v1          *apiV1
@@ -42,6 +43,10 @@ type Server struct {
 }
 
 func New(cfg Config, assets fs.FS) (http.Handler, error) {
+	origins, err := parseRadioOrigins(cfg.RadioPrivateOrigins)
+	if err != nil {
+		return nil, err
+	}
 	st, err := newStore(cfg.DataDir)
 	if err != nil {
 		return nil, err
@@ -53,7 +58,7 @@ func New(cfg Config, assets fs.FS) (http.Handler, error) {
 	transport := navidromeTransport()
 	llmTransport := navidromeTransport()
 	llmTransport.ResponseHeaderTimeout = 120 * time.Second
-	s := &Server{llm: &http.Client{Transport: llmTransport, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}, moodJobs: map[string]string{}, cfg: cfg, store: st, sessions: map[string]*session{}, attempts: map[string]attempt{}, upstream: &http.Client{Transport: transport, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}, radio: radioClient()}
+	s := &Server{llm: &http.Client{Transport: llmTransport, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}, moodJobs: map[string]string{}, cfg: cfg, store: st, sessions: map[string]*session{}, attempts: map[string]attempt{}, upstream: &http.Client{Transport: transport, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}, radio: radioClient(origins...)}
 	if cfg.RadioClient != nil {
 		s.radio = cfg.RadioClient
 	}

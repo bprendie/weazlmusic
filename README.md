@@ -126,8 +126,14 @@ idle-power claim has been measured.
 - Library playback uses browser-supported formats. Recorder captures public
   MP3/AAC and encodes seekable AAC-LC M4A. No HLS or YouTube/mpv URL resolver. If a library file cannot play natively, configure
   a compatible Navidrome transcoding policy. Radio stations can be offline.
-- Radio destinations must be public Internet addresses; private/LAN radio URLs
-  are intentionally rejected by the relay. Redirects and DNS results are checked.
+- Radio destinations default to public Internet addresses. For a trusted LAN or
+  split-DNS station, set `RADIO_PRIVATE_ORIGINS=https://radio.prendie.io` in the
+  deployment `.env` and recreate the service. This comma-separated list accepts
+  exact origins (scheme, hostname and optional port), without stream paths or
+  wildcards. Only those origins may resolve to private addresses; loopback,
+  link-local and metadata addresses remain blocked. Redirects and playlist
+  targets are checked independently. This applies to web/native radio and
+  Flight Recorder. See [radio troubleshooting](docs/RADIO_PRIVATE_ORIGINS.md).
 - Native library scrobbles are supported with durable dedupe and explicit
   ambiguous outcomes. Recorded radio is not submitted as library scrobbles. Radio titles depend on station-supplied ICY metadata.
 - Search shows up to 100 tracks; playlist writes accept up to 1,000 tracks per

@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	handler, err := server.New(server.Config{DataDir: server.Env("DATA_DIR", "./data"), SecureCookie: os.Getenv("COOKIE_SECURE") == "true", AccountBudgetBytes: positiveEnv("CAPTURE_ACCOUNT_BUDGET_BYTES", 10<<30), CaptureBudgetBytes: positiveEnv("CAPTURE_BUDGET_BYTES", 20<<30), ReserveBytes: positiveEnv("CAPTURE_RESERVE_BYTES", 1<<30), RetentionDays: int(positiveEnv("CAPTURE_RETENTION_DAYS", 0))}, web.Files)
+	handler, err := server.New(server.Config{RadioPrivateOrigins: os.Getenv("RADIO_PRIVATE_ORIGINS"), DataDir: server.Env("DATA_DIR", "./data"), SecureCookie: os.Getenv("COOKIE_SECURE") == "true", AccountBudgetBytes: positiveEnv("CAPTURE_ACCOUNT_BUDGET_BYTES", 10<<30), CaptureBudgetBytes: positiveEnv("CAPTURE_BUDGET_BYTES", 20<<30), ReserveBytes: positiveEnv("CAPTURE_RESERVE_BYTES", 1<<30), RetentionDays: int(positiveEnv("CAPTURE_RETENTION_DAYS", 0))}, web.Files)
 	if err != nil {
 		log.Fatal(err)
 	}

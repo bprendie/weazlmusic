@@ -33,7 +33,11 @@ func publicIP(ip net.IP) bool {
 	}
 	return true
 }
-func radioClient() *http.Client {
+func radioIPAllowed(ip net.IP, allowPrivate bool) bool {
+	return publicIP(ip) || (allowPrivate && ip.IsPrivate())
+}
+
+func radioTransport(allowPrivate bool) *http.Transport {
 	tr := &http.Transport{ResponseHeaderTimeout: 15 * time.Second, TLSHandshakeTimeout: 10 * time.Second, IdleConnTimeout: 30 * time.Second, MaxIdleConns: 10}
 	tr.DialContext = func(ctx context.Context, network, address string) (net.Conn, error) {
 		host, port, err := net.SplitHostPort(address)
@@ -48,7 +52,7 @@ func radioClient() *http.Client {
 			return nil, errors.New("Radio host not found")
 		}
 		for _, ip := range ips {
-			if !publicIP(ip) {
+			if !radioIPAllowed(ip, allowPrivate) {
 				return nil, errors.New("Radio streams must use public Internet addresses")
 			}
 		}
@@ -63,7 +67,16 @@ func radioClient() *http.Client {
 		}
 		return nil, last
 	}
-	return &http.Client{Transport: tr, CheckRedirect: func(req *http.Request, via []*http.Request) error {
+	return tr
+}
+
+func radioClient(origins ...string) *http.Client {
+	allowed := make(map[string]bool, len(origins))
+	for _, origin := range origins {
+		allowed[origin] = true
+	}
+	transport := &radioOriginTransport{allowed, radioTransport(false), radioTransport(true)}
+	return &http.Client{Transport: transport, CheckRedirect: func(req *http.Request, via []*http.Request) error {
 		if len(via) > 5 {
 			return errors.New("Too many radio redirects")
 		}
