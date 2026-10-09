@@ -49,3 +49,27 @@ WEAZL_TEST_RADIO_URL=https://radio.prendie.io/radio.mp3 node tests/radio-live.cj
 Other stations can still fail because they are offline, have unsupported formats,
 or resolve privately without an operator exception. This change does not claim
 that every saved preset has been checked.
+
+## Production receipt
+
+Deployed source `9dab51d` on 2026-10-09 to `weazlmusic.teralab.local` via the
+trusted jumpbox route. Initially deferred because five stations were recording;
+the user explicitly approved deploying immediately with a recording gap.
+Production `.env` now sets `RADIO_PRIVATE_ORIGINS=https://radio.prendie.io`;
+the running container's environment was checked after recreation.
+
+Runtime image:
+`sha256:6b20408a71788169ec08ea4b1c52715b985d9d22ecd1c6afd4fdfeb05348df95`.
+Health/root HTTP checks passed; container healthy with zero restarts, anonymous
+native identity returned 401, and installation info/key digest stayed unchanged.
+All five stations wrote fresh checkpoints at 15:05:55–15:06:03 UTC after restart;
+the active recording retained its original 17:24:04 UTC end time.
+
+Full-volume backup and rollback receipts:
+`/home/bobp/weazlmusic-backups/20261009T150427Z` (directory0700, archive0600).
+Archive SHA-256:
+`f45a981d73e9e3c98919bb3a1a1b0b1dda6a45e9809a72ed6cd4d4e82373a8e5`.
+Rollback tag: `weazltunes-web:rollback-20261009T150427Z`; previous deployment
+`.env`, source/image receipts and compose rollback override are retained there.
+The real browser playback check used an isolated local app with the same policy;
+production verification did not sign in as a user or mutate saved presets.
