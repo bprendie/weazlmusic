@@ -1,12 +1,14 @@
 # WeazlTunes Web: The Sovereign Acoustic Deck
 
-A browser listening desk and native Subweazl backend for Navidrome and Internet radio, stamped with `weazlhead` branding. One Go binary serves the UI, the authenticated API, and the audio pipeline.
+**WeazlTunes is a frontend for Navidrome**, with Internet radio and a native Subweazl backend, stamped with `weazlhead` branding. Navidrome manages your music library; WeazlTunes provides the listening interface. One Go binary serves the UI, the authenticated API, and the audio pipeline.
+
+**WeazlTunes and Navidrome can run on the same host**, or on separate machines. Connect WeazlTunes to your existing Navidrome installation, or install Navidrome alongside it.
 
 No frontend framework bloat. No Node runtime. No cloud identity brokers. Zero telemetry. Just pure, unadulterated acoustic grindage on your local bare metal.
 
 ## Ignition
 
-Boot the rig using Docker. No external Navidrome server is configured in the Compose file or default environment variables.
+Boot the rig using Docker. This Compose file starts WeazlTunes only; run Navidrome separately on the same host or another reachable machine, then configure its URL under **Account → Installation settings**. No Navidrome URL is preconfigured.
 
 ```sh
 docker compose up --build -d
@@ -22,7 +24,7 @@ Fresh data volumes spin up with a local-only administrator account. This local v
 2. Navigate to **Account → Installation settings** and lock in your shared Navidrome backend URL.
 3. Sign out, then drop back in using your actual Navidrome credentials.
 
-Normal users authenticate against the remote Navidrome server. WeazlTunes stores only the Navidrome API token and salt—never the plaintext password. The local `weazladmin` login acts as your emergency hatch if Navidrome goes dark. New users are provisioned in the app automatically upon their first successful Navidrome login.
+Normal users authenticate against the configured Navidrome server. WeazlTunes stores only the Navidrome API token and salt—never the plaintext password. The local `weazladmin` login acts as your emergency hatch if Navidrome goes dark. New users are provisioned in the app automatically upon their first successful Navidrome login.
 
 ### Network Ops
 
@@ -34,7 +36,7 @@ Your reverse proxy handles domain routing and TLS. WeazlTunes serves plain HTTP.
 | `DATA_DIR` | `./data` (`/data` in Docker) | Encrypted user settings, SQLite vault, recording assets, and AES-GCM key. |
 | `COOKIE_SECURE` | `false` | Set to `true` to restrict session cookies to HTTPS entry points. |
 
-*Note: `localhost` inside a container means the container itself. Use a reachable server URL or Docker network service name for Navidrome and your LLM endpoint.*
+*Same-host setup: when both services run directly on the host, WeazlTunes can reach Navidrome through its loopback URL and listening port. When they run in separate containers, put them on a shared Docker network and use Navidrome’s service name and container port. For a container connecting to a host service, use a host address reachable from that container. `localhost` inside a container means the container itself. The same networking rules apply to your LLM endpoint.*
 
 ## The Deck: What Works
 
