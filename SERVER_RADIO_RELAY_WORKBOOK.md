@@ -168,15 +168,23 @@ The embedded patch was applied to current main. In addition to its direct relay 
   session or establish the correct verified key/access configuration.
 - [x] Inspect active Flight Recorder captures. Coordinate a restart outside
   active recordings; do not silently interrupt or stop them.
-- [ ] Follow current `docs/DEPLOYMENT.md` backup/rollback procedure. Preserve the
+- [x] Follow current `docs/DEPLOYMENT.md` backup/rollback procedure. Preserve the
   actual persistent volume, database, encryption key, presets and recordings.
   Record rollback image/source and backup evidence without logging secrets.
-- [ ] Build/deploy the reviewed fixed source using the existing production
+- [x] Build/deploy the reviewed fixed source using the existing production
   process. Do not run `down -v`, recreate storage, regenerate keys or change ports.
-- [ ] Verify running image/source and service health. Keep the existing native
+- [x] Verify running image/source and service health. Keep the existing native
   public contract compatible; `/api/v1/info` should still respond successfully.
 
 A healthy landing page or `/api/v1/info` response is not radio acceptance.
+
+## Production deployment receipt — October 10, 2026
+
+The owner explicitly authorized this server deployment. No recording/finalization job was active both before build and immediately before stopping the service. The clean checkout fast-forwarded from `a6d7bbf` to release `6bafb70` (`v1.0.1`); existing split-DNS authorization and 128 kbps ten-minute recorder code were retained. The service rebuilt and restarted on image `sha256:c5a17a398b97129f6a1959a38b25cba9d94862f0822a14657daa4d5e386353a4`, healthy with zero restarts.
+
+Full-volume backup and rollback receipts: `/home/bobp/weazlmusic-backups/20261010T151928Z` (directory mode 0700, archive mode 0600), archive SHA-256 `0881edf3e8d370035d26407d479235909d1f03640b7fcca79dba247adca9a98e`. Previous running image is tagged `weazltunes-web:rollback-20261010T151928Z`, with compose override and old source/image receipts. `/healthz` and root HTTP passed; anonymous native identity remained 401, `/api/v1/info` and encryption key digest matched before/after, and the running origin exception still included `https://radio.prendie.io`. No production account, station, library or recording was mutated for acceptance.
+
+The isolated tests establish the regression result 200/200 versus the earlier physical-phone 200/409. The **production leased overlap test and real audible iPhone playback remain unverified** until a signed-in phone/device can run them. Service health alone does not close R4.
 
 ## R4 — Re-run the failing production check and phone playback
 

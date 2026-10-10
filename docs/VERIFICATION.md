@@ -244,3 +244,7 @@ fixtures; the user's actual model endpoint remains a smoke-test boundary.
 ## Ten-minute recorder finalization (2026-10-08)
 
 Go race tests and vet, real AAC packet/seek checks, transactional rollback and cleanup checks, ten-minute browser playback, buffer/gap tests, recorder UI acceptance and the general browser suite passed. See [evidence and limits](RECORDER_CHUNKS.md).
+
+## Native radio probe relay — 2026-10-10
+
+Release `v1.0.1` fixes the radio playback slot being claimed by Apple’s `Range: bytes=0-1` format probe. Race-tested direct relay and native lease route checks returned 200 for overlapping probe/audio, 409 for duplicate actual audio, and 200 when audio reopened after disconnect with a retained feed. Invalid playback ID and other Range values stay rejected. Full `go test -race ./...` and `go vet ./...` passed. See [server relay workbook](../SERVER_RADIO_RELAY_WORKBOOK.md) for deployment image, backup receipt and remaining phone acceptance. Production service is healthy, but a production authenticated overlap test and audible physical-iPhone confirmation are still pending.
