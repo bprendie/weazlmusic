@@ -145,7 +145,7 @@ for the first overnight transfer scenario; clients renew before retrying expired
 Range requests. Returned URLs are **relative same-origin** paths; resolve against the configured
 WeazlTunes origin. `playbackId` is non-null only for `radioLive`. Do not log query strings. GET and HEAD
 support ranges, 206/416, ETag/If-Range and stable content length for immutable files.
-Live streams have null byteLength/hash and no byte-seek claim. Original download
+Live streams have null byteLength/hash and no byte-seek claim. A live radio GET with exactly `Range: bytes=0-1` is a bounded Apple format probe: it receives HTTP 200 and up to 16 KiB, without a static Content-Length, Content-Range or Accept-Ranges header. It does not claim the playback ID, so an overlapping ordinary audio GET on the same lease can stream concurrently. Only one actual audio GET owns that playback ID at a time (a duplicate receives 409); disconnect releases ownership for a later retry. Invalid or revoked leases remain unauthorized. This is compatible with contract revision `2026-10-03.2`. Original download
 means original bytes; transcoding is only a separately advertised quality.
 
 This design lets Apple media APIs open a normal URL without undocumented custom

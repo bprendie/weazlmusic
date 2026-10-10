@@ -20,7 +20,7 @@ through the app; no upstream URL or credential environment variables are needed.
 | CAPTURE_RESERVE_BYTES | 1073741824 | 1 GiB filesystem free reserve |
 | CAPTURE_RETENTION_DAYS | 0 | Retention disabled; positive days removes old server copies |
 
-Reservations include twice the nominal FDK AAC-LC160k output rate. Native storage
+Reservations include twice the nominal FDK AAC-LC128k output rate. Native storage
 and the management view expose limits, used and available space. Scheduled repeats
 reserve their next occurrence, then revalidate storage/source/duration when
 advancing; a failed future occurrence is visible. Capacity is checked against a

@@ -92,11 +92,15 @@ func (s *Server) radioStream(w http.ResponseWriter, r *http.Request, se *session
 		return
 	}
 	publish := func(radioMetadata) {}
-	if id := r.URL.Query().Get("playback"); id != "" {
-		if !playbackID.MatchString(id) {
-			fail(w, 400, "Invalid playback ID")
-			return
-		}
+	// AVPlayer probes a live URL with bytes=0-1, then opens its audio
+	// connection without Range. The probe must not claim the playback ID:
+	// cancellation can overlap the real GET while the relay unwinds.
+	probe := r.Method == http.MethodGet && strings.TrimSpace(r.Header.Get("Range")) == "bytes=0-1"
+	if id := r.URL.Query().Get("playback"); id != "" && !playbackID.MatchString(id) {
+		fail(w, 400, "Invalid playback ID")
+		return
+	}
+	if id := r.URL.Query().Get("playback"); id != "" && !probe {
 		feed, release, err := se.radio.acquire(id)
 		if err != nil {
 			fail(w, 429, err.Error())
@@ -107,6 +111,7 @@ func (s *Server) radioStream(w http.ResponseWriter, r *http.Request, se *session
 			fail(w, 409, "This radio playback is already active")
 			return
 		}
+		defer feed.end()
 		publish = feed.publish
 		defer func() { feed.publish(radioMetadata{Ended: true}) }()
 	}
@@ -120,6 +125,17 @@ func (s *Server) radioStream(w http.ResponseWriter, r *http.Request, se *session
 		return
 	}
 	defer res.Body.Close()
+	if probe {
+		// Live audio has no static size or seek range. Bound abandoned sniff
+		// connections without claiming a two-byte file or retaining a feed.
+		res.Body = struct {
+			io.Reader
+			io.Closer
+		}{io.LimitReader(res.Body, 16*1024), res.Body}
+		res.Header.Del("Content-Length")
+		res.Header.Del("Content-Range")
+		res.Header.Del("Accept-Ranges")
+	}
 	w.Header().Set("X-Accel-Buffering", "no")
 	intervalHeader := res.Header.Get("Icy-Metaint")
 	if intervalHeader == "" {

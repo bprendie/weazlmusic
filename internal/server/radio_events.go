@@ -58,6 +58,11 @@ func (f *radioFeed) begin() bool {
 	f.active = true
 	return true
 }
+func (f *radioFeed) end() {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.active = false
+}
 func (f *radioFeed) publish(meta radioMetadata) {
 	f.mu.Lock()
 	defer f.mu.Unlock()

@@ -1,6 +1,6 @@
 # WeazlTunes Web: The Sovereign Acoustic Deck
 
-**Release 1.0** · Version `1.0.0` · Git tag `v1.0.0`
+**Release 1.0** · Version `1.0.1` · Git tag `v1.0.1`
 
 **WeazlTunes is a frontend for Navidrome**, with Internet radio and a native Subweazl backend, stamped with `weazlhead` branding. Navidrome manages your music library; WeazlTunes provides the listening interface. One Go binary serves the UI, the authenticated API, and the audio pipeline.
 
