@@ -248,3 +248,33 @@ Go race tests and vet, real AAC packet/seek checks, transactional rollback and c
 ## Native radio probe relay — 2026-10-10
 
 Release `v1.0.1` fixes the radio playback slot being claimed by Apple’s `Range: bytes=0-1` format probe. Race-tested direct relay and native lease route checks returned 200 for overlapping probe/audio, 409 for duplicate actual audio, and 200 when audio reopened after disconnect with a retained feed. Invalid playback ID and other Range values stay rejected. Full `go test -race ./...` and `go vet ./...` passed. See [server relay workbook](../SERVER_RADIO_RELAY_WORKBOOK.md) for deployment image, backup receipt and remaining phone acceptance. Production service is healthy, but a production authenticated overlap test and audible physical-iPhone confirmation are still pending.
+
+## WeazlMusic mascot refresh — 2026-10-12
+
+The provided `AppIcon.png` became `web/appicon.png`, replacing the old web logo in
+the home hero, favicon, sidebar, login/account views and fallback playback art.
+The hero layout was visually checked in Chromium at 1440 px desktop and 390 px
+mobile widths. `tests/run-browser.sh` passed after the asset references changed;
+`go build ./cmd/weazltunes` and `go test ./web` passed, and the final CSS preview
+kept title/buttons clear of the mascot.
+
+Code commit `30b7a6a` deployed to `weazlmusic.teralab.local` through the trusted
+jumpbox route. Production image:
+`sha256:3b6ade89a3051d35107ce23127433475c1e3b1b18d198eb242fd7ee008b74669`.
+Container healthy with zero restarts; health/root checks passed, anonymous native
+identity stayed 401, and installation info/key digest matched before and after.
+The served `/appicon.png` SHA-256
+`ac3ba33b587a0a56a017042d06d803e9dba7071777f638e89db43c2dd9d5dec8`
+matched the checked-in production asset. No capture was active at either
+preflight check.
+
+Production rollback receipts (old source/image, override, build log and health):
+`/home/bobp/weazlmusic-backups/20261012T140544Z`, with the previous running
+image tagged `weazltunes-web:rollback-20261012T140544Z`. To preserve free space
+on production, the verified full-volume archive is stored on this workstation at
+`/home/bobp/weazlmusic-backups/20261012T140544Z/data.tar.gz` (0700 directory,
+0600 archive). Its SHA-256 is
+`fd46c1c6655a956bc9eb245e636f766e1a7f38b7bd63821b61c04e0edc820d80`.
+The production receipt points to this external archive. It contains the data
+volume and encryption key; restore requires transferring it back through the
+trusted route before following the restore procedure.
