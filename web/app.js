@@ -114,5 +114,5 @@ document.addEventListener('keydown',event => {
   if (/^[1-6]$/.test(event.key)) navigate(['home','albums','favorites','playlists','radio','queue'][Number(event.key)-1]);
 });
 $('#modal').addEventListener('close',() => {if (!$('#modal').open) $('#modal-content').replaceChildren();});
-document.addEventListener('error',event => {if (event.target.matches?.('img.album-art,img.mini-cover')) {event.target.src = '/weazlhead.png';event.target.classList.add('art-2');}},true);
+document.addEventListener('error',event => {if (event.target.matches?.('img.album-art,img.mini-cover')) {event.target.src = '/appicon.png';event.target.classList.add('art-2');}},true);
 bindAuth(signedOut);

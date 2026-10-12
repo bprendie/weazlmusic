@@ -15,7 +15,7 @@ const {chromium} = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.goto(process.env.TEST_URL || 'http://127.0.0.1:4002');
-  assert.equal(await page.locator('link[rel=icon]').getAttribute('href'),'/weazlhead.png');
+  assert.equal(await page.locator('link[rel=icon]').getAttribute('href'),'/appicon.png');
   await page.locator('#login-form input[name=username]').fill('weazladmin');
   await page.locator('#login-form input[name=password]').fill('admin');
   await page.locator('#login-form button').click();

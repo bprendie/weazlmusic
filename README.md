@@ -2,7 +2,7 @@
 
 **Release 1.0** · Version `1.0.1` · Git tag `v1.0.1`
 
-**WeazlTunes is a frontend for Navidrome**, with Internet radio and a native Subweazl backend, stamped with `weazlhead` branding. Navidrome manages your music library; WeazlTunes provides the listening interface. One Go binary serves the UI, the authenticated API, and the audio pipeline.
+**WeazlTunes is a frontend for Navidrome**, with Internet radio and a native Subweazl backend, stamped with the new WeazlMusic mascot. Navidrome manages your music library; WeazlTunes provides the listening interface. One Go binary serves the UI, the authenticated API, and the audio pipeline.
 
 **WeazlTunes and Navidrome can run on the same host**, or on separate machines. Connect WeazlTunes to your existing Navidrome installation, or install Navidrome alongside it.
 

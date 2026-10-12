@@ -11,7 +11,7 @@ function albums(shelf = false) {
   return `<div class="album-grid ${shelf ? 'album-shelf' : ''}" ${shelf ? 'id="fresh-shelf" tabindex="0" aria-label="Recently added albums"' : ''}>${state.albums.map((a,i) => `<button class="album-card" data-album="${i}" aria-label="Open ${esc(a.name)}">${cover(a)}<strong>${esc(a.name)}</strong><small>${esc(a.artist)} · ${esc(a.year || '')}</small></button>`).join('')}</div>`;
 }
 function home() {
-  return `<section class="hero"><div class="hero-copy"><p class="eyebrow">GOOD SIGNAL. ZERO SLUDGE.</p><h1>Stay in the flow.</h1><p>Your collection. The underground airwaves.<br>All dialed in. All yours.</p><div class="hero-actions"><button class="primary" data-action="resume">▶ &nbsp; Pick up the needle</button><button class="secondary" data-view="radio">Find a frequency ↗</button></div></div><img src="weazlhead.png" alt="Weazl" width="255" height="251"></section><section><div class="section-title"><h2>Fresh in the crates</h2><div class="shelf-actions"><button class="icon-button" data-shelf="-1" aria-label="Previous recent albums">←</button><button class="icon-button" data-shelf="1" aria-label="Next recent albums">→</button><button class="text-button" data-view="albums">All albums ↗</button></div></div>${albums(true)}</section><section><div class="section-title"><h2>Your favorites</h2><button class="text-button" data-view="favorites">All favorites ↗</button></div>${trackList(state.tracks)}</section>`;
+  return `<section class="hero"><div class="hero-copy"><p class="eyebrow">GOOD SIGNAL. ZERO SLUDGE.</p><h1>Stay in the flow.</h1><p>Your collection. The underground airwaves.<br>All dialed in. All yours.</p><div class="hero-actions"><button class="primary" data-action="resume">▶ &nbsp; Pick up the needle</button><button class="secondary" data-view="radio">Find a frequency ↗</button></div></div><img src="appicon.png" alt="WeazlMusic mascot" width="1024" height="1024"></section><section><div class="section-title"><h2>Fresh in the crates</h2><div class="shelf-actions"><button class="icon-button" data-shelf="-1" aria-label="Previous recent albums">←</button><button class="icon-button" data-shelf="1" aria-label="Next recent albums">→</button><button class="text-button" data-view="albums">All albums ↗</button></div></div>${albums(true)}</section><section><div class="section-title"><h2>Your favorites</h2><button class="text-button" data-view="favorites">All favorites ↗</button></div>${trackList(state.tracks)}</section>`;
 }
 function radio() {
   const list = state.radioTab === 'Presets' ? state.stations.filter(s => s.preset) : state.radioTab === 'My stations' ? state.stations : state.directory;
@@ -68,7 +68,7 @@ export function renderPlayer() {
   $('#now-title').textContent = title;$('#now-title').title = title;
   $('#now-artist').textContent = subtitle;$('#now-artist').title = subtitle;
   if ('mediaSession' in navigator && 'MediaMetadata' in window) navigator.mediaSession.metadata = t ? new MediaMetadata({title,artist:meta?.artist || (t.url ? t.title : t.artist),album:t.url ? t.title : t.album}) : null;
-  $('#now-cover').innerHTML = t && !flight ? cover(t,true) : '<img src="weazlhead.png" alt="" class="mini-cover">';
+  $('#now-cover').innerHTML = t && !flight ? cover(t,true) : '<img src="appicon.png" alt="" class="mini-cover">';
   $('#play').textContent = playing ? 'Ⅱ' : '▶';
   $('#play').setAttribute('aria-label',playing ? 'Pause' : 'Play');
   $('#duration').textContent = t ? duration(t.duration) : '0:00';
