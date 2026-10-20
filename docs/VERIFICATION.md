@@ -435,3 +435,43 @@ library, recording master, playlist or listening-history mutation was used for
 acceptance. Media integration tests need sufficient CPU headroom (four usable
 core groups for two-worker checks); restricted-resource behavior is tested
 separately. Detailed local logs are under ignored `test-results/weazlpod-cpu/`.
+
+### CPU-reserve production receipt — 2026-10-20
+
+Deployed source `50e178e3f475c442947743c062a8bbd8ccd28375` directly to
+`bobp@weazlmusic.teralab.local`. Automatic worker sizing is enabled in the
+production compose configuration (`TRANSCODE_WORKERS=0`); no cache budget changed.
+Runtime image:
+`sha256:e8a348249e11416e8f0f9a6791d0d7fb78feb69dd1ed789bc0be8d58b96749e0`.
+Container healthy, zero restarts, original named volume and nonroot user retained.
+No active capture or session due within five minutes was found at either
+pre-build or immediate pre-stop check. Existing service stayed live during build.
+
+Verified stopped-volume backup/receipt directory:
+`/home/bobp/weazlmusic-backups/20261020T205121Z` on production (0700 directory,
+0600 archive). SHA-256:
+`1112beee06d44677196b7686fa2e4b9b30df51e69f42c30f4a1e7a201f5254f8`.
+Rollback image: `weazltunes-web:rollback-20261020T205121Z`; receipts include the
+previous image/source/environment, rollback override, build log, pre/post checks,
+encoder proof and CPU/API proof. Archive listing and checksum were verified
+before new runtime startup.
+
+Installation identity/key digest and 17 device records, 5,995 master assets and
+six manifests match pre-deployment counts; the single existing MP3 derivative
+remains present. API revision2026-10-03.2 and discovery response are unchanged.
+Root/health and anonymous browser/native auth boundaries pass. The production
+image still encodes/decodes MP3/44100/stereo/128000.
+
+The exact image was also started as a disposable isolated installation with
+private tmpfs data, no network, no production volume/account and the production
+transcode settings. Authenticated capability discovery returned:
+
+```json
+{"reservedApplicationCores":2,"transcodeCores":22,"maxWorkers":5,"storageWorkerLimit":5,"encoderThreadsPerJob":1,"workerModel":"parallel-processes"}
+```
+
+Its API process retained CPU affinity0–23; an actual FFmpeg subprocess used0–21.
+The disposable account, database and container were removed afterwards. No
+authenticated production account, library mutation or listening-history update
+was used for validation. The receipt commit is documentation only and does not
+require a second runtime restart. Hardware playback acceptance remains separate.
