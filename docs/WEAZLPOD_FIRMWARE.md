@@ -169,4 +169,4 @@ IDs/URLs are inert; regeneration is deterministic for the same packaged toolchai
 Pending physical checks: ESP32 decoder format detection, audible playback, SD
 throughput/storage, trimming/preroll, start/middle/end seeking, uninterrupted
 segment transitions, radio reconnect/UI and power/resource behavior. Linux tests
-are not hardware acceptance. No production deployment was performed.
+are not hardware acceptance. The server was subsequently deployed on 2026-10-20 after user authorization; see the deployment receipt in VERIFICATION.md.

@@ -1,6 +1,6 @@
 # Weazlpod server workbook for Sol
 
-Created 2026-10-20. Status: **implemented and server verification passed; physical ESP32 acceptance pending**.
+Created 2026-10-20. Status: **implemented, verified and deployed 2026-10-20; physical ESP32 acceptance pending**.
 
 Implement a Weazlpod client profile in the music server so an ESP32-S3 player can stream and download predictable **MP3 at 128 kbps**. Sol owns the server header handling, profile negotiation, transcoding, and delivery. The implementation, finalized contract and evidence are recorded below; physical-device acceptance remains separate.
 
@@ -147,7 +147,7 @@ Run the repository's appropriate tests, including `make test` for Go/race covera
 
 Fill in as work lands:
 
-- Source baseline: `250181bf92c71846e57951b1e3eab370bb1f1c86`. Implementation is the local review commit titled `Add Weazlpod MP3 preparation, cache and radio relay` (commit ID in the final delivery message). No push or deployment.
+- Source baseline: `250181bf92c71846e57951b1e3eab370bb1f1c86`. Implementation commit `e2af997d1d1f86ac4be821980e5db7bb6a52a367`, pushed to origin/main and deployed after explicit user authorization on 2026-10-20.
 - Final header/profile: `X-Weazl-Client: weazlpod`, trimmed case-insensitive exact single value. Unknown/repeated/comma values preserve legacy defaults. Request-local preference; explicit MP3 also works without the hint. Conflicting Weazlpod original/other quality fails 422. `cover` stays an image. `mp3-128`; new `trackDownload` preserves separate `trackOriginal` semantics.
 - Encoding: packaged FFmpeg 8.0.1/libmp3lame (lame-libs 3.100-r5); MP3 CBR128000/44100/stereo, first audio stream, no video/artwork/tags, finite Info/Xing/LAME header. Exact args in `weazlpod_encoder.go`; executable/linked-library/version/argument fingerprint in the representation fixture. Host FFmpeg n9.0.2/Go1.27.2. Packaged input-matrix, frame-by-frame CBR, full decode/sample-count, seek and real API tests pass via `scripts/verify-weazlpod.sh`.
 - Compatibility: keep discovery/capabilities revision `2026-10-03.2`; optional `weazlpod.extensionRevision:2026-10-20.1`. Both inspected iOS exact-revision checks still accept it; no iOS files changed. Existing browser regression and original-integrity/native tests pass. No proposed AAC quality enabled.
@@ -170,4 +170,14 @@ Selected `X-Weazl-Client: weazlpod` (trimmed, case-insensitive exact value), `mp
 
 `make test`, `go vet ./...`, `tests/run-browser.sh`, production-target Docker build, `scripts/verify-weazlpod.sh`, synthetic fixture generation and sample SHA256SUMS verification passed. Full Go suite includes the race detector; focused host race/API tests and packaged encoder tests also pass. Local sanitized logs are under ignored `test-results/weazlpod/`. Host race-test first preparation of the synthetic 60-second WAV: 575.6 ms; packaged non-race example: 659.6 ms. These are fixture measurements, not device or maximum-input performance guarantees. Both the native revision checks and Codable capability/lease DTOs were inspected; added fields are ignored by those existing DTOs and mediaProfiles remains absent. No native app files changed.
 
-Implementation stages were finite library first, then live relay and recorded derivatives. See `docs/WEAZLPOD_FIRMWARE.md` for concrete requests/responses and the important distinction between LAME encoder priming and reference decoder trim. All task-board implementation items are complete; the remaining physical/load/ENOSPC/SIGKILL acceptance limits above stay explicit. No production push or deployment was performed.
+Implementation stages were finite library first, then live relay and recorded derivatives. See `docs/WEAZLPOD_FIRMWARE.md` for concrete requests/responses and the important distinction between LAME encoder priming and reference decoder trim. All task-board implementation items are complete; the remaining physical/load/ENOSPC/SIGKILL acceptance limits above stay explicit. At the implementation handoff, no production push or deployment had been performed; subsequent user-authorized deployment is recorded below.
+
+## Production deployment — 2026-10-20
+
+The user subsequently authorized commit/push and production deployment, overriding the original task boundary. `e2af997` was pushed to origin/main and deployed directly via trusted SSH to `bobp@weazlmusic.teralab.local`, checkout `/home/bobp/weazlmusic`. No jumpbox was needed. Both pre-build and immediate pre-stop checks found zero active captures and no session scheduled within five minutes. The image built while the old service remained live; the service stopped only for a full-volume backup and container replacement.
+
+- Runtime image: `sha256:c3c4a90a7c6e06cd0745ac4818f9ab0f26cfcb67a44137e6184cfcd8050c89c5`; container healthy, zero restarts, nonroot user weazl, original data volume retained.
+- Local and LAN HTTP health passed; root 200, anonymous browser/native identity 401. Discovery, installation identity, encryption-key digest, 12 device records, 5,995 master asset records and six manifests matched before/after. Contract revision remains 2026-10-03.2.
+- Synthetic encoding in the production image produced MP3/44100/stereo/128000 and fully decoded. No production-account media preparation, playlist or listening-history mutation was used as acceptance.
+- Verified stopped full-volume backup and receipts: `/home/bobp/weazlmusic-backups/20261020T194836Z` on production, directory0700/archive0600. Archive SHA-256 `7bb1bc8ff812b1ffd64f50c2d61dc931ca10242dcee7274bd860abe70d2af923`.
+- Rollback image: `weazltunes-web:rollback-20261020T194836Z`; receipt directory includes rollback.yaml, previous source/image, build log, before/after checks and encoder proof. Physical-device and stress acceptance limitations above are unchanged.

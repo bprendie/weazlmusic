@@ -83,7 +83,13 @@ for preset edits made after upgrade, so an old server will not see those newer
 edits without a deliberate export. See VERIFICATION.md for the deployment's exact
 source, backup and rollback tag.
 
-Production access uses nested SSH (the destination is reached through the jumpbox):
+Production is directly reachable from the current workstation with its trusted SSH entry:
+
+```sh
+ssh bobp@weazlmusic.teralab.local
+```
+
+The historical nested route, for networks requiring the jumpbox:
 
 ```sh
 ssh bobp@jumpbox.prendie.io \
@@ -109,4 +115,4 @@ and removes only derivative orphans/staging. Backups may retain these expendable
 files alongside the authoritative full-volume backup. No migration or revision
 bump is required; old AAC assets and native leases stay valid. Restart after media
 tool upgrades so the encoder/library fingerprint refreshes. See
-[firmware/server contract](WEAZLPOD_FIRMWARE.md). This change was not deployed.
+[firmware/server contract](WEAZLPOD_FIRMWARE.md). This change was deployed on 2026-10-20; see VERIFICATION.md for its receipt.

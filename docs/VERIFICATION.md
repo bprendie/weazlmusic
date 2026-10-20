@@ -353,3 +353,33 @@ ordinary restart and simulated abandoned staging are tested). No Apple device or
 hardware acceptance is inferred. Preparations are deliberately ephemeral across
 restart; published leases/representations are durable. Live reconnect is
 client-driven. No production deployment was performed.
+
+### Weazlpod production deployment receipt — 2026-10-20
+
+After the isolated implementation checks above, the user explicitly authorized
+push and deployment. Source `e2af997d1d1f86ac4be821980e5db7bb6a52a367` was pushed
+to origin/main and deployed using direct, trusted SSH to
+`bobp@weazlmusic.teralab.local`, checkout `/home/bobp/weazlmusic`. The production
+checkout fast-forwarded from `250181b`. The previous runtime remained live during
+the build. Read-only encrypted-record checks found zero active captures and no
+session due within five minutes, both before build and immediately before stop.
+
+The full existing volume/key was archived with the service stopped. Tar integrity
+and SHA-256 verification passed before replacement startup. Retained backup and
+receipts on production: `/home/bobp/weazlmusic-backups/20261020T194836Z`
+(directory0700, archive0600). Archive SHA-256:
+`7bb1bc8ff812b1ffd64f50c2d61dc931ca10242dcee7274bd860abe70d2af923`.
+Rollback image: `weazltunes-web:rollback-20261020T194836Z`. Its compose override,
+old source/image, build log and before/after checks are in the receipt directory.
+
+Deployed runtime:
+`sha256:c3c4a90a7c6e06cd0745ac4818f9ab0f26cfcb67a44137e6184cfcd8050c89c5`.
+Container healthy, zero restarts, user weazl, original named volume retained.
+Local and LAN health endpoints pass; root 200, anonymous browser/native identity
+401. Installation `a185535e72bc82b7eef2dca766a4161ea5cc45cb8cd195ac6aeeefd6e424c3ad`,
+contract revision2026-10-03.2, encryption-key digest, 12 devices, 5,995 master
+assets and six manifests remained unchanged. A synthetic lavfi source encoded
+inside the actual production image probed MP3/44100/2/128000 and fully decoded.
+No production login, music mutation or real-account transcode served as a fixture.
+Physical ESP32 and long-run acceptance boundaries remain open. The later receipt
+commit updates documentation only; it does not require another runtime restart.
