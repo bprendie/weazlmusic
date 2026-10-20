@@ -475,3 +475,21 @@ The disposable account, database and container were removed afterwards. No
 authenticated production account, library mutation or listening-history update
 was used for validation. The receipt commit is documentation only and does not
 require a second runtime restart. Hardware playback acceptance remains separate.
+
+### Authorized production backup cleanup — 2026-10-20
+
+The user authorized retiring old backups to conserve production disk space.
+Confirmed the current runtime image above remained healthy with zero restarts,
+and recomputed the retained `20261020T205121Z/data.tar.gz` SHA-256 against the
+recorded value above before deletion. Removed the older
+`20261020T194836Z/data.tar.gz` and 11 older rollback image tags (nine image IDs).
+Retained the latest verified full-volume archive and immediate rollback image;
+historical receipt metadata/checksums remain, with an archive-retirement marker.
+No production data volume was modified and no service restart was needed.
+
+The production receipt `20261020T205121Z/cleanup.txt` records the exact deletions,
+image identities, health and before/after filesystem availability. Net reclaimed:
+2,729,304,064 bytes (2.54 GiB). Available space afterwards: 14,202,728,448 bytes
+(13.23 GiB); filesystem usage 56%. Runtime remains
+`sha256:e8a348249e11416e8f0f9a6791d0d7fb78feb69dd1ed789bc0be8d58b96749e0`,
+healthy, zero restarts. This receipt update is documentation only.
