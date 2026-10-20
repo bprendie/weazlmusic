@@ -22,3 +22,22 @@ These tests replace a separate OpenAPI generator for this release. Run
 The live exporter `scripts/generate-v1-fixtures.py` refuses non-fixture stations.
 It changes only isolated fixture playlists/favorites/schedules. Use a fresh
 fixture volume when regenerating. Apple media acceptance remains pending.
+
+## Weazlpod optional extension 2026-10-20.1
+
+Base revision remains 2026-10-03.2. `weazlpod-capabilities.json` is the optional
+capability object and base revision; `weazlpod-lease.json` is the actual ready
+response builder with inert authorization values. `weazlpod-representation.json`
+records source digest, full packaged toolchain fingerprint and exact media facts.
+`media/mp3-128-stereo.mp3` derives from the existing synthetic AAC fixture and is
+MPEG-1 Layer III CBR128k/44100/stereo, 81,083 bytes, 221,184 presentation samples,
+5,016 rounded milliseconds, 576/576 encoder delay/padding, with FFmpeg reference skip/discard 1,105/47. SHA256SUMS covers both
+samples. `TestPodContractFixture` checks response/capability/media consistency.
+
+Regenerate only these synthetic artifacts using
+`scripts/generate-weazlpod-fixtures.sh weazltunes:weazlpod-review` after building
+that production-target image. Firmware requests, polling/range examples and
+hardware acceptance boundaries are in `docs/WEAZLPOD_FIRMWARE.md`.
+The base capabilities fixture also carries the optional extension; preparing,
+failed and live-lease fixtures describe the other response states. In preparing
+and failed examples no URL exists. The live example has no finite identity/hash.

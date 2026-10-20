@@ -1,0 +1,16 @@
+{
+  "representationId": "mp3-76153d045fe507f8b5c188ebb50e0f048f647696d7cca817c416930fd07a5bbf",
+  "sourceSha256": "68a5a4ee46f8964a28199503989343d11fe0bda30c34649d1e5084f0ff6f527d",
+  "encoderRevision": "4266f8509493ab32de5b39395253028ff59f568296b4d15631cccb4a716b76c8",
+  "byteLength": 81083,
+  "sha256": "21491ed489b84cd40167a8125b119651fdb01f0e81ffe26459ccd7958ccc6a57",
+  "durationMs": 5016,
+  "decodedSamples": 221184,
+  "encoderDelaySamples": 576,
+  "encoderPaddingSamples": 576,
+  "decoderSkipSamples": 1105,
+  "decoderDiscardSamples": 47,
+  "referenceDecoderDelaySamples": 529,
+  "lastUsedAt": "0001-01-01T00:00:00Z",
+  "pinnedUntil": "0001-01-01T00:00:00Z"
+}

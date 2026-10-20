@@ -1,0 +1,19 @@
+{
+  "data": {
+    "url": "/api/v1/media/assets/fixture-live-lease?lease=fixture-only",
+    "expiresAt": "2026-10-21T00:00:00Z",
+    "contentType": "audio/mpeg",
+    "byteLength": null,
+    "sha256": null,
+    "supportsRanges": false,
+    "playbackId": "fixture-live-playback-123",
+    "profile": "mp3-128",
+    "codec": "mp3",
+    "bitRateKbps": 128,
+    "bitRateMode": "cbr",
+    "sampleRateHz": 44100,
+    "channels": 2,
+    "representationId": null,
+    "durationMs": null
+  }
+}

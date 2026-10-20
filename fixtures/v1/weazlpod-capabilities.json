@@ -1,0 +1,33 @@
+{
+  "data": {
+    "contractRevision": "2026-10-03.2",
+    "weazlpod": {
+      "budgetBytes": 4294967296,
+      "client": "weazlpod",
+      "extensionRevision": "2026-10-20.1",
+      "finiteLibrary": true,
+      "gaplessTrimmingRequired": true,
+      "identificationHeader": "X-Weazl-Client",
+      "maxDurationMs": 14400000,
+      "maxInputBytes": 536870912,
+      "maxLiveWorkers": 2,
+      "maxLiveWorkersPerAccount": 1,
+      "maxOutputBytes": 268435456,
+      "maxWorkers": 2,
+      "preparations": true,
+      "profiles": [
+        {
+          "bitRateKbps": 128,
+          "bitRateMode": "cbr",
+          "channels": 2,
+          "codec": "mp3",
+          "profile": "mp3-128",
+          "sampleRateHz": 44100
+        }
+      ],
+      "radioLive": true,
+      "recordingSegments": true,
+      "trackDownload": true
+    }
+  }
+}

@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"net/url"
 	"os"
@@ -10,19 +9,6 @@ import (
 	"strings"
 	"time"
 )
-
-type mediaLease struct {
-	ID, Hash, User, Device, BrowserHash, Library, Kind, Resource, Quality, PlaybackID string
-	Expires                                                                           time.Time
-}
-type assetRecord struct {
-	ID       string `json:"id"`
-	Session  string `json:"sessionId"`
-	Path     string `json:"path"`
-	Bytes    int64  `json:"byteLength"`
-	Hash     string `json:"sha256"`
-	Duration int64  `json:"durationMs"`
-}
 
 func (a *apiV1) lease(w http.ResponseWriter, r *http.Request, se *session) {
 	if r.Method != "POST" {
@@ -38,8 +24,35 @@ func (a *apiV1) lease(w http.ResponseWriter, r *http.Request, se *session) {
 		verror(w, 422, "validation_failed", "Media kind and resourceId required.")
 		return
 	}
-	if in.Quality != "" && in.Quality != "original" {
-		verror(w, 422, "unsupported", "Only original library quality is available.")
+	// The hint applies only to audio, never covers or JSON. Unknown clients retain defaults.
+	if isPod(r) && in.Kind != "cover" {
+		if in.Kind == "trackOriginal" || (in.Quality != "" && in.Quality != podProfile) {
+			verror(w, 422, "unsupported", "Weazlpod requires mp3-128; use trackDownload for normalized downloads.")
+			return
+		}
+		in.Quality = podProfile
+	}
+	if in.Quality == podProfile {
+		switch in.Kind {
+		case "trackStream", "trackDownload", "recordingSegment":
+			a.podPrepare(w, r, se, in.Kind, in.ID)
+			return
+		case "radioLive":
+			if a.pod.encoder == "" {
+				verror(w, 422, "unsupported", "MP3 encoder is unavailable.")
+				return
+			}
+		default:
+			verror(w, 422, "unsupported", "MP3 is unavailable for this media kind.")
+			return
+		}
+	}
+	if in.Quality != "" && in.Quality != "original" && in.Quality != podProfile {
+		verror(w, 422, "unsupported", "Unsupported media quality.")
+		return
+	}
+	if in.Kind == "trackDownload" {
+		verror(w, 422, "unsupported", "trackDownload requires mp3-128; use trackOriginal for original bytes.")
 		return
 	}
 	ct := ""
@@ -119,12 +132,20 @@ func (a *apiV1) lease(w http.ResponseWriter, r *http.Request, se *session) {
 		return
 	}
 	// Relative URLs work behind home and remote origins without trusting forwarded Host headers.
-	dataOut(w, 200, map[string]any{"url": "/api/v1/media/assets/" + ml.ID + "?lease=" + token, "expiresAt": ml.Expires, "contentType": ct, "byteLength": size, "sha256": hash, "supportsRanges": ranges, "playbackId": func() any {
+	response := map[string]any{"url": "/api/v1/media/assets/" + ml.ID + "?lease=" + token, "expiresAt": ml.Expires, "contentType": ct, "byteLength": size, "sha256": hash, "supportsRanges": ranges, "profile": ml.Quality, "playbackId": func() any {
 		if ml.PlaybackID != "" {
 			return ml.PlaybackID
 		}
 		return nil
-	}()})
+	}()}
+	if ml.Quality == podProfile {
+		for key, value := range podEncoding() {
+			response[key] = value
+		}
+		response["representationId"] = nil
+		response["durationMs"] = nil
+	}
+	dataOut(w, 200, response)
 }
 func (a *apiV1) leaseIdentity(ml mediaLease) (*session, bool) {
 	if ml.Device != "" {
@@ -165,6 +186,14 @@ func (a *apiV1) asset(w http.ResponseWriter, r *http.Request) {
 	}
 	if !a.now().Before(ml.Expires) {
 		verror(w, 410, "asset_expired", "Media lease expired; request a new lease.")
+		return
+	}
+	if ml.Quality == podProfile && ml.Kind != "radioLive" {
+		if ml.Representation == "" {
+			verror(w, 502, "transcode_failed", "MP3 representation is missing.")
+			return
+		}
+		a.podAsset(w, r, se, ml)
 		return
 	}
 	if ml.Kind == "recordingSegment" {
@@ -212,6 +241,10 @@ func (a *apiV1) asset(w http.ResponseWriter, r *http.Request) {
 			verror(w, 404, "not_found", "Station was removed.")
 			return
 		}
+		if ml.Quality == podProfile {
+			a.podLive(w, r, se, ml, raw)
+			return
+		}
 		q := url.Values{"url": {raw}, "playback": {ml.PlaybackID}}
 		r.URL.RawQuery = q.Encode()
 		se.radio = a.radioHub(ml.Device, ml.BrowserHash)
@@ -257,30 +290,3 @@ func (a *apiV1) asset(w http.ResponseWriter, r *http.Request) {
 	}
 	copyMedia(w, res)
 }
-func (a *apiV1) radioHub(device, browser string) *radioHub {
-	key := device + browser
-	a.s.mu.Lock()
-	defer a.s.mu.Unlock()
-	if a.s.nativeRadio == nil {
-		a.s.nativeRadio = map[string]*radioHub{}
-	}
-	if a.s.nativeRadio[key] == nil {
-		a.s.nativeRadio[key] = newRadioHub()
-	}
-	return a.s.nativeRadio[key]
-}
-func (a *apiV1) radioEvents(w http.ResponseWriter, r *http.Request, se *session) {
-	clone := *se
-	se = &clone
-	browser := ""
-	if c, e := r.Cookie("weazl_session"); e == nil {
-		browser = digest(c.Value)
-	}
-	se.radio = a.radioHub(se.DeviceID, browser)
-	a.s.radioEvents(w, r, se)
-}
-func (a *apiV1) capabilities(w http.ResponseWriter, se *session) {
-	dataOut(w, 200, map[string]any{"contractRevision": contractRevision, "library": se.ServerURL != "", "originalDownloads": true, "favorites": []string{"track", "album", "artist"}, "playlistReplace": true, "maxPlaylistTracks": 1000, "scrobble": true, "radio": true, "radioDirectory": []string{"somafm", "icecast"}, "mood": true, "flightRecorder": map[string]any{"enabled": a.mediaEnabled, "maxStations": 6, "defaultDurationMs": 14400000, "maxDurationMs": 43200000, "maxConcurrentStreams": 6, "recurrence": []string{"once", "daily", "weekly"}, "inputFormats": []string{"mp3", "aac"}, "outputProfiles": []string{"aac-lc-m4a"}, "outputEncoding": map[string]any{"encoder": "fdkaac", "profile": "AAC-LC", "bitRateKbps": recorderBitrateKbps, "sampleRateHz": 44100, "channels": 2}, "overnightValidated": false, "appleValidated": false}})
-}
-
-var _ = json.Marshal

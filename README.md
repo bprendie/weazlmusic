@@ -83,6 +83,7 @@ The Now Playing footer lights up for recorded playback, with play/pause and seek
 
 ## System Boundaries & Limits
 
+* Weazlpod hardware clients can negotiate cached MP3 CBR128k/44100/stereo for finite playback/downloads, recorded segments and a bounded live-radio relay. See the [firmware contract](docs/WEAZLPOD_FIRMWARE.md). Browser/iOS defaults remain compatible.
 * Library playback relies on native browser codec support. Radio rips to seekable AAC-LC M4A. No HLS or YouTube URL resolving. Use Navidrome transcoding policies for unsupported local formats.
 * Radio origins default to public internet. For LAN/split-DNS stations, set `RADIO_PRIVATE_ORIGINS=https://radio.yourdomain.com` in your Compose `.env` and recreate the service. Use comma-separated exact origins without paths or wildcards. Redirects and playlist targets are checked independently; metadata, link-local and loopback addresses remain blocked. See [radio troubleshooting](docs/RADIO_PRIVATE_ORIGINS.md).
 * Native library scrobbles are supported with durable deduplication. Recorded radio does *not* submit library scrobbles.

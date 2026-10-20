@@ -56,6 +56,9 @@ func (a *apiV1) storage() (storageStatus, error) {
 		return v, e
 	}
 	free := int64(fs.Bavail)*int64(fs.Bsize) - reserve
+	if a.pod != nil {
+		free -= a.pod.reserved.Load()
+	}
 	v.Available = max(int64(0), min(budget-v.Used-v.Reserved, free-v.Reserved))
 	return v, nil
 }

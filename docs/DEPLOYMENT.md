@@ -93,3 +93,20 @@ ssh bobp@jumpbox.prendie.io \
 No production playlists/listening history are mutated by acceptance tests. The
 fixture command's trusted radio transport is absent from the production command.
 Fixtures and six-hour soak run on isolated local volumes.
+
+## Optional Weazlpod cache configuration
+
+`TRANSCODE_BUDGET_BYTES` defaults to 4294967296 (4 GiB); `TRANSCODE_WORKERS`
+defaults to 2 (maximum 8). Compose and the standalone binary accept both.
+`CAPTURE_RESERVE_BYTES` is also the derivative disk-free reserve; pending
+recording commitments take precedence over derivative admission. Each finite
+preparation reserves 768 MiB for its bounded source/output, so small remaining
+budgets can reject even a small cached-track preparation. Unexpired leases pin
+derivatives; pressure evicts only unpinned, unread disposable MP3 files.
+DATA_DIR/derivatives holds both durable finalized MP3s and transient staging;
+never place it on the container's small /tmp. Startup verifies indexed hashes
+and removes only derivative orphans/staging. Backups may retain these expendable
+files alongside the authoritative full-volume backup. No migration or revision
+bump is required; old AAC assets and native leases stay valid. Restart after media
+tool upgrades so the encoder/library fingerprint refreshes. See
+[firmware/server contract](WEAZLPOD_FIRMWARE.md). This change was not deployed.

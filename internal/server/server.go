@@ -13,17 +13,19 @@ import (
 )
 
 type Config struct {
-	DataDir             string
-	SecureCookie        bool
-	Now                 func() time.Time
-	DisableWorkers      bool
-	CaptureBudgetBytes  int64
-	AccountBudgetBytes  int64
-	ReserveBytes        int64
-	RetentionDays       int
-	SegmentSeconds      int
-	RadioClient         *http.Client
-	RadioPrivateOrigins string
+	TranscodeBudgetBytes int64
+	TranscodeWorkers     int
+	DataDir              string
+	SecureCookie         bool
+	Now                  func() time.Time
+	DisableWorkers       bool
+	CaptureBudgetBytes   int64
+	AccountBudgetBytes   int64
+	ReserveBytes         int64
+	RetentionDays        int
+	SegmentSeconds       int
+	RadioClient          *http.Client
+	RadioPrivateOrigins  string
 }
 type Server struct {
 	v1          *apiV1

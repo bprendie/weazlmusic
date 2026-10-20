@@ -278,3 +278,78 @@ on production, the verified full-volume archive is stored on this workstation at
 The production receipt points to this external archive. It contains the data
 volume and encryption key; restore requires transferring it back through the
 trusted route before following the restore procedure.
+
+## Weazlpod server extension — 2026-10-20
+
+Baseline `250181bf92c71846e57951b1e3eab370bb1f1c86`. All new media acceptance uses
+synthetic WAV/FLAC/AAC/MP3, fake Navidrome, isolated radio origins and temporary
+storage. No production accounts, listening-history/playlist mutations, push or
+production deployment. Existing contract revision stays **2026-10-03.2**; optional
+Weazlpod extension revision is **2026-10-20.1**. Both exact-revision iOS checks
+were inspected, along with the Codable capability/lease DTOs (unknown added fields
+are ignored); server/fixture discovery stays compatible without iOS edits.
+
+Commands and evidence:
+
+- `make test` (`go test -race ./...`): passed all Go packages, including existing
+  recorder/native/browser-server regressions and new Weazlpod tests.
+- `go vet ./...`, `git diff --check`: passed.
+- `tests/run-browser.sh`: passed library audio, random queue, curator/Mood,
+  favorites/playlists/search, presets, ICY lifecycle, persistence, logout,
+  second-user and mobile checks. No production fixture traffic.
+- `docker build --target production -t weazltunes:weazlpod-review .`: passed
+  with unchanged pinned Alpine FFmpeg8.0.1-r1 and installed libmp3lame/lame-libs
+  3.100-r5. No package/source change to the encoder image dependencies.
+- `scripts/verify-weazlpod.sh weazltunes:weazlpod-review`: passed the focused
+  API/encoder/radio/recovery/contract fixture tests against actual packaged
+  ffmpeg/ffprobe, nonroot/read-only/no-network, 8 MiB /tmp and isolated mounted
+  data. The initial attempt to put all test data on a 128 MiB tmpfs correctly
+  received 507 admission errors; the reusable verifier now places fixture data
+  on disk, mirroring production staging. No production volume is mounted.
+- `scripts/generate-weazlpod-fixtures.sh weazltunes:weazlpod-review`: generated
+  only the synthetic MP3/ready-response/representation/capability artifacts using
+  production code's encoder settings, probe and response builder.
+- `(cd fixtures/v1/media && sha256sum -c SHA256SUMS)`: both samples pass. MP3 is
+  81,083 bytes, SHA-256
+  `21491ed489b84cd40167a8125b119651fdb01f0e81ffe26459ccd7958ccc6a57`,
+  221,184 presentation samples, 5,016 rounded ms; raw LAME encoder delay/padding
+  576/576 and FFmpeg reference skip/discard 1105/47 (529 decoder-delay samples).
+
+Focused acceptance covers the header/default/conflict matrix; unchanged original
+WAV downloads despite upstream default AAC streaming; header-free MP3 GET/HEAD;
+stream/download byte identity and renewed leases; 206/416/If-Range 200 fallback;
+lease expiry/revocation; foreign preparation/recording rejection; changed bytes
+under unchanged source metadata; concurrent in-flight deduplication; responsive
+unrelated API while two workers block; admission backoff, quota exhaustion and
+active-reader protection; cancellation, corrupt/truncated input, abandoned
+staging/orphan cleanup and restart/lease persistence. Encoder matrix includes
+WAV, FLAC, AAC/M4A, CBR/VBR MP3, mono and differing input sample rates. Tests
+inspect every encoded MPEG frame for CBR, fully decode source/output to compare
+presentation sample counts, and seek near beginning/middle/end.
+
+Live tests use both MP3 and AAC origins with ICY interleaving. They verify actual
+MP3 CBR128k/44100/stereo output, metadata separation, no static file claims,
+duplicate ownership rejection, per-account worker admission, disconnect/reopen,
+Range rejection, and active-device revocation ending the encoder promptly.
+Recorded derivatives preserve AAC master hashes and manifest station starts/gaps;
+known-tone start/middle/end seeks across two station timelines verify presentation
+mapping. A deleted master makes its cached derivative inaccessible.
+
+Representative uncached preparation of a synthetic 60-second mono8000Hz WAV was
+**575.6 ms** in the host race-test run (includes source fetch/hash, two full
+decodes, encode/probe, publication and polling). This is a synthetic short-run
+measurement, not a large-library or ESP32 latency bound. A packaged non-race
+example was **659.6 ms**. Packaged verification
+logs include their corresponding preparation time. Source/encoder digests and
+actual ready DTO are checked in; detailed local logs are retained under ignored
+`test-results/weazlpod/`. Reproducible commands and firmware request/response,
+resume, trim and preroll guidance: [WEAZLPOD_FIRMWARE.md](WEAZLPOD_FIRMWARE.md).
+
+Still pending: physical ESP32 decode/playback, decoder-specific trimming and
+reservoir preroll, uninterrupted segment transitions, SD throughput and power;
+sustained maximum-size/load and long live-transcode soak; actual ENOSPC and
+abrupt SIGKILL during publication (reserve rejection, encoder cancellation,
+ordinary restart and simulated abandoned staging are tested). No Apple device or
+hardware acceptance is inferred. Preparations are deliberately ephemeral across
+restart; published leases/representations are durable. Live reconnect is
+client-driven. No production deployment was performed.

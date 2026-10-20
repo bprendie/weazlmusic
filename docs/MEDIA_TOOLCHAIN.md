@@ -48,3 +48,33 @@ advancement, FFmpeg decode/seeks and AAC/VBR-MP3 inputs. Apple compatibility is
 pending hardware tests. Staging validation rejects incomplete files; detected
 restart/disconnect gaps preserve the shared timeline. Sub-15-second in-attempt
 stalls and independent broadcaster delivery offsets remain timing limitations.
+
+## Weazlpod MP3 — 2026-10-20
+
+The same packaged FFmpeg 8.0.1 has `libmp3lame`; no new runtime dependency or AAC
+profile is enabled. `weazlpod_encoder.go` selects the first audio stream, excludes
+video/artwork/chapters/tags, encodes `libmp3lame -b:a 128k -ar 44100 -ac 2
+-threads 1 -id3v2_version 0 -write_id3v1 0 -write_xing 1 -f mp3`. Input decode
+is strict (`-xerror -err_detect explode`), accepts local files/pipes only, and is
+bounded by input/output sizes, decoded duration and a 15-minute preparation
+context. Full source/output decodes compare presentation sample counts; probe
+checks codec/rate/channels/bitrate/packet count, the bounded Info/LAME header, and
+the first packet's reference decoder trim info. File encoder priming/padding and
+FFmpeg's decoder-adjusted skip/discard are reported separately.
+The cache fingerprints actual FFmpeg bytes, linked shared-library bytes, version
+and exact encoder arguments at process startup, so independent library upgrades
+also invalidate representations. Dynamic Linux builds require `ldd` for this
+fingerprint (present in the packaged image). Static builds are fingerprinted by
+their executable. Restart after changing media tools.
+
+Live uses a separate pipe-only encoder with `-write_xing 0`, no finite seek/length
+claims, a secured Go origin connection, and ICY stripping before stdin. It has a
+separate cap of 2 globally/1 per account and no disk cache. Finite derivatives are
+durable finalized files, with a separate 4 GiB default expendable cache and
+recording-aware reservations. AAC masters are never replaced.
+
+`WEAZLPOD_FIRMWARE.md` gives the firmware contract and reproducible container test
+commands. The checked-in MP3 is generated using the packaged encoder, not the
+host FFmpeg. Existing FFmpeg/LAME licensing obligations apply; no encoder source
+or package update was made. Actual host tools for this change: Go1.27.2-X:nodwarf5,
+FFmpeg n9.0.2. Physical ESP32 playback remains pending.

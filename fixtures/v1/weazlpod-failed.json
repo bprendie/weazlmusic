@@ -1,0 +1,11 @@
+{
+  "data": {
+    "preparationId": "fixture-preparation",
+    "state": "failed",
+    "kind": "trackDownload",
+    "resourceId": "fixture-track",
+    "createdAt": "2026-10-20T12:00:00Z",
+    "expiresAt": "2026-10-20T13:00:00Z",
+    "errorCode": "transcode_failed"
+  }
+}

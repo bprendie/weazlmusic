@@ -32,6 +32,7 @@ type apiV1 struct {
 	moodCancel   map[string]context.CancelFunc
 	snapshot     map[string]*librarySnapshot
 	mediaEnabled bool
+	pod          *podStore
 }
 
 func newV1(s *Server) (*apiV1, error) {
@@ -81,6 +82,10 @@ func newV1(s *Server) (*apiV1, error) {
 	}
 	a.recoverMoods()
 	a.mediaEnabled = mediaToolsAvailable()
+	if err = a.initPod(); err != nil {
+		a.close()
+		return nil, err
+	}
 	if err = os.MkdirAll(filepath.Join(s.cfg.DataDir, "recordings"), 0700); err != nil {
 		a.close()
 		return nil, err

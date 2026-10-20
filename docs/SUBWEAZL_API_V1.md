@@ -96,7 +96,7 @@ Six streams for six hours encode roughly 2.07 GB plus packaging and reserve
 4.15 GB of capacity. Existing 160 kbps assets remain immutable and valid; clients
 use manifest byteLength/hash rather than deriving sizes from the current encoding. Capabilities also
 include `maxPlaylistTracks:1000`, `radioDirectory:["somafm","icecast"]`, and
-`contractRevision`. Library streams/downloads currently offer original quality only.
+`contractRevision`. Existing library defaults remain original quality; the optional Weazlpod extension below adds negotiated MP3.
 
 ## Library and music mutations
 
@@ -317,3 +317,176 @@ An offline phone copy is never deleted by a server retention operation.
 ## Ten-minute recorder assets (2026-10-08)
 
 New recordings retain short capture checkpoints, then finalize contiguous audio into approximately ten-minute AAC M4A assets. Gaps and tails yield shorter assets; failures can retain the original short files. Clients must use startMs, durationMs and mediaStartMs, never assume a fixed segment length. Existing finalized IDs, hashes and bytes remain unchanged. The schema and revision remain 2026-10-03.2. See [chunk policy](RECORDER_CHUNKS.md).
+
+## Weazlpod additive extension — 2026-10-20.1
+
+The default contract revision remains **2026-10-03.2**. The existing iOS client
+checks that exact revision at discovery and capability loading. This extension
+adds optional fields and operations; no existing field changes type or meaning.
+Browser/iOS requests keep their current defaults. AAC quality profiles from
+SUBWEAZL_QUALITY_HANDOFF.md remain unavailable. Discover the optional
+`capabilities.data.weazlpod` object before consuming this extension; its
+`extensionRevision` is `2026-10-20.1`. See checked-in `weazlpod-*.json` fixtures
+and [firmware examples](WEAZLPOD_FIRMWARE.md).
+
+### Selection
+
+`X-Weazl-Client: weazlpod` is a request-local hint, independent of authentication.
+Trim surrounding whitespace and compare case-insensitively to the exact value;
+unknown, repeated or comma-separated values do not enable the hint. Device
+preferences are not persisted. Native bearer authentication is unchanged. The
+hint is never forwarded upstream. It changes audio lease defaults, not JSON or
+cover-image types.
+
+| Request | Effective behavior |
+| --- | --- |
+| No/unknown hint, existing kind, omitted/original quality | Existing browser/iOS behavior |
+| Weazlpod, `trackStream` or `trackDownload`, omitted quality | `mp3-128` preparation |
+| Either client, explicit `mp3-128`, `trackStream`/`trackDownload` | Same preparation and immutable representation |
+| Weazlpod, `trackOriginal` or conflicting explicit quality | 422 `unsupported`; use `trackDownload` for MP3 |
+| No/unknown hint, `trackOriginal` | Original upstream **download** bytes |
+| `trackDownload` without `mp3-128` or Weazlpod hint | 422 `unsupported` |
+| `cover` with hint and omitted/original quality | Existing image representation |
+| Explicit MP3 for `cover`, `trackOriginal`, unknown kind | 422 `unsupported` |
+| Weazlpod `recordingSegment` | Prepare derivative of owned finalized immutable AAC asset |
+| Weazlpod `radioLive` | Separate live MP3 lease, never a static-file lease |
+
+`mp3-128` means MPEG-1 Layer III, **128,000 bit/s CBR, 44,100 Hz, stereo**,
+`audio/mpeg`; normalize even already-low-bitrate/MP3 sources. No original or AAC
+fallback is permitted. Finite output omits ID3 tags, chapters and artwork and
+contains an Info/Xing seek header and encoder trim information. Encoder build and
+all settings participate in the cache key. An unavailable encoder gives 422
+`unsupported` and empty capability profiles with audio-operation flags false.
+
+### Finite readiness and leases
+
+POST `/media/leases` retains its original body `{kind,resourceId,quality?}`.
+For finite MP3 a new preparation returns **202**, `Retry-After: 2` and
+`Location: /api/v1/media/preparations/{preparationId}`:
+
+```json
+{"data":{"preparationId":"fixture-preparation","state":"preparing","kind":"trackDownload","resourceId":"fixture-track","createdAt":"2026-10-20T12:00:00Z","expiresAt":"2026-10-20T13:00:00Z"}}
+```
+
+There is no playable URL, estimated length or unfinished-file lease in a 202.
+GET that Location with bearer authentication; it needs no identification header.
+202 means keep polling with Retry-After. On success **200** returns a normal
+lease extended with `state:"ready"`, `preparationId`, `profile`, `codec`,
+`bitRateKbps`, `bitRateMode`, `sampleRateHz`, `channels`, `representationId`,
+`sourceSha256`, `durationMs`, `decodedSamples`, `encoderDelaySamples`,
+`encoderPaddingSamples`, `decoderSkipSamples`, `decoderDiscardSamples`,
+`referenceDecoderDelaySamples`, `decoderTrimBasis:"ffmpeg"`, `mediaStartMs:0`, `seekOrigin`,
+`requiresGaplessTrimming:true`, and finalized byteLength/SHA-256. Stop polling
+when ready. Every ready GET issues a fresh resource-scoped 12-hour lease of the
+same bytes; it does not change their ETag or representation identity. Media
+GET/HEAD needs only the issued URL, without bearer or identification headers.
+Leases still verify device/browser validity and current source authorization on
+**every** GET/HEAD, including cached representations. Existing recorder manifests
+and original leases retain their prior shapes and meanings.
+
+Preparations are account/library scoped, expire one hour after creation, and
+are bounded to 1,000 retained entries. Concurrent POSTs for a running resource
+join its preparation. A POST after completion starts fresh source revalidation:
+fetch authorized original download bytes and SHA-256 them, then reuse matching
+cached output. Unknown upstream revisions are never guessed. A ready preparation
+is an immutable source snapshot; renewing it retains that snapshot even if the
+upstream source subsequently changes. POST again to discover replacement bytes.
+Source digest, library identity, encoder build and settings define the cache key;
+expiring URLs, devices and request times do not. Different resource IDs with
+identical source bytes in the same library can share the encode; authorization
+remains per resource.
+
+GET of a failed/cancelled preparation returns **200** with
+`state:"failed"`/`"cancelled"`, no URL; failed responses include `errorCode`:
+`upstream_unavailable`, `upstream_rejected`, `unsupported` (input size),
+`storage_full` or `transcode_failed` (invalid audio, encoder/validation/timeout
+failure). Start a new POST to retry; failures are never cached as media.
+DELETE the Location cancels a shared preparing job for that account, **204**;
+existing completed leases are unaffected. Cancellation frees the worker after
+process/network cleanup; another consumer of that same preparation must retry.
+These reversible preparation operations do not require Idempotency-Key; running
+resource deduplication is their idempotency rule. Unknown/restarted preparation
+IDs give 404 `not_found`; expired retained IDs give 410 `asset_expired`. A restart
+discards ephemeral preparations; restart the POST. Published representations and
+unexpired durable leases survive restart, subject to ordinary revocation.
+
+Admission returns **429** `rate_limited`, `Retry-After: 2` when workers/retained
+job slots are full; **507** `storage_full`, `Retry-After: 30` when disk/budget
+reservations cannot be made. No unbounded work queue exists. Default finite
+worker count is 2 (`TRANSCODE_WORKERS`, capped at 8), per-job deadline 15 minutes,
+source limit 512 MiB, output limit 256 MiB, decoded presentation limit 4 hours.
+Each admitted job reserves 768 MiB conservatively, including when it ultimately
+reuses a cached encode. Reservations protect recorder commitments and the
+configured CAPTURE_RESERVE_BYTES. Staging lives under DATA_DIR/derivatives;
+TRANSCODE_BUDGET_BYTES defaults to 4 GiB and includes published files plus active
+reservations. Full probe/decode, presentation sample-count comparison, length,
+SHA-256, file sync, rename, directory sync and encrypted durable metadata precede
+publication. On startup hash-check indexed output and discard damaged/orphaned
+output and all abandoned staging. No master is removed. Admission evicts only
+least-recently-used derivatives whose lease/preparation pins have elapsed and
+which have no active readers. Ready-but-unleased output has a one-hour pin;
+issued leases extend that through their expiry. A pinned-full cache returns 507.
+
+Immutable ETag is the quoted representation SHA-256, shared across renewed
+leases. HEAD returns final Content-Length. GET supports ordinary 200, 206 with
+Content-Range, 416, and If-Range: mismatch returns full 200. A resuming client
+must replace/revalidate its partial file on 200, **never append**. Verify size and
+SHA-256 before atomic offline promotion. Do not use AAC-manifest hash/length to
+validate MP3 derivatives.
+
+### Recorded timeline and MP3 priming
+
+Authoritative AAC assets, manifests, logical starts/durations, station order,
+metadata and gaps stay unchanged. Fetch the original manifest, then request each
+selected asset as `recordingSegment` with MP3 quality (or the hint). Store the MP3
+lease metadata with that asset as its selected representation. There is no
+separate MP3 manifest or replacement of bytes under AAC asset IDs. Only assets
+belonging to finalized, nondeleted owned sessions are accepted. Deleting a master
+session revokes access to its derivatives as well.
+
+`durationMs` is rounded **decoded presentation** duration, not MP3 padded frame
+time; `decodedSamples` is exact at 44,100 Hz. `mediaStartMs:0` and
+`seekOrigin:"gapless-decoded-sample-zero"` refer to PCM after Info/Xing/LAME
+trimming. The decoder must skip the Info frame and honor the LAME-tag encoderDelaySamples
+and encoderPaddingSamples using its own decoder-delay convention. The explicit
+`decoderSkipSamples`/`decoderDiscardSamples` describe FFmpeg's reference decoder,
+including `referenceDecoderDelaySamples`; they are not universal embedded-decoder
+trim counts. In the checked-in sample the file stores 576/576, while FFmpeg's
+529-sample decoder delay produces skip/discard 1105/47. A decoder that already
+honors gapless metadata must not apply these trims twice. For a
+manifest segment at session offset S and original media origin M, seek to
+`M + T - S` in that trimmed presentation. Retain the manifest's logical duration
+and gaps even if its final interval clips a padded source tail. Source AAC
+priming is removed by the server decoder before MP3 encoding.
+
+For accurate MP3 random access, seek to an earlier frame, decode reservoir
+preroll and discard samples to the requested presentation position; alternatively
+decode forward from the start. Raw byte-offset seeking and immediately sounding
+the first frame after an indexed seek are not timeline parity. Firmware must
+verify its decoder's Info/LAME handling, reservoir preroll and trim behavior on
+hardware. Server tests verify source/output sample counts and known-tone seeks at
+start/middle/end on two station timelines with gaps; ESP32 acceptance is pending.
+
+### Live MP3
+
+`radioLive` with MP3 quality/hint produces a normal station-owned lease with
+profile/encoding fields, non-null playbackId, and null byteLength, SHA-256,
+representationId and durationMs; supportsRanges is false. It uses the existing
+validated Go resolver/relay for URLs, DNS, redirects and playlists. FFmpeg receives
+only ICY-stripped audio over stdin. Metadata remains on the authenticated
+`/radio/events?playback={playbackId}` SSE feed and is never inserted into MP3.
+No ETag, Content-Length, Content-Range or Accept-Ranges is emitted. MP3 live GETs
+with any Range are 422 `unsupported`; HEAD is 405. Existing non-MP3 Apple probe
+and relay behavior is unchanged.
+
+At most **2 live transcodes globally, 1 per account**, separate from finite
+workers and capture workers. A duplicate actual GET on a playbackId is 409;
+capacity rejection is 429 with Retry-After: 2. A disconnect releases ownership;
+reopen the URL with exponential backoff (suggested 1–30 seconds), renew an expired
+lease, and do not resume bytes from the old stream. The server ends an attempt
+on disconnect, 15-second input idle/write deadlines, lease expiry, revocation or
+shutdown. Revocation is rechecked every second for active streams. It does not
+silently reconnect across an audio discontinuity: the firmware opens a fresh
+attempt. Once HTTP audio has started, encoder/origin failure closes the stream;
+there is no JSON/audio fallback. Live audio is not an offline download; use Flight
+Recorder plus finalized segment derivatives for offline radio.
