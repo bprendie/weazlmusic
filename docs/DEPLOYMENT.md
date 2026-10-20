@@ -103,7 +103,10 @@ Fixtures and six-hour soak run on isolated local volumes.
 ## Optional Weazlpod cache configuration
 
 `TRANSCODE_BUDGET_BYTES` defaults to 4294967296 (4 GiB); `TRANSCODE_WORKERS`
-defaults to 2 (maximum 8). Compose and the standalone binary accept both.
+defaults to 0 (automatic). Automatic concurrency is the minimum of the media
+CPU-core budget and derivative-budget preparation slots. A positive value is an
+additional ceiling, never an override of the two-core application reserve. Compose
+and the standalone binary accept both.
 `CAPTURE_RESERVE_BYTES` is also the derivative disk-free reserve; pending
 recording commitments take precedence over derivative admission. Each finite
 preparation reserves 768 MiB for its bounded source/output, so small remaining
@@ -116,3 +119,31 @@ files alongside the authoritative full-volume backup. No migration or revision
 bump is required; old AAC assets and native leases stay valid. Restart after media
 tool upgrades so the encoder/library fingerprint refreshes. See
 [firmware/server contract](WEAZLPOD_FIRMWARE.md). This change was deployed on 2026-10-20; see VERIFICATION.md for its receipt.
+
+## CPU reserve and playlist throughput
+
+All server-launched FFmpeg, ffprobe and fdkaac subprocesses share a CPU affinity
+pool excluding **at least two application cores**. Where topology is available,
+whole SMT sibling groups are excluded. The Go API retains its full affinity.
+Cgroup v1/v2 CPU quotas and visible ancestors are also honored: floor fractional
+CPU quotas before subtracting two, and cap worker affinity to that remaining
+logical-CPU-time budget. With no safe pool (two or fewer available cores/CPU quota,
+or unreadable affinity/quota), new encoding is unavailable; originals, existing
+cached-file transfers and other API operations remain usable. No client header,
+quality or worker configuration can lower the reserve. Restart after changing
+CPU topology/affinity/container quotas.
+
+MP3 libmp3lame reports no internal threading support. Throughput comes from
+parallel independent FFmpeg processes, one encoder thread per job, with all
+probes, validation, live radio and Flight Recorder media processes using the same
+restricted pool. No additional runtime executable/package is required: the server
+launches its own short-lived media-exec entrypoint, applies Linux affinity there,
+and execs the tool while preserving PID, pipes and cancellation.
+
+The API advertises reservedApplicationCores, transcodeCores, storageWorkerLimit,
+maxWorkers, encoderThreadsPerJob and workerModel. At 24 vCPU cores without SMT and
+4 GiB cache, media has 22 cores but five conservative preparation reservations;
+maxWorkers is five unless an explicit lower ceiling is configured. At four cores
+it is two. Actual free-space pressure or existing cached files can further reduce
+admission. Increasing workers alone does not enlarge the disk budget. Firmware
+can pipeline that many playlist preparations while transferring completed files.

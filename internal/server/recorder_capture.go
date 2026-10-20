@@ -23,7 +23,7 @@ func mediaToolsAvailable() bool {
 	_, e := exec.LookPath("ffmpeg")
 	_, ee := exec.LookPath("ffprobe")
 	_, fdkErr := exec.LookPath("fdkaac")
-	return e == nil && ee == nil && fdkErr == nil
+	return e == nil && ee == nil && fdkErr == nil && mediaCPUs().Cores > 0
 }
 func (a *apiV1) captureStation(parent context.Context, j recordingJob, index int) {
 	root := filepath.Join(a.s.cfg.DataDir, "recordings", "staging", j.ID, j.Stations[index].StationID)

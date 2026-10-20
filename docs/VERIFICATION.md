@@ -383,3 +383,55 @@ inside the actual production image probed MP3/44100/2/128000 and fully decoded.
 No production login, music mutation or real-account transcode served as a fixture.
 Physical ESP32 and long-run acceptance boundaries remain open. The later receipt
 commit updates documentation only; it does not require another runtime restart.
+
+## Parallel playlist preparation with two application cores reserved
+
+Follow-up source baseline `8e6fb62`. TRANSCODE_WORKERS now defaults to automatic
+(0), with positive settings acting as ceilings. Effective admission is bounded
+by remaining physical-core groups and the existing cache reservation budget.
+Every production FFmpeg/ffprobe/fdkaac subprocess uses the same restricted CPU
+pool; the API process keeps its original affinity. Two whole core groups are
+excluded, SMT siblings are handled, visible cgroup v1/v2 ancestor quotas are
+floored, and unsafe/missing CPU headroom disables encoding rather than allowing
+unrestricted execution. MP3 encoder settings, fixture bytes/checksum and cached
+representation IDs are unchanged; optional capability fields describe capacity.
+
+Verification:
+
+- `make test`: all packages pass with the race detector (115.073 s for the server
+  package), including four simultaneous playlist preparations and excess-work
+  backoff, parent/child affinity checks, cancellation, SMT/noncontiguous CPU sets,
+  explicit worker ceiling clamping and cgroup ancestor limits.
+- `go vet ./...`, `git diff --check`: pass.
+- `tests/run-browser.sh`: existing isolated browser playback/library/radio/Mood,
+  persistence and mobile acceptance passes.
+- `docker build --target production -t weazltunes:weazlpod-cpu-review .`: passes.
+  No Alpine package or FFmpeg version change. x/sys v0.36.0 was already pinned
+  transitively; it is now a direct dependency for Linux affinity syscalls.
+- `scripts/verify-weazlpod.sh weazltunes:weazlpod-cpu-review`: actual packaged
+  media/API/fixture tests pass as nonroot with a read-only root/no network. Its
+  extra four-core container verifies restricted worker affinity. Two-core and
+  2.9-CPU-quota containers verify encoding is unavailable even with a configured
+  worker ceiling of 999. Existing original/file/API operations stay available.
+- The production binary entrypoint was exercised in the isolated image using
+  `--weazl-media-exec ffmpeg -hide_banner -h encoder=libmp3lame`; it execs the
+  actual tool and reports no internal MP3 encoder threading support.
+- `go test ./internal/server -run '^$' -bench BenchmarkPodPlaylist -benchtime=1x
+  -count=1`: four distinct five-minute 48 kHz stereo FLAC fixtures, cold derivative
+  stores and full source/output validation. One worker: **9.015 s**; two workers:
+  **5.907 s**, about **1.53× throughput** in this local example. Another loaded
+  development run measured 18.104/9.497 s. These are fixture measurements, not a
+  promise for every codec, disk, hardware or network.
+- Synthetic MP3 SHA256SUMS and encoder/profile/representation receipts remain
+  byte-identical. Capability fixtures describe a deterministic four-core example;
+  live capacities depend on the actual host, quota and budget.
+
+The production VM changed from four to 24 vCPU cores during this work, with
+approximately 3.4 GiB RAM. The new policy leaves 22 cores in the shared media
+pool, while the unchanged 4 GiB budget admits five worst-case reservations. The
+client should pipeline up to advertised maxWorkers track preparations while
+transferring completed files; serialized clients remain serialized. No original
+library, recording master, playlist or listening-history mutation was used for
+acceptance. Media integration tests need sufficient CPU headroom (four usable
+core groups for two-worker checks); restricted-resource behavior is tested
+separately. Detailed local logs are under ignored `test-results/weazlpod-cpu/`.

@@ -49,7 +49,7 @@ func TestPodContractFixture(t *testing.T) {
 		save("weazlpod-lease.json", map[string]any{"data": data})
 		save("weazlpod-representation.json", rep)
 		p := &podStore{encoder: rep.Encoder}
-		a := &apiV1{s: &Server{}, pod: p}
+		a := &apiV1{s: &Server{}, pod: p, cpu: fixtureMediaCPUPlan()}
 		save("weazlpod-capabilities.json", map[string]any{"data": map[string]any{"contractRevision": contractRevision, "weazlpod": a.podCapabilities()}})
 		t.Logf("packaged sample: %d bytes, %s, %d ms, %d samples, trim %d/%d", rep.Bytes, rep.Hash, rep.Duration, rep.Samples, rep.Delay, rep.Padding)
 		return
@@ -79,10 +79,14 @@ func TestPodContractFixture(t *testing.T) {
 		t.Fatal(err)
 	}
 	capabilities := decodeData[map[string]any](t, raw)
-	current := (&apiV1{s: &Server{}, pod: &podStore{encoder: "fixture"}}).podCapabilities()
+	current := (&apiV1{s: &Server{}, pod: &podStore{encoder: "fixture"}, cpu: fixtureMediaCPUPlan()}).podCapabilities()
 	b, _ := json.Marshal(current)
 	c, _ := json.Marshal(capabilities["weazlpod"])
 	if string(b) != string(c) || capabilities["contractRevision"] != contractRevision {
 		t.Fatal("fixture capability drift", string(b), string(c))
 	}
+}
+
+func fixtureMediaCPUPlan() *mediaCPUPlan {
+	return &mediaCPUPlan{CPUs: []int{0, 1}, Cores: 2, ReservedCores: 2}
 }

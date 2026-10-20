@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"syscall"
@@ -145,7 +144,7 @@ func (a *apiV1) compactGroup(parent context.Context, j recordingJob, station str
 	span := last.Start + last.Duration - start
 	ctx, cancel := context.WithTimeout(parent, 30*time.Second)
 	defer cancel()
-	cmd := exec.CommandContext(ctx, "ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin", "-y", "-protocol_whitelist", "file", "-f", "concat", "-safe", "0", "-i", list, "-map", "0:a:0", "-c:a", "copy", "-t", fmt.Sprintf("%.6f", float64(span)/1000), "-movflags", "+faststart", output)
+	cmd := mediaCommandContext(ctx, "ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin", "-y", "-protocol_whitelist", "file", "-f", "concat", "-safe", "0", "-i", list, "-map", "0:a:0", "-c:a", "copy", "-t", fmt.Sprintf("%.6f", float64(span)/1000), "-movflags", "+faststart", output)
 	if err = cmd.Run(); err != nil {
 		return
 	}

@@ -48,6 +48,7 @@
     "weazlpod": {
       "budgetBytes": 4294967296,
       "client": "weazlpod",
+      "encoderThreadsPerJob": 1,
       "extensionRevision": "2026-10-20.1",
       "finiteLibrary": true,
       "gaplessTrimmingRequired": true,
@@ -71,7 +72,11 @@
       ],
       "radioLive": true,
       "recordingSegments": true,
-      "trackDownload": true
+      "reservedApplicationCores": 2,
+      "storageWorkerLimit": 5,
+      "trackDownload": true,
+      "transcodeCores": 2,
+      "workerModel": "parallel-processes"
     }
   }
 }

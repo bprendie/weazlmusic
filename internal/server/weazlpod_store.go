@@ -87,10 +87,17 @@ func (a *apiV1) podBudget() int64 {
 	return 4 << 30
 }
 func (a *apiV1) podWorkers() int {
+	limit := min(a.mediaCPUPlan().Cores, int(a.podBudget()/podReservation))
 	if a.s.cfg.TranscodeWorkers > 0 {
-		return min(a.s.cfg.TranscodeWorkers, 8)
+		limit = min(limit, a.s.cfg.TranscodeWorkers)
 	}
-	return 2
+	return limit
+}
+func (a *apiV1) mediaCPUPlan() mediaCPUPlan {
+	if a.cpu != nil {
+		return *a.cpu
+	}
+	return mediaCPUs()
 }
 
 // Called with the API admission lock and pod lock held. Recorder reservations win.

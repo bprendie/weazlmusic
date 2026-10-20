@@ -413,7 +413,10 @@ unexpired durable leases survive restart, subject to ordinary revocation.
 Admission returns **429** `rate_limited`, `Retry-After: 2` when workers/retained
 job slots are full; **507** `storage_full`, `Retry-After: 30` when disk/budget
 reservations cannot be made. No unbounded work queue exists. Default finite
-worker count is 2 (`TRANSCODE_WORKERS`, capped at 8), per-job deadline 15 minutes,
+worker concurrency is automatic (`TRANSCODE_WORKERS=0`), bounded by available media
+cores after a mandatory two-core application reserve and by the configured
+derivative budget divided by the per-job reservation. A positive worker setting
+is a further ceiling; it cannot consume reserved cores. Per-job deadline is 15 minutes,
 source limit 512 MiB, output limit 256 MiB, decoded presentation limit 4 hours.
 Each admitted job reserves 768 MiB conservatively, including when it ultimately
 reuses a cached encode. Reservations protect recorder commitments and the
@@ -490,3 +493,38 @@ silently reconnect across an audio discontinuity: the firmware opens a fresh
 attempt. Once HTTP audio has started, encoder/origin failure closes the stream;
 there is no JSON/audio fallback. Live audio is not an offline download; use Flight
 Recorder plus finalized segment derivatives for offline radio.
+
+### Parallel playlist preparation and application CPU reserve
+
+Optional additive capability fields (base revision remains 2026-10-03.2):
+
+```json
+{"reservedApplicationCores":2,"transcodeCores":2,"storageWorkerLimit":5,"maxWorkers":2,"encoderThreadsPerJob":1,"workerModel":"parallel-processes"}
+```
+
+These example values describe a four-core installation with the default 4 GiB
+derivative budget, not universal constants. On 24 available cores with no SMT or
+CPU quota, transcodeCores is 22 and default maxWorkers is five because storage
+reservations cap admission. maxWorkers is the minimum of the media CPU-core count,
+storageWorkerLimit and any positive TRANSCODE_WORKERS ceiling. Used cache space,
+recording commitments and other clients can still cause 429/507 at admission. A
+budget too small for one reservation returns 507 rather than falsely advertising
+a playable preparation.
+
+The client should keep up to maxWorkers distinct playlist tracks preparing in
+parallel through existing lease POSTs and poll each readiness Location. Transfer
+ready MP3s while preparing later tracks; unchanged bytes remain deduplicated.
+Respect 429/507 Retry-After and maintain the existing checksum/atomic-promotion
+rules. This requires no new batch route, changed lease shape or extra media GET
+header. It does not automatically change existing clients' scheduling behavior.
+
+All media subprocesses (including live/recorder/validation workers) share CPU
+affinity excluding two whole core groups, including their allowed SMT siblings
+where topology is available. The API process keeps its full CPU affinity. Visible
+cgroup v1/v2 quotas and ancestor limits are honored conservatively, flooring
+fractional quotas before reserving two. No safe CPU headroom means empty MP3
+profiles and disabled encoding capabilities; a media subprocess cannot fall back
+to unrestricted execution. Existing original/proxy/file delivery is unaffected.
+Restart the service after changing CPU allocation. libmp3lame itself remains
+single-threaded, so parallelism is across tracks, not chunks of one MP3. Existing
+immutable representation IDs, hashes and encoder settings remain unchanged.

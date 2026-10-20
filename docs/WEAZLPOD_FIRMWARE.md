@@ -170,3 +170,21 @@ Pending physical checks: ESP32 decoder format detection, audible playback, SD
 throughput/storage, trimming/preroll, start/middle/end seeking, uninterrupted
 segment transitions, radio reconnect/UI and power/resource behavior. Linux tests
 are not hardware acceptance. The server was subsequently deployed on 2026-10-20 after user authorization; see the deployment receipt in VERIFICATION.md.
+
+## Playlist preparation pipeline
+
+Read maxWorkers from the optional Weazlpod capability object and prepare that
+many different upcoming track IDs concurrently. For each, POST trackDownload,
+poll its Location until ready, and begin or queue the verified transfer. Keep
+preparing later tracks while earlier MP3 files download. Respect Retry-After; a
+ready preparation no longer needs polling. Two application cores are always
+excluded from media subprocesses; concurrency cannot override this reserve.
+
+workerModel is parallel-processes and encoderThreadsPerJob is 1 because the
+installed MP3 encoder has no internal threading support. transcodeCores reports
+the shared media CPU pool, storageWorkerLimit reports the budget's worst-case
+preparation count, and maxWorkers is their minimum (also capped by an explicit
+operator worker ceiling). A four-core server allows two preparations; a 24-core
+server with the default 4 GiB budget allows five. Other clients and cache/free-space
+pressure still affect admission. Firmware must implement this pipeline to benefit;
+serial lease requests followed by serial downloads remain serial.

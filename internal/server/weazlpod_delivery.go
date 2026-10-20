@@ -93,10 +93,10 @@ func (a *apiV1) podAsset(w http.ResponseWriter, r *http.Request, se *session, ml
 	http.ServeContent(w, r, rep.ID+".mp3", time.Time{}, f)
 }
 func (a *apiV1) podCapabilities() map[string]any {
-	enabled := a.pod.encoder != ""
+	enabled := a.pod.encoder != "" && a.mediaCPUPlan().Cores > 0
 	profiles := []any{}
 	if enabled {
 		profiles = append(profiles, podEncoding())
 	}
-	return map[string]any{"extensionRevision": "2026-10-20.1", "identificationHeader": "X-Weazl-Client", "client": "weazlpod", "profiles": profiles, "finiteLibrary": enabled, "trackDownload": enabled, "recordingSegments": enabled, "radioLive": enabled, "preparations": true, "maxWorkers": a.podWorkers(), "maxLiveWorkers": 2, "maxLiveWorkersPerAccount": 1, "maxInputBytes": podInputLimit, "maxOutputBytes": podOutputLimit, "maxDurationMs": 14400000, "budgetBytes": a.podBudget(), "gaplessTrimmingRequired": true}
+	return map[string]any{"extensionRevision": "2026-10-20.1", "identificationHeader": "X-Weazl-Client", "client": "weazlpod", "profiles": profiles, "finiteLibrary": enabled, "trackDownload": enabled, "recordingSegments": enabled, "radioLive": enabled, "preparations": true, "maxWorkers": a.podWorkers(), "storageWorkerLimit": a.podBudget() / podReservation, "reservedApplicationCores": applicationCoreReserve, "transcodeCores": a.mediaCPUPlan().Cores, "encoderThreadsPerJob": 1, "workerModel": "parallel-processes", "maxLiveWorkers": 2, "maxLiveWorkersPerAccount": 1, "maxInputBytes": podInputLimit, "maxOutputBytes": podOutputLimit, "maxDurationMs": 14400000, "budgetBytes": a.podBudget(), "gaplessTrimmingRequired": true}
 }

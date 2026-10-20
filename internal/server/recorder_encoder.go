@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"io"
 	"os"
 	"os/exec"
@@ -32,9 +33,9 @@ func startRecorderEncoder(dir string, seconds int) (*recorderEncoder, error) {
 	}
 	defer aacRead.Close()
 	defer aacWrite.Close()
-	decode := exec.Command("ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin", "-protocol_whitelist", "pipe,file", "-probesize", "32768", "-analyzeduration", "1000000", "-i", "pipe:0", "-map", "0:a:0", "-vn", "-threads", "1", "-f", "wav", "-ar", "44100", "-ac", "2", "-sample_fmt", "s16", "pipe:1")
-	encode := exec.Command("fdkaac", "-S", "-I", "-p", "2", "-b", strconv.Itoa(recorderBitrateKbps)+"k", "-f", "2", "-o", "-", "-")
-	pack := exec.Command("ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin", "-protocol_whitelist", "pipe,file", "-f", "aac", "-probesize", "32768", "-analyzeduration", "1000000", "-i", "pipe:0", "-map", "0:a:0", "-c:a", "copy", "-bsf:a", "aac_adtstoasc", "-f", "segment", "-segment_time", strconv.Itoa(seconds), "-reset_timestamps", "1", "-segment_format", "mp4", "-segment_format_options", "movflags=+faststart", "-segment_list", filepath.Join(dir, "segments.csv"), "-segment_list_type", "csv", filepath.Join(dir, "%06d.m4a"))
+	decode := mediaCommandContext(context.Background(), "ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin", "-protocol_whitelist", "pipe,file", "-probesize", "32768", "-analyzeduration", "1000000", "-i", "pipe:0", "-map", "0:a:0", "-vn", "-threads", "1", "-f", "wav", "-ar", "44100", "-ac", "2", "-sample_fmt", "s16", "pipe:1")
+	encode := mediaCommandContext(context.Background(), "fdkaac", "-S", "-I", "-p", "2", "-b", strconv.Itoa(recorderBitrateKbps)+"k", "-f", "2", "-o", "-", "-")
+	pack := mediaCommandContext(context.Background(), "ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin", "-protocol_whitelist", "pipe,file", "-f", "aac", "-probesize", "32768", "-analyzeduration", "1000000", "-i", "pipe:0", "-map", "0:a:0", "-c:a", "copy", "-bsf:a", "aac_adtstoasc", "-f", "segment", "-segment_time", strconv.Itoa(seconds), "-reset_timestamps", "1", "-segment_format", "mp4", "-segment_format_options", "movflags=+faststart", "-segment_list", filepath.Join(dir, "segments.csv"), "-segment_list_type", "csv", filepath.Join(dir, "%06d.m4a"))
 	decode.Stdout = pcmWrite
 	encode.Stdin = pcmRead
 	encode.Stdout = aacWrite

@@ -4,7 +4,6 @@ import (
 	"context"
 	"io"
 	"net/http"
-	"os/exec"
 	"strconv"
 	"time"
 )
@@ -70,7 +69,7 @@ func (a *apiV1) podLive(w http.ResponseWriter, r *http.Request, se *session, ml 
 	}
 	// FFmpeg only sees stripped audio on stdin. Disable Xing for an unbounded stream.
 	args := []string{"-hide_banner", "-loglevel", "error", "-nostdin", "-protocol_whitelist", "pipe", "-probesize", "32768", "-analyzeduration", "1000000", "-i", "pipe:0", "-map", "0:a:0", "-vn", "-map_metadata", "-1", "-map_chapters", "-1", "-c:a", "libmp3lame", "-b:a", "128k", "-ar", "44100", "-ac", "2", "-threads", "1", "-id3v2_version", "0", "-write_id3v1", "0", "-write_xing", "0", "-flush_packets", "1", "-f", "mp3", "pipe:1"}
-	cmd := exec.CommandContext(ctx, "ffmpeg", args...)
+	cmd := mediaCommandContext(ctx, "ffmpeg", args...)
 	input, err := cmd.StdinPipe()
 	if err != nil {
 		verror(w, 503, "transcode_failed", "Cannot start live encoder.")

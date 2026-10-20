@@ -19,6 +19,7 @@ func TestPodAdmissionCancellationAndRecovery(t *testing.T) {
 	c := h.native("alice", "pod")
 	s := h.app.Config.Handler.(*Server)
 	a := s.v1
+	s.cfg.TranscodeWorkers = 2
 	original := s.upstream.Transport
 	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { <-r.Context().Done() }))
 	defer upstream.Close()

@@ -26,6 +26,7 @@ import (
 )
 
 func main() {
+	server.ExecMediaCommand()
 	radio, e := testradio.New()
 	if e != nil {
 		log.Fatal(e)

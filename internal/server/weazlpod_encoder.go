@@ -27,16 +27,19 @@ var podFingerprint = sync.OnceValue(detectPodEncoder)
 
 func podEncoderVersion() string { return podFingerprint() }
 func detectPodEncoder() string {
+	if mediaCPUs().Cores == 0 {
+		return ""
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
-	out, err := exec.CommandContext(ctx, "ffmpeg", "-hide_banner", "-encoders").Output()
+	out, err := mediaCommandContext(ctx, "ffmpeg", "-hide_banner", "-encoders").Output()
 	if err != nil || !strings.Contains(string(out), "libmp3lame") {
 		return ""
 	}
 	if _, err = exec.LookPath("ffprobe"); err != nil {
 		return ""
 	}
-	out, err = exec.CommandContext(ctx, "ffmpeg", "-version").Output()
+	out, err = mediaCommandContext(ctx, "ffmpeg", "-version").Output()
 	if err != nil {
 		return ""
 	}
@@ -104,7 +107,7 @@ func podHash(path string) (int64, string, error) {
 }
 func podValidate(ctx context.Context, path string) (podRepresentation, error) {
 	var rep podRepresentation
-	out, err := exec.CommandContext(ctx, "ffprobe", "-v", "error", "-count_packets", "-show_entries", "stream=codec_name,sample_rate,channels,bit_rate,nb_read_packets:format=duration", "-of", "json", path).Output()
+	out, err := mediaCommandContext(ctx, "ffprobe", "-v", "error", "-count_packets", "-show_entries", "stream=codec_name,sample_rate,channels,bit_rate,nb_read_packets:format=duration", "-of", "json", path).Output()
 	var p struct {
 		Streams []struct {
 			Codec    string `json:"codec_name"`
@@ -122,7 +125,7 @@ func podValidate(ctx context.Context, path string) (podRepresentation, error) {
 		return rep, errors.New("incorrect MP3 profile")
 	}
 	// Full decode is integrity evidence and measures the gapless presentation, not padded frame time.
-	cmd := exec.CommandContext(ctx, "ffmpeg", "-v", "error", "-xerror", "-err_detect", "explode", "-nostdin", "-protocol_whitelist", "file,pipe", "-threads", "1", "-i", path, "-map", "0:a:0", "-f", "s16le", "-acodec", "pcm_s16le", "pipe:1")
+	cmd := mediaCommandContext(ctx, "ffmpeg", "-v", "error", "-xerror", "-err_detect", "explode", "-nostdin", "-protocol_whitelist", "file,pipe", "-threads", "1", "-i", path, "-map", "0:a:0", "-f", "s16le", "-acodec", "pcm_s16le", "pipe:1")
 	counter := &podCounter{limit: 4 * 44100 * 4 * 60 * 60}
 	cmd.Stdout = counter
 	if err = cmd.Run(); err != nil || counter.n <= 0 {
@@ -130,7 +133,7 @@ func podValidate(ctx context.Context, path string) (podRepresentation, error) {
 	}
 	rep.Samples = counter.n / 4
 	// Probe just the first packet; never materialize an unbounded packet JSON array.
-	first, e := exec.CommandContext(ctx, "ffprobe", "-v", "error", "-read_intervals", "%+#1", "-show_packets", "-show_entries", "packet=side_data_list", "-of", "json", path).Output()
+	first, e := mediaCommandContext(ctx, "ffprobe", "-v", "error", "-read_intervals", "%+#1", "-show_packets", "-show_entries", "packet=side_data_list", "-of", "json", path).Output()
 	var trim struct {
 		Packets []struct {
 			Side []struct {
@@ -170,7 +173,7 @@ func (c *podCounter) Write(p []byte) (int, error) {
 
 // Source decode count detects a truncated/output-limited encode and supplies an exact presentation check.
 func podSourceSamples(ctx context.Context, path string) (int64, error) {
-	cmd := exec.CommandContext(ctx, "ffmpeg", "-v", "error", "-xerror", "-err_detect", "explode", "-nostdin", "-protocol_whitelist", "file,pipe", "-threads", "1", "-i", path, "-map", "0:a:0", "-vn", "-ar", "44100", "-ac", "2", "-f", "s16le", "pipe:1")
+	cmd := mediaCommandContext(ctx, "ffmpeg", "-v", "error", "-xerror", "-err_detect", "explode", "-nostdin", "-protocol_whitelist", "file,pipe", "-threads", "1", "-i", path, "-map", "0:a:0", "-vn", "-ar", "44100", "-ac", "2", "-f", "s16le", "pipe:1")
 	c := &podCounter{limit: 4 * 44100 * 4 * 60 * 60}
 	cmd.Stdout = c
 	err := cmd.Run()
@@ -180,7 +183,7 @@ func podSourceSamples(ctx context.Context, path string) (int64, error) {
 	return c.n / 4, err
 }
 func podEncodeCommand(ctx context.Context, input, output string) *exec.Cmd {
-	return exec.CommandContext(ctx, "ffmpeg", podEncodeArgs(input, output)...)
+	return mediaCommandContext(ctx, "ffmpeg", podEncodeArgs(input, output)...)
 }
 
 // Read the bounded MPEG-1 stereo Info/LAME header. File tag values are encoder

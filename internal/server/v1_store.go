@@ -33,6 +33,7 @@ type apiV1 struct {
 	snapshot     map[string]*librarySnapshot
 	mediaEnabled bool
 	pod          *podStore
+	cpu          *mediaCPUPlan
 }
 
 func newV1(s *Server) (*apiV1, error) {

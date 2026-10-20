@@ -57,6 +57,13 @@ func (a *apiV1) podPrepare(w http.ResponseWriter, r *http.Request, se *session, 
 			delete(p.jobs, jobID)
 		}
 	}
+	if a.podWorkers() == 0 {
+		p.mu.Unlock()
+		a.mu.Unlock()
+		w.Header().Set("Retry-After", "30")
+		verror(w, 507, "storage_full", "Derivative budget cannot reserve a preparation.")
+		return
+	}
 	if p.running >= a.podWorkers() || len(p.jobs) >= 1000 {
 		p.mu.Unlock()
 		a.mu.Unlock()

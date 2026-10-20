@@ -10,7 +10,6 @@ import (
 	"io"
 	"math"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -48,7 +47,7 @@ func syncDir(path string) error {
 func probeMedia(path string) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	out, e := exec.CommandContext(ctx, "ffprobe", "-v", "error", "-select_streams", "a:0", "-show_entries", "format=duration:stream=codec_name,profile,sample_rate,channels", "-of", "json", path).Output()
+	out, e := mediaCommandContext(ctx, "ffprobe", "-v", "error", "-select_streams", "a:0", "-show_entries", "format=duration:stream=codec_name,profile,sample_rate,channels", "-of", "json", path).Output()
 	if e != nil {
 		return 0, errors.New("media validation failed")
 	}

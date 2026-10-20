@@ -78,3 +78,20 @@ commands. The checked-in MP3 is generated using the packaged encoder, not the
 host FFmpeg. Existing FFmpeg/LAME licensing obligations apply; no encoder source
 or package update was made. Actual host tools for this change: Go1.27.2-X:nodwarf5,
 FFmpeg n9.0.2. Physical ESP32 playback remains pending.
+
+## Parallel CPU policy follow-up
+
+`ffmpeg -hide_banner -h encoder=libmp3lame` on both workstation and packaged
+FFmpeg reports `Threading capabilities: none`. Keep the actual MP3 encoder at
+one thread and run independent tracks in parallel; FFmpeg's generic threading
+options only apply to implementations supporting them (see the primary
+[codec documentation](https://ffmpeg.org/ffmpeg-codecs.html)). No codec/profile
+setting or cache identity changed.
+
+The Linux media-exec child launcher applies a shared affinity pool before exec,
+so FFmpeg-created threads and fdkaac inherit it. It excludes two application
+cores, accounts for SMT and visible cgroup quota limits, and fails closed without
+headroom. The parent API affinity stays unchanged. Both production and fixture
+entrypoints invoke this launcher; the packaged test binary exercises the same
+path. golang.org/x/sys v0.36.0 was already pinned transitively and is now declared
+as a direct dependency; no new package/version or Alpine dependency is needed.
