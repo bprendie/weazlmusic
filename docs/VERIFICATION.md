@@ -539,3 +539,22 @@ album covers with Wi-Fi off. Steady playback logged zero underruns, but the
 combined pause/resume test exposed a transition underrun in firmware; a firmware
 fix has been flashed and its uninterrupted acceptance run remains pending.
 This does not affect the server thumbnail checks or the verified SD downloads.
+
+#### Final firmware acceptance
+
+The follow-up yellow-board build passed the uninterrupted hardware check at
+2026-10-24 13:01–13:03 America/New_York. It preserves queued PCM while asynchronous
+Bluetooth pause suspension is pending. Two offline boots retained the cache;
+all five original tracks' cover payloads matched server hashes, three album
+selections displayed cached art and played over A2DP, and quick pause/resume,
+navigation and track changes completed with zero logged underruns. Repeated
+artwork refresh used existing files without waking Wi-Fi. Six audio tracks were
+present and preserved at the final check (one additional track had been selected
+during manual interaction). Artwork refresh reported six ready, zero failures.
+
+Hardware workspace evidence:
+`/home/bobp/hardware/weazlpod/test-results/artwork-20261024-130154.log`;
+repeat with `tools/check-artwork-device.py` and saved headphones powered on.
+Host cache/strip/checksum tests also pass under AddressSanitizer and UBSan.
+The board was left stopped. This is a short device acceptance run, not a long
+battery/endurance test or subjective audio-quality assessment.
