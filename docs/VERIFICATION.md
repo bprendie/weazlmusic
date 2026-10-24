@@ -507,3 +507,35 @@ complete [API reference](API_REFERENCE.md) was checked against route registratio
 dispatch handlers and response schemas, including browser compatibility behavior.
 Production deployment and physical-device artwork acceptance are pending; the
 source checks above do not claim those have completed.
+
+#### Production deployment receipt
+
+Deployed source `045a364` on 2026-10-24 using the prebuilt production image
+`sha256:ba841acfd544ba924b2858724a22aca5d05daf0e9bcad860a53927559f07467b`.
+The runtime is healthy with zero restarts. `/healthz` and `/api/v1/info` passed;
+authenticated capabilities advertise `rgb565-112`. Three real album thumbnails
+returned exactly 25,088 bytes each with matching response SHA-256.
+
+Before stopping the service, read-only encrypted-state audit found zero active
+captures and zero schedules due within five minutes. A stopped-service full-volume
+backup was created and gzip/archive validation passed before replacement:
+
+- Receipt directory: `/home/bobp/weazlmusic-backups/20261024T165248Z` on production.
+- Archive: `data.tar.gz`; SHA-256
+  `a923b8f01f9bb97b8ef61af6e6023f955689ef8e31ca86f7e7442631aad085e7`.
+- Rollback tag: `weazltunes-web:rollback-20261024T165248Z`, retained runtime image
+  `sha256:e8a348249e11416e8f0f9a6791d0d7fb78feb69dd1ed789bc0be8d58b96749e0`.
+- Before/after audit preserved the encryption-key digest and all 5,995 asset,
+  six manifest, six job, 67 scrobble and four station collection records.
+
+Browser sessions expired on restart as expected. No playlists, listening history,
+recordings or SD audio files were deleted for this deployment. Runtime code is
+unchanged by this documentation receipt.
+
+Physical yellow-board backfill downloaded three distinct covers for all five
+existing audio files without re-grabbing audio. Each SD payload matched the
+server checksum before and after reset. Cached playback displayed all three
+album covers with Wi-Fi off. Steady playback logged zero underruns, but the
+combined pause/resume test exposed a transition underrun in firmware; a firmware
+fix has been flashed and its uninterrupted acceptance run remains pending.
+This does not affect the server thumbnail checks or the verified SD downloads.
