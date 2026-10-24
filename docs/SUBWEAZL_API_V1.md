@@ -152,6 +152,33 @@ This design lets Apple media APIs open a normal URL without undocumented custom
 header injection. Proxy headers at the outer reverse proxy still need a supported
 native path or authenticated download-to-local fallback and device validation.
 
+### Small device cover profile
+
+`GET /capabilities` advertises `coverProfiles: ["rgb565-112"]`. A cover lease may
+explicitly request `{kind:"cover",resourceId:coverId,quality:"rgb565-112"}`.
+The result retains the existing scoped lease URL and reports that profile,
+`contentType:"application/vnd.weazlpod.rgb565"`, `byteLength:25088`,
+`sha256:null`, and `supportsRanges:true`. No default cover representation changes.
+
+GET returns exactly 112 × 112 row-major RGB565 pixels, little-endian, with no
+file header. The server requests a 112-pixel upstream thumbnail, decodes JPEG
+(including progressive), PNG or GIF, center-crops a square and scales it.
+Transparent pixels are composited over black. The response's
+`X-Weazl-Cover-SHA256` and quoted ETag identify the returned pixel bytes; verify
+the checksum and length before publishing an offline cache entry. HEAD, Range,
+and conditional GET use those same bytes. The source is re-read for each asset
+request, so the lease does not promise immutable cover contents across upstream
+changes; clients should make one complete 25,088-byte request rather than combine
+partial downloads from different representations.
+
+Original covers still return their original representation. This profile is
+rejected for audio. Existing lease expiration, account/library binding and device
+revocation apply. Missing upstream covers return 404; decode/transfer failures
+return retryable 502, and occupied thumbnail workers return 429 with Retry-After.
+Do not persist a temporary failure as evidence that the album has no artwork.
+Two concurrent conversions, 20-second requests, 4 MiB encoded input and 16 MiPixels
+decoded input bound the conversion work. This is additive to revision 2026-10-03.2.
+
 ## Radio presets and directories
 
 Station: `{id,name,streamURL,preset,order,version}`. IDs survive URL/name edits.

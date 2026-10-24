@@ -47,7 +47,11 @@ func (a *apiV1) lease(w http.ResponseWriter, r *http.Request, se *session) {
 			return
 		}
 	}
-	if in.Quality != "" && in.Quality != "original" && in.Quality != podProfile {
+	if in.Quality == podCoverProfile && in.Kind != "cover" {
+		verror(w, 422, "unsupported", "RGB565 thumbnails are only available for covers.")
+		return
+	}
+	if in.Quality != "" && in.Quality != "original" && in.Quality != podProfile && in.Quality != podCoverProfile {
 		verror(w, 422, "unsupported", "Unsupported media quality.")
 		return
 	}
@@ -105,6 +109,10 @@ func (a *apiV1) lease(w http.ResponseWriter, r *http.Request, se *session) {
 			ct = textValue(object(out["song"])["contentType"])
 		} else {
 			ct = "image/*"
+			if in.Quality == podCoverProfile {
+				ct = podCoverContentType
+				size = podCoverBytes
+			}
 		}
 		ranges = true
 	default:
@@ -186,6 +194,10 @@ func (a *apiV1) asset(w http.ResponseWriter, r *http.Request) {
 	}
 	if !a.now().Before(ml.Expires) {
 		verror(w, 410, "asset_expired", "Media lease expired; request a new lease.")
+		return
+	}
+	if ml.Kind == "cover" && ml.Quality == podCoverProfile {
+		a.podCover(w, r, se, ml)
 		return
 	}
 	if ml.Quality == podProfile && ml.Kind != "radioLive" {

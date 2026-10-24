@@ -493,3 +493,17 @@ image identities, health and before/after filesystem availability. Net reclaimed
 (13.23 GiB); filesystem usage 56%. Runtime remains
 `sha256:e8a348249e11416e8f0f9a6791d0d7fb78feb69dd1ed789bc0be8d58b96749e0`,
 healthy, zero restarts. This receipt update is documentation only.
+
+### Automatic device artwork and API reference — 2026-10-24
+
+Added the advertised `rgb565-112` cover lease profile without changing original
+cover/audio defaults. Tests cover RGB565 byte order and crop, progressive JPEG,
+malformed/oversized input, authenticated lease delivery, SHA-256, HEAD, Range,
+ETag, missing art, incompatible audio quality and revoked access.
+
+Validation before deployment: `go test ./internal/server -run TestPodCover -count=1`,
+`go test -race ./...`, `go vet ./...`, and production Docker build passed. The
+complete [API reference](API_REFERENCE.md) was checked against route registration,
+dispatch handlers and response schemas, including browser compatibility behavior.
+Production deployment and physical-device artwork acceptance are pending; the
+source checks above do not claim those have completed.

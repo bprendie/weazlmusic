@@ -8,6 +8,8 @@
 
 No frontend framework bloat. No Node runtime. No cloud identity brokers. Zero telemetry. Just pure, unadulterated acoustic grindage on your local bare metal.
 
+Complete endpoint documentation: [API reference](docs/API_REFERENCE.md) (native v1, browser API, media, artwork, radio, Mood and Flight Recorder).
+
 ## Ignition
 
 Boot the rig using Docker. This Compose file starts WeazlTunes only; run Navidrome separately on the same host or another reachable machine, then configure its URL under **Account → Installation settings**. No Navidrome URL is preconfigured.

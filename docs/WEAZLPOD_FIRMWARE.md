@@ -188,3 +188,13 @@ operator worker ceiling). A four-core server allows two preparations; a 24-core
 server with the default 4 GiB budget allows five. Other clients and cache/free-space
 pressure still affect admission. Firmware must implement this pipeline to benefit;
 serial lease requests followed by serial downloads remain serial.
+## Automatic cover downloads
+
+For a track's `coverId`, request the advertised `rgb565-112` cover profile as
+specified in [the API contract](SUBWEAZL_API_V1.md#small-device-cover-profile).
+Cache the 25,088 little-endian RGB565 pixel bytes after verifying the response's
+`X-Weazl-Cover-SHA256`. Reuse by cover ID plus profile, so songs on the same album
+share a file. Download artwork during Grab alongside audio, and preserve it for
+offline playback. Missing metadata may use the fallback graphic; network errors
+remain retryable. The original image may be large or progressive, so the device
+does not need to download or decode it.
