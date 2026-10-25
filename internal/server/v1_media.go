@@ -24,17 +24,27 @@ func (a *apiV1) lease(w http.ResponseWriter, r *http.Request, se *session) {
 		verror(w, 422, "validation_failed", "Media kind and resourceId required.")
 		return
 	}
+	quality, err := podSelectRadioQuality(r, in.Kind, in.Quality)
+	if err != nil {
+		verror(w, 422, "unsupported", err.Error())
+		return
+	}
+	in.Quality = quality
 	// The hint applies only to audio, never covers or JSON. Unknown clients retain defaults.
-	if isPod(r) && in.Kind != "cover" {
+	if isPod(r) && in.Kind != "cover" && in.Kind != "radioLive" {
 		if in.Kind == "trackOriginal" || (in.Quality != "" && in.Quality != podProfile) {
 			verror(w, 422, "unsupported", "Weazlpod requires mp3-128; use trackDownload for normalized downloads.")
 			return
 		}
 		in.Quality = podProfile
 	}
-	if in.Quality == podProfile {
+	if podRadioBitrate(in.Quality) != 0 {
 		switch in.Kind {
 		case "trackStream", "trackDownload", "recordingSegment":
+			if in.Quality != podProfile {
+				verror(w, 422, "unsupported", "Lower bitrate MP3 profiles are only available for live radio.")
+				return
+			}
 			a.podPrepare(w, r, se, in.Kind, in.ID)
 			return
 		case "radioLive":
@@ -51,7 +61,7 @@ func (a *apiV1) lease(w http.ResponseWriter, r *http.Request, se *session) {
 		verror(w, 422, "unsupported", "RGB565 thumbnails are only available for covers.")
 		return
 	}
-	if in.Quality != "" && in.Quality != "original" && in.Quality != podProfile && in.Quality != podCoverProfile {
+	if in.Quality != "" && in.Quality != "original" && podRadioBitrate(in.Quality) == 0 && in.Quality != podCoverProfile {
 		verror(w, 422, "unsupported", "Unsupported media quality.")
 		return
 	}
@@ -146,8 +156,8 @@ func (a *apiV1) lease(w http.ResponseWriter, r *http.Request, se *session) {
 		}
 		return nil
 	}()}
-	if ml.Quality == podProfile {
-		for key, value := range podEncoding() {
+	if ml.Kind == "radioLive" && podRadioBitrate(ml.Quality) != 0 {
+		for key, value := range podRadioEncoding(ml.Quality) {
 			response[key] = value
 		}
 		response["representationId"] = nil
@@ -253,7 +263,7 @@ func (a *apiV1) asset(w http.ResponseWriter, r *http.Request) {
 			verror(w, 404, "not_found", "Station was removed.")
 			return
 		}
-		if ml.Quality == podProfile {
+		if podRadioBitrate(ml.Quality) != 0 {
 			a.podLive(w, r, se, ml, raw)
 			return
 		}

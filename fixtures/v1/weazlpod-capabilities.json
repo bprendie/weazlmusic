@@ -5,7 +5,7 @@
       "budgetBytes": 4294967296,
       "client": "weazlpod",
       "encoderThreadsPerJob": 1,
-      "extensionRevision": "2026-10-20.1",
+      "extensionRevision": "2026-10-25.1",
       "finiteLibrary": true,
       "gaplessTrimmingRequired": true,
       "identificationHeader": "X-Weazl-Client",
@@ -26,7 +26,38 @@
           "sampleRateHz": 44100
         }
       ],
+      "radioDefaultQuality": "high",
       "radioLive": true,
+      "radioProfiles": [
+        {
+          "bitRateKbps": 64,
+          "bitRateMode": "cbr",
+          "channelMode": "joint_stereo",
+          "channels": 2,
+          "codec": "mp3",
+          "profile": "mp3-64",
+          "sampleRateHz": 44100
+        },
+        {
+          "bitRateKbps": 96,
+          "bitRateMode": "cbr",
+          "channelMode": "joint_stereo",
+          "channels": 2,
+          "codec": "mp3",
+          "profile": "mp3-96",
+          "sampleRateHz": 44100
+        },
+        {
+          "bitRateKbps": 128,
+          "bitRateMode": "cbr",
+          "channelMode": "joint_stereo",
+          "channels": 2,
+          "codec": "mp3",
+          "profile": "mp3-128",
+          "sampleRateHz": 44100
+        }
+      ],
+      "radioQualityHeader": "X-Weazl-Radio-Quality",
       "recordingSegments": true,
       "reservedApplicationCores": 2,
       "storageWorkerLimit": 5,

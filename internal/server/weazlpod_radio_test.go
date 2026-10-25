@@ -16,156 +16,173 @@ import (
 
 func TestPodLiveMP3AndAACMetadataOwnership(t *testing.T) {
 	for _, codec := range []string{"mp3", "aac"} {
-		t.Run(codec, func(t *testing.T) {
-			args := []string{"-v", "error", "-f", "lavfi", "-i", "sine=frequency=660:sample_rate=48000", "-t", "3", "-ac", "1"}
-			if codec == "aac" {
-				args = append(args, "-c:a", "aac", "-f", "adts", "pipe:1")
-			} else {
-				args = append(args, "-c:a", "libmp3lame", "-b:a", "96k", "-f", "mp3", "pipe:1")
-			}
-			audio, err := exec.Command("ffmpeg", args...).Output()
-			if err != nil {
-				t.Fatal(err)
-			}
-			origin := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.Header.Get("Authorization") != "" || r.Header.Get("X-Weazl-Client") != "" {
-					t.Error("credentials leaked")
+		for _, profile := range []struct {
+			quality, name string
+			bitrate       int
+		}{{"low", "mp3-64", 64}, {"med", "mp3-96", 96}, {"high", "mp3-128", 128}} {
+			t.Run(codec+"/"+profile.name, func(t *testing.T) {
+				args := []string{"-v", "error", "-f", "lavfi", "-i", "sine=frequency=660:sample_rate=48000", "-t", "3", "-ac", "1"}
+				if codec == "aac" {
+					args = append(args, "-c:a", "aac", "-f", "adts", "pipe:1")
+				} else {
+					args = append(args, "-c:a", "libmp3lame", "-b:a", "96k", "-f", "mp3", "pipe:1")
 				}
-				w.Header().Set("Content-Type", "audio/"+codec)
-				w.Header().Set("Icy-Metaint", "1024")
-				w.(http.Flusher).Flush()
-				// Cycle audio continuously; all metadata is stripped before the encoder.
-				index := 0
-				for {
-					block := make([]byte, 1024)
-					for i := range block {
-						block[i] = audio[index%len(audio)]
-						index++
+				audio, err := exec.Command("ffmpeg", args...).Output()
+				if err != nil {
+					t.Fatal(err)
+				}
+				origin := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					if r.Header.Get("Authorization") != "" || r.Header.Get("X-Weazl-Client") != "" || r.Header.Get(podRadioQualityHeader) != "" {
+						t.Error("credentials leaked")
 					}
-					if _, e := w.Write(block); e != nil {
-						return
-					}
-					meta := []byte("StreamTitle='Fixture - Cue';")
-					padding := make([]byte, 32)
-					copy(padding, meta)
-					if _, e := w.Write(append([]byte{2}, padding...)); e != nil {
-						return
-					}
+					w.Header().Set("Content-Type", "audio/"+codec)
+					w.Header().Set("Icy-Metaint", "1024")
 					w.(http.Flusher).Flush()
-					select {
-					case <-r.Context().Done():
-						return
-					case <-time.After(time.Millisecond):
+					// Cycle audio continuously; all metadata is stripped before the encoder.
+					index := 0
+					for {
+						block := make([]byte, 1024)
+						for i := range block {
+							block[i] = audio[index%len(audio)]
+							index++
+						}
+						if _, e := w.Write(block); e != nil {
+							return
+						}
+						meta := []byte("StreamTitle='Fixture - Cue';")
+						padding := make([]byte, 32)
+						copy(padding, meta)
+						if _, e := w.Write(append([]byte{2}, padding...)); e != nil {
+							return
+						}
+						w.(http.Flusher).Flush()
+						select {
+						case <-r.Context().Done():
+							return
+						case <-time.After(time.Millisecond):
+						}
+					}
+				}))
+				defer origin.Close()
+				h := setup(t)
+				h.login("alice")
+				c := h.native("alice", "pod")
+				s := h.app.Config.Handler.(*Server)
+				s.radio = &http.Client{Transport: fixtureRadioTransport{origin.Client(), origin.URL}}
+				code, b, _ := h.vrequest("POST", "radio/stations", map[string]any{"name": "Pod fixture", "streamURL": "https://radio.fixture.invalid/audio", "preset": false}, c.Access, nil)
+				if code != 201 {
+					t.Fatal(code, string(b))
+				}
+				station := decodeData[nativeStation](t, b)
+				code, b, _ = h.vrequest("POST", "media/leases", map[string]string{"kind": "radioLive", "resourceId": station.ID}, c.Access, map[string]string{"X-Weazl-Client": "weazlpod", podRadioQualityHeader: profile.quality})
+				if code != 200 {
+					t.Fatal(code, string(b))
+				}
+				lease := decodeData[map[string]any](t, b)
+				if lease["profile"] != profile.name || lease["bitRateKbps"] != float64(profile.bitrate) || lease["sampleRateHz"] != float64(44100) || lease["channels"] != float64(2) || lease["channelMode"] != "joint_stereo" {
+					t.Fatal("incorrect lease encoding", lease)
+				}
+				path := lease["url"].(string)
+				client := &http.Client{Timeout: 10 * time.Second}
+				res, err := client.Get(h.app.URL + path)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if res.StatusCode != 200 {
+					raw, _ := io.ReadAll(res.Body)
+					res.Body.Close()
+					t.Fatal(res.StatusCode, string(raw))
+				}
+				if res.Header.Get("X-Weazl-Radio-Profile") != profile.name || res.Header.Get("Cache-Control") != "private, no-store" {
+					t.Fatal("incorrect live headers", res.Header)
+				}
+				for _, header := range []string{"Content-Length", "Content-Range", "ETag", "Accept-Ranges", "Icy-Metaint"} {
+					if res.Header.Get(header) != "" {
+						t.Fatal("false live claim", header)
 					}
 				}
-			}))
-			defer origin.Close()
-			h := setup(t)
-			h.login("alice")
-			c := h.native("alice", "pod")
-			s := h.app.Config.Handler.(*Server)
-			s.radio = &http.Client{Transport: fixtureRadioTransport{origin.Client(), origin.URL}}
-			code, b, _ := h.vrequest("POST", "radio/stations", map[string]any{"name": "Pod fixture", "streamURL": "https://radio.fixture.invalid/audio", "preset": false}, c.Access, nil)
-			if code != 201 {
-				t.Fatal(code, string(b))
-			}
-			station := decodeData[nativeStation](t, b)
-			code, b, _ = h.vrequest("POST", "media/leases", map[string]string{"kind": "radioLive", "resourceId": station.ID}, c.Access, map[string]string{"X-Weazl-Client": "weazlpod"})
-			if code != 200 {
-				t.Fatal(code, string(b))
-			}
-			lease := decodeData[map[string]any](t, b)
-			path := lease["url"].(string)
-			client := &http.Client{Timeout: 10 * time.Second}
-			res, err := client.Get(h.app.URL + path)
-			if err != nil {
-				t.Fatal(err)
-			}
-			if res.StatusCode != 200 {
-				raw, _ := io.ReadAll(res.Body)
+				capture := make([]byte, 32768)
+				if _, err := io.ReadFull(res.Body, capture); err != nil {
+					t.Fatal(err)
+				}
+				code, _, _ = podGet(t, h, "GET", path, nil)
+				if code != 409 {
+					t.Fatal("duplicate actual owner", code)
+				}
+				code, b, _ = h.vrequest("POST", "media/leases", map[string]string{"kind": "radioLive", "resourceId": station.ID, "quality": podProfile}, c.Access, nil)
+				another := decodeData[map[string]any](t, b)
+				if code != 200 {
+					t.Fatal("second lease", code, string(b))
+				}
+				code, _, limits := podGet(t, h, "GET", another["url"].(string), nil)
+				if code != 429 || limits.Get("Retry-After") == "" {
+					t.Fatal("account live limit", code)
+				}
+
+				hub := s.v1.radioHub(c.Device, "")
+				feed, release, err := hub.acquire(lease["playbackId"].(string))
+				if err != nil {
+					t.Fatal(err)
+				}
+				feed.mu.Lock()
+				latest := feed.latest
+				feed.mu.Unlock()
+				release()
+				if latest.Title != "Cue" || latest.Artist != "Fixture" {
+					t.Fatal("metadata not separated", latest)
+				}
 				res.Body.Close()
-				t.Fatal(res.StatusCode, string(raw))
-			}
-			for _, header := range []string{"Content-Length", "Content-Range", "ETag", "Accept-Ranges", "Icy-Metaint"} {
-				if res.Header.Get(header) != "" {
-					t.Fatal("false live claim", header)
+				deadline := time.Now().Add(5 * time.Second)
+				for {
+					s.v1.pod.mu.Lock()
+					running := s.v1.pod.live["alice"]
+					s.v1.pod.mu.Unlock()
+					if running == 0 {
+						break
+					}
+					if time.Now().After(deadline) {
+						t.Fatal("disconnect leaked worker")
+					}
+					time.Sleep(10 * time.Millisecond)
 				}
-			}
-			capture := make([]byte, 32768)
-			if _, err := io.ReadFull(res.Body, capture); err != nil {
-				t.Fatal(err)
-			}
-			code, _, _ = podGet(t, h, "GET", path, nil)
-			if code != 409 {
-				t.Fatal("duplicate actual owner", code)
-			}
-			code, b, _ = h.vrequest("POST", "media/leases", map[string]string{"kind": "radioLive", "resourceId": station.ID, "quality": podProfile}, c.Access, nil)
-			another := decodeData[map[string]any](t, b)
-			if code != 200 {
-				t.Fatal("second lease", code, string(b))
-			}
-			code, _, limits := podGet(t, h, "GET", another["url"].(string), nil)
-			if code != 429 || limits.Get("Retry-After") == "" {
-				t.Fatal("account live limit", code)
-			}
+				req, _ := http.NewRequest("GET", h.app.URL+path, nil)
+				req.Header.Set(podRadioQualityHeader, "low") // GET cannot renegotiate the lease.
+				res, err = client.Do(req)
+				if err != nil {
+					t.Fatal("reconnect", err)
+				}
+				defer res.Body.Close()
+				if res.Header.Get("X-Weazl-Radio-Profile") != profile.name {
+					t.Fatal("GET changed leased profile")
+				}
+				assertPodRadioFrames(t, capture, profile.bitrate)
+				file := filepath.Join(t.TempDir(), "live.mp3")
+				_ = os.WriteFile(file, capture, 0600)
+				out, err := exec.Command("ffprobe", "-v", "error", "-show_entries", "stream=codec_name,sample_rate,channels,bit_rate", "-of", "csv=p=0", file).Output()
+				if err != nil || !bytes.Contains(out, []byte("mp3,44100,2,"+strconv.Itoa(profile.bitrate*1000))) {
+					t.Fatal("incorrect live MP3", string(out), err)
+				}
+				code, _, _ = podGet(t, h, "GET", path, map[string]string{"Range": "bytes=0-1"})
+				if code != 422 {
+					t.Fatal("live range accepted", code)
+				}
+				start := time.Now()
+				code, b, _ = h.vrequest("POST", "auth/logout", nil, c.Access, nil)
+				if code != 204 {
+					t.Fatal(code, string(b))
+				}
+				_, _ = io.Copy(io.Discard, res.Body)
+				res.Body.Close()
+				if time.Since(start) > 3*time.Second {
+					t.Fatal("revocation did not stop live encoder promptly")
+				}
+				code, _, _ = podGet(t, h, "GET", path, nil)
+				if code != 401 {
+					t.Fatal("revoked live lease", code)
+				}
 
-			hub := s.v1.radioHub(c.Device, "")
-			feed, release, err := hub.acquire(lease["playbackId"].(string))
-			if err != nil {
-				t.Fatal(err)
-			}
-			feed.mu.Lock()
-			latest := feed.latest
-			feed.mu.Unlock()
-			release()
-			if latest.Title != "Cue" || latest.Artist != "Fixture" {
-				t.Fatal("metadata not separated", latest)
-			}
-			res.Body.Close()
-			deadline := time.Now().Add(5 * time.Second)
-			for {
-				s.v1.pod.mu.Lock()
-				running := s.v1.pod.live["alice"]
-				s.v1.pod.mu.Unlock()
-				if running == 0 {
-					break
-				}
-				if time.Now().After(deadline) {
-					t.Fatal("disconnect leaked worker")
-				}
-				time.Sleep(10 * time.Millisecond)
-			}
-			res, err = client.Get(h.app.URL + path)
-			if err != nil {
-				t.Fatal("reconnect", err)
-			}
-			defer res.Body.Close()
-			file := filepath.Join(t.TempDir(), "live.mp3")
-			_ = os.WriteFile(file, capture, 0600)
-			out, err := exec.Command("ffprobe", "-v", "error", "-show_entries", "stream=codec_name,sample_rate,channels,bit_rate", "-of", "csv=p=0", file).Output()
-			if err != nil || !bytes.Contains(out, []byte("mp3,44100,2,128000")) {
-				t.Fatal("incorrect live MP3", string(out), err)
-			}
-			code, _, _ = podGet(t, h, "GET", path, map[string]string{"Range": "bytes=0-1"})
-			if code != 422 {
-				t.Fatal("live range accepted", code)
-			}
-			start := time.Now()
-			code, b, _ = h.vrequest("POST", "auth/logout", nil, c.Access, nil)
-			if code != 204 {
-				t.Fatal(code, string(b))
-			}
-			_, _ = io.Copy(io.Discard, res.Body)
-			res.Body.Close()
-			if time.Since(start) > 3*time.Second {
-				t.Fatal("revocation did not stop live encoder promptly")
-			}
-			code, _, _ = podGet(t, h, "GET", path, nil)
-			if code != 401 {
-				t.Fatal("revoked live lease", code)
-			}
-
-		})
+			})
+		}
 	}
 }
 func TestPodRecordingDerivativeTimeline(t *testing.T) {

@@ -147,3 +147,34 @@ maxWorkers is five unless an explicit lower ceiling is configured. At four cores
 it is two. Actual free-space pressure or existing cached files can further reduce
 admission. Increasing workers alone does not enlarge the disk budget. Firmware
 can pipeline that many playlist preparations while transferring completed files.
+
+## Weazlpod radio quality verification
+
+The radio-quality extension needs no new environment settings, volume migration,
+ports or reverse-proxy route. Preserve streaming/no-buffering behavior on native
+media asset routes. `X-Weazl-Radio-Quality` is used at authenticated lease creation;
+media GET uses the existing scoped URL. See
+[quality contract](API_REFERENCE.md#radio-quality-selection) and
+[rollout plan](WEAZLPOD-RADIO-QUALITY-PLAN.md).
+
+Before deployment run `go test -race ./...`, `go vet ./...`, build the production
+image, then run `scripts/verify-weazlpod.sh <image>`. This exercises real MP3/AAC
+inputs through all three profiles with the image's packaged FFmpeg.
+
+After deployment, verify real HTTPS delivery without firmware:
+
+```sh
+python3 scripts/verify-radio-quality.py \
+  --credentials /private/path/server-credentials.json \
+  --output test-results/radio-quality-production --seconds 60
+```
+
+The credentials file contains `server.public_url`, `server.username`, and
+`server.password`; never commit it. The default source is
+`https://radio.prendie.io/radio.mp3`; `--station-url` selects another source.
+The verifier reuses a matching saved station or creates/removes a temporary
+non-preset station, creates/logs out its own native session, and never alters
+library playlists or listening history. A temporary station changes the station
+collection revision even after cleanup. It leaves only private captured audio
+and token-free format/timing receipts in the output directory. These are short
+server acceptance checks, not listening tests or ESP32 endurance verification.

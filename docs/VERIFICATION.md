@@ -558,3 +558,22 @@ repeat with `tools/check-artwork-device.py` and saved headphones powered on.
 Host cache/strip/checksum tests also pass under AddressSanitizer and UBSan.
 The board was left stopped. This is a short device acceptance run, not a long
 battery/endurance test or subjective audio-quality assessment.
+
+### Radio quality profiles — 2026-10-25
+
+Added live-only 64/96/128 kbps CBR MP3 selection at 44100 Hz, two-channel joint
+stereo. Existing Weazlpod requests default to 128 kbps; finite audio derivatives
+and ordinary browser/iOS relay behavior remain unchanged. Selection is bound to
+the authenticated station lease; conflicting/invalid selectors return 422.
+
+Before deployment, `go test -race ./...` (server 193.724 seconds), `go vet ./...`,
+production Docker build and `scripts/verify-weazlpod.sh` against the exact image
+passed. The live integration matrix covers MP3 and AAC sources at all three
+bitrates, every complete captured MP3 frame, ffprobe format, ICY stripping/SSE
+metadata, duplicate/account limits, disconnect/reconnect and device revocation.
+The packaged checks include CPU affinity and restricted-quota rejection.
+Logs are in ignored `test-results/radio-quality-20261025/`.
+
+Production deployment and real Prendie acceptance will be recorded below. No
+firmware was changed or flashed for this work. Server format/decode tests are not
+subjective listening or yellow-board playback acceptance.

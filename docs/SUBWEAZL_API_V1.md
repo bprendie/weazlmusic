@@ -345,7 +345,7 @@ An offline phone copy is never deleted by a server retention operation.
 
 New recordings retain short capture checkpoints, then finalize contiguous audio into approximately ten-minute AAC M4A assets. Gaps and tails yield shorter assets; failures can retain the original short files. Clients must use startMs, durationMs and mediaStartMs, never assume a fixed segment length. Existing finalized IDs, hashes and bytes remain unchanged. The schema and revision remain 2026-10-03.2. See [chunk policy](RECORDER_CHUNKS.md).
 
-## Weazlpod additive extension — 2026-10-20.1
+## Weazlpod additive extension — 2026-10-25.1
 
 The default contract revision remains **2026-10-03.2**. The existing iOS client
 checks that exact revision at discovery and capability loading. This extension
@@ -353,7 +353,7 @@ adds optional fields and operations; no existing field changes type or meaning.
 Browser/iOS requests keep their current defaults. AAC quality profiles from
 SUBWEAZL_QUALITY_HANDOFF.md remain unavailable. Discover the optional
 `capabilities.data.weazlpod` object before consuming this extension; its
-`extensionRevision` is `2026-10-20.1`. See checked-in `weazlpod-*.json` fixtures
+`extensionRevision` is `2026-10-25.1`. See checked-in `weazlpod-*.json` fixtures
 and [firmware examples](WEAZLPOD_FIRMWARE.md).
 
 ### Selection
@@ -377,6 +377,16 @@ cover-image types.
 | Explicit MP3 for `cover`, `trackOriginal`, unknown kind | 422 `unsupported` |
 | Weazlpod `recordingSegment` | Prepare derivative of owned finalized immutable AAC asset |
 | Weazlpod `radioLive` | Separate live MP3 lease, never a static-file lease |
+
+Live radio also accepts `mp3-64` and `mp3-96`, at the same 44,100 Hz and two
+channels. `X-Weazl-Radio-Quality: low|med|high` selects 64/96/128 kbps when paired
+with the valid Weazlpod hint on radio lease creation. Explicit JSON quality must
+agree with that header. Missing selectors preserve the 128-kbps Weazlpod default;
+ordinary clients keep original relay behavior. Invalid/duplicate/conflicting
+headers or lower profiles on finite media return 422. Capabilities expose
+`radioProfiles`, `radioQualityHeader`, and `radioDefaultQuality` separately from
+finite `profiles`. All requested MP3 radio profiles enable joint stereo.
+See [full selection and transfer contract](API_REFERENCE.md#radio-quality-selection).
 
 `mp3-128` means MPEG-1 Layer III, **128,000 bit/s CBR, 44,100 Hz, stereo**,
 `audio/mpeg`; normalize even already-low-bitrate/MP3 sources. No original or AAC
@@ -504,7 +514,7 @@ profile/encoding fields, non-null playbackId, and null byteLength, SHA-256,
 representationId and durationMs; supportsRanges is false. It uses the existing
 validated Go resolver/relay for URLs, DNS, redirects and playlists. FFmpeg receives
 only ICY-stripped audio over stdin. Metadata remains on the authenticated
-`/radio/events?playback={playbackId}` SSE feed and is never inserted into MP3.
+`/radio/events?playbackId={playbackId}` SSE feed and is never inserted into MP3.
 No ETag, Content-Length, Content-Range or Accept-Ranges is emitted. MP3 live GETs
 with any Range are 422 `unsupported`; HEAD is 405. Existing non-MP3 Apple probe
 and relay behavior is unchanged.

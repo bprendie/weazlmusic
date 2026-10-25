@@ -190,6 +190,12 @@ availability is not an assertion of Apple-device or overnight acceptance.
 `weazlpod` contains `extensionRevision`, `identificationHeader:'X-Weazl-Client'`,
 `client:'weazlpod'`, and `profiles` (empty when encoding is unavailable, otherwise
 `[{profile:'mp3-128',codec:'mp3',bitRateKbps:128,bitRateMode:'cbr',sampleRateHz:44100,channels:2}]`).
+Extension `2026-10-25.1` also exposes `radioProfiles`: `mp3-64`, `mp3-96`, and
+`mp3-128`, each with the encoding fields above and `channelMode:'joint_stereo'`.
+All use 44100 Hz and two channels; the bitrate is 64, 96, or 128 respectively.
+`radioProfiles` is empty when encoding is unavailable. `profiles` continues to
+advertise finite media only. `radioQualityHeader` is `X-Weazl-Radio-Quality` and
+`radioDefaultQuality` is `high`.
 Boolean fields are `finiteLibrary`, `trackDownload`, `recordingSegments`,
 `radioLive`, `preparations`, and `gaplessTrimmingRequired`.
 Numeric limits are `maxWorkers`, `storageWorkerLimit`, `reservedApplicationCores`,
@@ -269,7 +275,7 @@ Authenticated; no idempotency key required. Body:
 | `trackOriginal` | Library track ID | Omitted/`original`; original download bytes. |
 | `trackDownload` | Library track ID | Requires `mp3-128`. |
 | `cover` | Track/album/artist `coverId` | Omitted/`original`, or `rgb565-112`. |
-| `radioLive` | Saved owned station ID | Omitted/`original`, or `mp3-128`. |
+| `radioLive` | Saved owned station ID | Omitted/`original`, or `mp3-64`, `mp3-96`, `mp3-128`. |
 | `recordingSegment` | Manifest segment `assetId` | Omitted/`original` recording master, or `mp3-128`. |
 
 An ordinary 200 lease has
@@ -285,11 +291,38 @@ them out of logs, and renew after expiry. Maximum lifetime is 12 hours, bounded
 by browser-session expiry where applicable. Revocation and library binding are
 checked at fetch time; possession of an asset hash is never authorization.
 
-`X-Weazl-Client: weazlpod` automatically selects `mp3-128` for audio, leaves covers
+`X-Weazl-Client: weazlpod` defaults audio to `mp3-128`, leaves covers
 unchanged, and rejects `trackOriginal` or incompatible explicit audio quality.
 The value is case-insensitive after trimming and must occur in one header value.
 Other clients retain ordinary defaults. Explicit `quality:'mp3-128'` also works
-without that header. Unsupported kind/quality combinations return 422.
+without that header. Live radio additionally accepts the lower bitrate profiles
+below. Unsupported kind/quality combinations return 422.
+
+### Radio quality selection
+
+On `POST /media/leases` with `kind:'radioLive'`, identified Weazlpod clients may
+send `X-Weazl-Radio-Quality: low|med|high` to select `mp3-64`, `mp3-96`, or
+`mp3-128`. Header values are case-insensitive after trimming. Exactly one value
+is required if the header is present: empty, duplicate, comma-separated and
+unknown values return 422 `unsupported`. The quality header on another media
+kind or without the valid `X-Weazl-Client: weazlpod` hint also returns 422.
+
+Any authenticated client can instead supply JSON `quality:'mp3-64'`, `'mp3-96'`
+or `'mp3-128'`. If JSON quality and the quality header are both present they must
+match, otherwise 422. Weazlpod with neither selector keeps `mp3-128`; other
+clients retain original relay behavior. Low/medium are radio-only and cannot
+change existing finite derivatives or their cache keys.
+
+All three profiles are MPEG-1 Layer III CBR, 44100 Hz, two-channel joint stereo.
+The server normalizes the source even when it is already MP3; a source's bitrate
+or codec can change during live playback. It strips ICY and ID3 metadata from the
+audio; use the separate authenticated SSE route for station metadata.
+The lease response reports the selected encoding including `channelMode`.
+The media URL binds that profile; GET needs no identity/quality header and any
+quality header there cannot override it. To change quality, close the stream,
+create a new lease and open its URL. Transcoded responses include
+`X-Weazl-Radio-Profile: mp3-64|mp3-96|mp3-128`, `Cache-Control: private, no-store`
+and `X-Accel-Buffering: no`. Lease URLs remain secrets.
 
 ### GET / HEAD `/media/assets/{id}?lease=…`
 
@@ -301,10 +334,11 @@ resuming, verify final size/hash, then atomically publish the offline file.
 Do not store a partial download as playable audio.
 
 Live radio has no finite length/hash and does not support ordinary byte seeking.
-HEAD is rejected. A GET with exactly `Range: bytes=0-1` is a format probe: 200,
+HEAD is rejected. For original relays only, a GET with exactly `Range: bytes=0-1` is a format probe: 200,
 at most 16 KiB, no static Content-Length/Content-Range/Accept-Ranges, and no claim
 on playback ownership. Other ranges return 416. One ordinary audio GET owns a
 playback ID at a time; duplicates return 409. Disconnect releases ownership.
+Transcoded MP3 rejects **all** Range requests with 422 and supports GET only.
 MP3 live leases also report encoding fields, with null representation/duration.
 Live workers are bounded; exhaustion can return 429. A stream failure requires
 reopening playback; do not interpret EOF as completion of a finite recording.

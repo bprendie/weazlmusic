@@ -1,6 +1,6 @@
 # Weazlpod firmware handoff
 
-Server extension `2026-10-20.1`; base API revision stays `2026-10-03.2` for existing
+Server extension `2026-10-25.1`; base API revision stays `2026-10-03.2` for existing
 iOS clients. No firmware changes or ESP32 playback have been validated here.
 All examples use inert credentials/IDs. Substitute your authenticated device's
 resource IDs; the checked-in IDs are not runtime server resources.
@@ -130,11 +130,45 @@ the start. Verify these on the actual ESP decoder before claiming timeline parit
 
 ## Live radio
 
+Discover `data.weazlpod.radioProfiles` before enabling the radio quality setting.
+Keep finite audio on `mp3-128`. Persist the radio setting on the device:
+
+| Setting | Header value | JSON profile | Output |
+| --- | --- | --- | --- |
+| Low | low | mp3-64 | 64 kbps CBR |
+| Medium | med | mp3-96 | 96 kbps CBR |
+| High (default) | high | mp3-128 | 128 kbps CBR |
+
+Every profile stays at 44100 Hz, two channels, joint stereo. Send the setting
+when creating the lease, never to an external station:
+
+```http
+POST /api/v1/media/leases HTTP/1.1
+Authorization: Bearer <device-access-token>
+X-Weazl-Client: weazlpod
+X-Weazl-Radio-Quality: med
+Content-Type: application/json
+
+{"kind":"radioLive","resourceId":"<owned-station-id>"}
+```
+
+Alternatively send `quality:"mp3-96"` in JSON. If both selectors are sent, they
+must agree. The quality header is valid only on identified Weazlpod radio lease
+creation. Missing selectors retain High. Unsupported or conflicting settings
+return 422, never silently downgrade. GET uses the leased URL alone; a changed
+setting needs a new lease after closing the old stream.
+
+Firmware follow-up: accept 64/96/128-kbps MPEG-1 Layer III frames on the radio
+path while preserving 44100-Hz stereo validation and existing finite-file seek
+assumptions. Verify returned encoding before playback; show the chosen quality
+and actual connecting/buffering/retry state. Server tests must pass before this
+firmware work; Linux stream verification is not hardware playback acceptance.
+
 Request `kind:"radioLive"`, an owned station ID, and the hint/profile. Response
 is 200 with MP3 encoding fields, playbackId, null length/hash/representationId and
 supportsRanges false. Open without Range. HEAD is 405; Range is 422. Live MP3
 contains no ID3 or ICY metadata; consume metadata separately from authenticated
-`/api/v1/radio/events?playback=<playback-id>`. Existing station URL policy applies.
+`/api/v1/radio/events?playbackId=<playback-id>`. Existing station URL policy applies.
 
 Two live transcodes globally, one per account; finite preparation has separate
 workers. Disconnect frees the slot; duplicate actual GET is 409 and account/global

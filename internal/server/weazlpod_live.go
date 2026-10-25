@@ -68,7 +68,7 @@ func (a *apiV1) podLive(w http.ResponseWriter, r *http.Request, se *session, ml 
 		}
 	}
 	// FFmpeg only sees stripped audio on stdin. Disable Xing for an unbounded stream.
-	args := []string{"-hide_banner", "-loglevel", "error", "-nostdin", "-protocol_whitelist", "pipe", "-probesize", "32768", "-analyzeduration", "1000000", "-i", "pipe:0", "-map", "0:a:0", "-vn", "-map_metadata", "-1", "-map_chapters", "-1", "-c:a", "libmp3lame", "-b:a", "128k", "-ar", "44100", "-ac", "2", "-threads", "1", "-id3v2_version", "0", "-write_id3v1", "0", "-write_xing", "0", "-flush_packets", "1", "-f", "mp3", "pipe:1"}
+	args := []string{"-hide_banner", "-loglevel", "error", "-nostdin", "-protocol_whitelist", "pipe", "-probesize", "32768", "-analyzeduration", "1000000", "-i", "pipe:0", "-map", "0:a:0", "-vn", "-map_metadata", "-1", "-map_chapters", "-1", "-c:a", "libmp3lame", "-b:a", strconv.Itoa(podRadioBitrate(ml.Quality)) + "k", "-joint_stereo", "1", "-ar", "44100", "-ac", "2", "-threads", "1", "-id3v2_version", "0", "-write_id3v1", "0", "-write_xing", "0", "-flush_packets", "1", "-f", "mp3", "pipe:1"}
 	cmd := mediaCommandContext(ctx, "ffmpeg", args...)
 	input, err := cmd.StdinPipe()
 	if err != nil {
@@ -137,6 +137,8 @@ func (a *apiV1) podLive(w http.ResponseWriter, r *http.Request, se *session, ml 
 		return
 	}
 	w.Header().Set("Content-Type", "audio/mpeg")
+	w.Header().Set("Cache-Control", "private, no-store")
+	w.Header().Set("X-Weazl-Radio-Profile", ml.Quality)
 	w.Header().Set("X-Accel-Buffering", "no")
 	w.Header().Del("Content-Length")
 	w.Header().Del("ETag")

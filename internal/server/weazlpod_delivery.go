@@ -95,8 +95,12 @@ func (a *apiV1) podAsset(w http.ResponseWriter, r *http.Request, se *session, ml
 func (a *apiV1) podCapabilities() map[string]any {
 	enabled := a.pod.encoder != "" && a.mediaCPUPlan().Cores > 0
 	profiles := []any{}
+	radioProfiles := []any{}
 	if enabled {
 		profiles = append(profiles, podEncoding())
+		for _, profile := range []string{"mp3-64", "mp3-96", podProfile} {
+			radioProfiles = append(radioProfiles, podRadioEncoding(profile))
+		}
 	}
-	return map[string]any{"extensionRevision": "2026-10-20.1", "identificationHeader": "X-Weazl-Client", "client": "weazlpod", "profiles": profiles, "finiteLibrary": enabled, "trackDownload": enabled, "recordingSegments": enabled, "radioLive": enabled, "preparations": true, "maxWorkers": a.podWorkers(), "storageWorkerLimit": a.podBudget() / podReservation, "reservedApplicationCores": applicationCoreReserve, "transcodeCores": a.mediaCPUPlan().Cores, "encoderThreadsPerJob": 1, "workerModel": "parallel-processes", "maxLiveWorkers": 2, "maxLiveWorkersPerAccount": 1, "maxInputBytes": podInputLimit, "maxOutputBytes": podOutputLimit, "maxDurationMs": 14400000, "budgetBytes": a.podBudget(), "gaplessTrimmingRequired": true}
+	return map[string]any{"extensionRevision": "2026-10-25.1", "identificationHeader": "X-Weazl-Client", "client": "weazlpod", "profiles": profiles, "radioProfiles": radioProfiles, "radioQualityHeader": podRadioQualityHeader, "radioDefaultQuality": "high", "finiteLibrary": enabled, "trackDownload": enabled, "recordingSegments": enabled, "radioLive": enabled, "preparations": true, "maxWorkers": a.podWorkers(), "storageWorkerLimit": a.podBudget() / podReservation, "reservedApplicationCores": applicationCoreReserve, "transcodeCores": a.mediaCPUPlan().Cores, "encoderThreadsPerJob": 1, "workerModel": "parallel-processes", "maxLiveWorkers": 2, "maxLiveWorkersPerAccount": 1, "maxInputBytes": podInputLimit, "maxOutputBytes": podOutputLimit, "maxDurationMs": 14400000, "budgetBytes": a.podBudget(), "gaplessTrimmingRequired": true}
 }
