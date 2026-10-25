@@ -574,6 +574,53 @@ metadata, duplicate/account limits, disconnect/reconnect and device revocation.
 The packaged checks include CPU affinity and restricted-quota rejection.
 Logs are in ignored `test-results/radio-quality-20261025/`.
 
-Production deployment and real Prendie acceptance will be recorded below. No
-firmware was changed or flashed for this work. Server format/decode tests are not
+No firmware was changed or flashed for this work. Server format/decode tests are not
 subjective listening or yellow-board playback acceptance.
+
+#### Radio-quality production deployment receipt
+
+Deployed source `43091b4aceedb179e40c24a6177e6ce6c47a430a` to
+`bobp@weazlmusic.teralab.local` on 2026-10-25. The exact locally tested production
+image was transferred and started without rebuilding:
+`sha256:f53e8d1cf15c4787485382da273aa7eef613bae777a669f58e1a2c94e55621c3`.
+The service is healthy with zero restarts; `/healthz` and `/api/v1/info` pass.
+GitHub main includes this change and the three previously unpushed artwork/docs
+commits. The existing Compose configuration and named volume were preserved.
+
+Immediately before stopping, the read-only audit found no active captures and no
+schedules due within five minutes. The stopped-volume backup passed gzip and
+archive listing checks; its checksum was recorded before starting the new image.
+
+- Private receipt: `/home/bobp/weazlmusic-backups/20261025T184435Z-radio-quality`.
+- Archive: `data.tar.gz`, mode 0600 in a 0700 directory; SHA-256
+  `ae0248b08b5ce21685d6617eb8a8039a2c3ab597205051bd42b2c751b42b8c9d`.
+- Rollback image: `weazltunes-web:rollback-20261025T184435Z`, retaining
+  `sha256:ba841acfd544ba924b2858724a22aca5d05daf0e9bcad860a53927559f07467b`.
+- Before/after key digest and record counts match: 5,995 assets, six manifests,
+  six jobs, four station collections, 72 scrobbles, 159 MP3 derivatives, and
+  all 145 existing device records. Browser sessions expire at service restart.
+
+The public HTTPS production endpoint passed the real Prendie stream acceptance
+at all three profiles, using its existing saved station. The verifier inspected
+all complete frames and fully decoded each captured MP3 without errors:
+
+| Profile | Delivery window | Verified frames | MP3 bytes | First audio byte | Largest observed read gap | Decode/reconnect |
+| --- | --- | --- | --- | --- | --- | --- |
+| mp3-64 | 60.030 s | 2603 | 543,973 | 4.477 s | 0.125 s | pass/pass |
+| mp3-96 | 60.029 s | 2604 | 816,274 | 4.493 s | 0.258 s | pass/pass |
+| mp3-128 | 60.032 s | 2604 | 1,088,365 | 4.484 s | 0.385 s | pass/pass |
+
+All frames are MPEG-1 Layer III CBR, 44100 Hz, joint stereo. Each capture contains
+about 68 seconds of audio because initial buffered audio arrives in a burst;
+the table's delivery window is wall time after the first byte, not file duration.
+Read gaps measure host-side reception and do not establish embedded buffer needs.
+Legacy default selection and conflicting-selector rejection also passed through
+production. No firmware, Bluetooth or subjective listening test was performed.
+
+The verifier logged out its own native test session. Final read-only audit shows
+unchanged assets/manifests/jobs/stations/scrobbles/derivatives, plus the expected
+one test-device record and four media leases (one default check and three profile
+checks). The existing Prendie station was reused; no station mutation was needed.
+Private captures/results: `test-results/radio-quality-20261025/production/`;
+repeat with `scripts/verify-radio-quality.py` as documented in DEPLOYMENT.md.
+This documentation receipt does not require another runtime restart.

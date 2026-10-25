@@ -56,4 +56,11 @@ when the upstream station changes codec/rate. Original radio continues to relay.
 - Header/JSON validation, finite-media compatibility and capability tests pass.
 - `go test -race ./...` passed (server package 193.724 seconds); `go vet ./...`
   passed. Production image and packaged-runtime media/CPU-reserve tests passed.
-- Deployment and real-station production acceptance pending. Firmware untouched.
+- Source committed/pushed as `43091b4`; tested image deployed to production with
+  verified full-volume backup and retained rollback image.
+- Production Prendie at 64/96/128 kbps passed 60 seconds per profile, complete-frame
+  checks, full decoding and reconnect. All output stays 44100 Hz joint stereo.
+- Production healthy with zero restarts; preserved data verified. See
+  [deployment and acceptance receipt](VERIFICATION.md#radio-quality-profiles--2026-10-25).
+- Server rollout complete. Firmware remains untouched; its quality UI/decoder and
+  actual yellow-board playback acceptance are the separate next step.
