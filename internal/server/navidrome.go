@@ -120,6 +120,10 @@ func (s *Server) favorite(w http.ResponseWriter, r *http.Request, se *session) {
 }
 func (s *Server) media(w http.ResponseWriter, r *http.Request, se *session) {
 	kind := r.PathValue("kind")
+	if kind == "download" {
+		s.downloadTrack(w, r, se)
+		return
+	}
 	method := "stream"
 	q := url.Values{"id": {r.URL.Query().Get("id")}}
 	if q.Get("id") == "" {

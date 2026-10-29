@@ -28,20 +28,21 @@ type Config struct {
 	RadioPrivateOrigins  string
 }
 type Server struct {
-	v1          *apiV1
-	nativeRadio map[string]*radioHub
-	handler     http.Handler
-	closeOnce   sync.Once
-	moodJobs    map[string]string
-	cfg         Config
-	upstream    *http.Client
-	llm         *http.Client
-	radio       *http.Client
-	mu          sync.Mutex
-	sessions    map[string]*session
-	attempts    map[string]attempt
-	accountsMu  sync.Mutex
-	store       *store
+	downloadSlots chan struct{}
+	v1            *apiV1
+	nativeRadio   map[string]*radioHub
+	handler       http.Handler
+	closeOnce     sync.Once
+	moodJobs      map[string]string
+	cfg           Config
+	upstream      *http.Client
+	llm           *http.Client
+	radio         *http.Client
+	mu            sync.Mutex
+	sessions      map[string]*session
+	attempts      map[string]attempt
+	accountsMu    sync.Mutex
+	store         *store
 }
 
 func New(cfg Config, assets fs.FS) (http.Handler, error) {
@@ -68,6 +69,7 @@ func New(cfg Config, assets fs.FS) (http.Handler, error) {
 	if err != nil {
 		return nil, err
 	}
+	s.downloadSlots = make(chan struct{}, 2)
 	mux := http.NewServeMux()
 	s.v1.routes(mux)
 	mux.HandleFunc("GET /api/v1/media/assets/{id}", s.v1.asset)
@@ -90,6 +92,7 @@ func New(cfg Config, assets fs.FS) (http.Handler, error) {
 	mux.HandleFunc("POST /api/playlists", s.connected(s.playlistWrite))
 	mux.HandleFunc("POST /api/playlist-delete", s.connected(s.playlistDelete))
 	mux.HandleFunc("GET /api/media/{kind}", s.connected(s.media))
+	mux.HandleFunc("GET /api/download/{kind}", s.connected(s.downloadCollection))
 	mux.HandleFunc("GET /api/state", s.auth(s.getState))
 	mux.HandleFunc("PUT /api/state", s.auth(s.putState))
 	mux.HandleFunc("GET /api/radio/directory", s.auth(s.directory))

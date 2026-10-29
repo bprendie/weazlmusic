@@ -11,7 +11,7 @@ export async function refreshPlaylists() {
 }
 export async function navigate(view = state.view, query = '', more = false) {
   closeFlightRecorder();
- if(view==='flight-recorder'){state.view=view;state.query='';state.loading=false;renderMain();await renderFlightRecorder();return;}
+ if(view==='flight-recorder'&&!query){cancelNavigation();$('#search').value='';state.view=view;state.query='';state.loading=false;state.error='';renderMain();await renderFlightRecorder();return;}
  controller?.abort(); controller = new AbortController();
   const id = ++requestID, signal = controller.signal;
   state.view = view; state.query = query; state.loading = true; state.error = '';
@@ -20,8 +20,8 @@ export async function navigate(view = state.view, query = '', more = false) {
   try {
     let apply = () => {};
     if (query) {
-      const data = await library('search3',{query,songCount:100,albumCount:0,artistCount:0},signal);
-      apply = () => {state.tracks = (data.searchResult3?.song || []).map(track);};
+      const data = await library('search3',{query,songCount:100,albumCount:40,artistCount:0},signal);
+      apply = () => {state.tracks = (data.searchResult3?.song || []).map(track);state.albums = data.searchResult3?.album || [];};
     } else if (view === 'home' || view === 'albums') {
       const offset = more ? state.offset + 40 : 0;
       const [data, stars] = await Promise.all([

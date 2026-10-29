@@ -9,7 +9,7 @@ export const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&
 export const duration = value => Number.isFinite(value) ? `${Math.floor(value / 60)}:${String(Math.floor(value % 60)).padStart(2, '0')}` : 'LIVE';
 export function track(raw) {
   return {id: String(raw.id), title: raw.title || raw.name || 'Untitled', artist: raw.artist || 'Unknown artist',
-    album: raw.album || '', coverArt: raw.coverArt || '', duration: Number(raw.duration) || 0, starred: !!raw.starred};
+    album: raw.album || '', albumId: raw.albumId == null ? '' : String(raw.albumId), coverArt: raw.coverArt || '', duration: Number(raw.duration) || 0, starred: !!raw.starred};
 }
 export const radioTrack = station => ({id: station.url, title: station.name, artist: 'Live radio', url: station.url, duration: null});
 let notice;

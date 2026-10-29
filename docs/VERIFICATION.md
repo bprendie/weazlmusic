@@ -624,3 +624,74 @@ checks). The existing Prendie station was reused; no station mutation was needed
 Private captures/results: `test-results/radio-quality-20261025/production/`;
 repeat with `scripts/verify-radio-quality.py` as documented in DEPLOYMENT.md.
 This documentation receipt does not require another runtime restart.
+
+## Browser album search, quick actions and downloads — 2026-10-29
+
+Implemented against source baseline `f1727cf`. See
+[UI_QUICK_ACTIONS.md](UI_QUICK_ACTIONS.md) for the full surface audit and behavior.
+Browser search now returns album cards and tracks; track menus resolve the
+selected album by ID, fetch its complete track list, and play in album order.
+Menus cover library rows/cards, queue, Now Playing, radio and existing recorder
+controls, with visible touch buttons and keyboard navigation. Searches from
+Flight Recorder now reach library search instead of being ignored.
+
+Added browser original-track attachment and album/playlist ZIP routes. These use
+upstream original downloads, preserve duplicate playlist occurrences, stream
+sequentially without audio staging/recompression, and enforce two global ZIP
+slots/1,000 tracks per collection. Native contract revision, normalized profiles,
+media defaults and firmware fixtures are unchanged. Recordings still use the
+existing Subweazl offline-copy workflow; live streams have no download action.
+
+Actual isolated verification:
+
+- `make test`: complete Go race suite passed (server 155.410 s). After the final
+  track-response error-handling adjustment, focused download race tests passed
+  again (11.277 s), including disconnect/logout cancellation and slot recovery.
+- `go vet ./...` and `git diff --check`: passed.
+- `tests/run-browser.sh`: passed the existing smoke flow and the new integrated
+  `tests/quick-actions.cjs` checks: mixed/album-only search, complete album order,
+  older saved queue album-ID lookup, keyboard/focus/viewport/mobile behavior,
+  original/ZIP browser downloads, queue occurrence handling, ownership-only
+  playlist mutations, radio download gating, and recorder menu state/confirmation
+  delegation. Recorder menu tests use intercepted synthetic metadata; they do
+  not claim a new capture/encoding soak. No JavaScript errors.
+- `docker build --target production -t weazltunes-web:ui-quick-actions .`: passed.
+  Local image ID:
+  `sha256:1778afd931cfb1a3c604c638b20d32c305e1a3c7ddd55d8e910263aa430b8055`.
+- Compiled static server tests executed inside that exact production image with
+  no network, read-only root and isolated writable temporary data: all
+  `TestBrowser.*Download|TestDownloadFilename` tests passed. Checks include
+  original bytes despite a differing stream default, Range/If-Range, HEAD,
+  ZIP bytes/order/duplicates, safe filenames, auth/upstream denial, bounds,
+  source failure and interrupted ZIP transport/cancellation. No encoders or
+  media profiles changed in this UI update.
+
+Logs and inspected desktop/mobile menu screenshots are retained locally under
+ignored `test-results/ui-quick-actions/`. No production account/library mutation,
+production push or deployment was performed for this change. Physical touch-device
+acceptance, other browser engines and long/large-download endurance remain
+unverified; ZIP downloads restart from the beginning after interruption.
+
+### UI production deployment — 2026-10-29
+
+Subsequently authorized by the user and deployed directly to
+`bobp@weazlmusic.teralab.local` before committing/pushing, as requested. The exact
+locally tested image above is running healthy with zero restarts. LAN health,
+root and quick-actions.js return 200; served quick-actions.js matches the local
+file byte-for-byte. Both new download routes return 401 without authentication.
+Discovery/installation info matches the pre-deployment response. No production
+account or music mutation was used. No active fdkaac recorder process was found
+at either preflight check; schedules were not inspected through an account.
+
+Verified stopped full-volume backup and rollback receipts:
+`/home/bobp/weazlmusic-backups/20261029T142051Z-ui-actions` (0700; archive 0600).
+Archive SHA-256:
+`87d3a09e5ec7018bc169371332ccc29ad76fb30e78cfd8cfa9229e1311df2398`.
+Rollback: `weazltunes-web:rollback-20261029T142051Z-ui-actions`.
+
+At the user's explicit cleanup request, purged all older data.tar.gz archives and
+older rollback tags, retaining this deployment's archive/image and small historical
+receipts. The user manages a separate hypervisor backup. Final cleanup reclaimed
+3,232,784,384 additional bytes after earlier archive cleanup during preflight;
+10,253,647,872 bytes (9.55 GiB) were free afterwards. Exact removals are recorded in
+`cleanup.json` in the new receipt directory. Production data volumes were retained.

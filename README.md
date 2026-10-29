@@ -111,3 +111,6 @@ tests/run-browser.sh     # Override Chromium path with BROWSER_BIN if needed
 ```
 
 See the [phase plan](docs/PHASES.md), [verification record](docs/VERIFICATION.md), and [deployment notes](docs/DEPLOYMENT.md) for operational details and acceptance evidence.
+
+Browser library search, contextual menus and original-file/collection downloads
+are described in [UI_QUICK_ACTIONS.md](docs/UI_QUICK_ACTIONS.md).

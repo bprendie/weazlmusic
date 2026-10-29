@@ -1,6 +1,6 @@
 # WeazlTunes API reference
 
-Implementation reference updated 2026-10-24. Covers every supported HTTP API route
+Implementation reference updated 2026-10-29. Covers every supported HTTP API route
 in this repository, including the browser compatibility API, native API v1,
 Weazlpod media extension, and health check. It describes the code in this revision;
 it is not a statement that a particular installation has deployed it.
@@ -663,7 +663,8 @@ access to the entire Subsonic API. Credentials are supplied server-side.
 | POST `/api/favorite` | `{id,star:boolean}` (track ID) | 200 `{ok:true}`. |
 | POST `/api/playlists` | `{id?,name?,songIds:[],remove:[]}` | 200 upstream inner response. |
 | POST `/api/playlist-delete` | `{id}` | 200 `{ok:true}`. |
-| GET `/api/media/{kind}` | `kind=stream|cover`, required query `id` | 200/206 media, or 416. |
+| GET `/api/media/{kind}` | `kind=stream|cover|download`, required query `id` | 200/206 media, or 416; download is an original-file attachment. |
+| GET `/api/download/{kind}` | `kind=album|playlist`, required query `id` | 200 streamed ZIP of original tracks, in upstream order. |
 
 Playlist creation omits `id` and requires a nonblank name; removal indices are
 invalid during create. An existing ID appends `songIds`, optionally renames, and
@@ -675,6 +676,20 @@ owner may edit/delete. Invalid positions return 400; an active Mood run returns
 Media streams forward Range and selected media headers. Browser covers request
 upstream size 400; there is no RGB565 option on this compatibility route. JSON/XML/
 HTML playback responses and non-image cover responses are rejected as 502.
+
+Browser downloads use the signed-in account's upstream `download` endpoint,
+never the player-default `stream` representation. Individual file attachments
+forward Range/If-Range, actual lengths and upstream validators when available;
+HEAD returns headers only. Filenames are sanitized from original track metadata.
+Collection ZIPs preserve track order and duplicate occurrences with numbered
+entries; audio is streamed sequentially with no recompression or disk staging.
+At most two ZIP requests run globally (429, Retry-After: 5); collections must have
+1–1,000 tracks (422 otherwise). Missing/unavailable resources return 400/404;
+source failures before output return 502. Later failures abort the transfer
+without completing the ZIP; disconnect/logout/session expiry cancel upstream
+work. ZIP HEAD returns type/disposition without generating audio; ZIP lengths,
+validators and resumable ranges are not available. Native lease downloads are
+unchanged. See [UI_QUICK_ACTIONS.md](UI_QUICK_ACTIONS.md) for UI coverage.
 
 ### Browser state
 

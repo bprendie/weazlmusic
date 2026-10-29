@@ -132,7 +132,15 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				entries = append(entries, t)
 			}
 		}
-		out["searchResult3"] = map[string]any{"song": entries}
+		albums := []map[string]any{}
+		albumCount, _ := strconv.Atoi(q.Get("albumCount"))
+		for i := 0; i < 12 && len(albums) < albumCount; i++ {
+			t := all[i*3]
+			if strings.Contains(strings.ToLower(fmt.Sprint(t["artist"], " ", t["album"])), strings.ToLower(q.Get("query"))) {
+				albums = append(albums, map[string]any{"id": strconv.Itoa(i), "name": albumName(t["album"].(string), i), "artist": t["artist"], "coverArt": strconv.Itoa(i)})
+			}
+		}
+		out["searchResult3"] = map[string]any{"song": entries, "album": albums}
 	case "getStarred2":
 		entries := []map[string]any{}
 		for _, t := range all {

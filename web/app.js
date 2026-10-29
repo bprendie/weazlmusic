@@ -1,3 +1,4 @@
+import {bindQuickActions, cancelQuickActions} from './quick-actions.js';
 import {state, $, esc, radioTrack, toast, track} from './state.js';
 import {api, library, saveState, cancelSave, flushState} from './api.js';
 import {renderMain, renderPlayer, renderQueue} from './render.js';
@@ -11,6 +12,7 @@ import {buildMood, cancelMood} from './mood.js';
 import {closeFlightRecorder} from './flight-recorder.js';
 let searchTimer;
 function signedOut() {
+ cancelQuickActions();
  closeFlightRecorder();
  cancelMood(true);
   cancelNavigation(); cancelSave(); clearTimeout(searchTimer); resetPlayer();
@@ -75,7 +77,7 @@ async function action(button) {
   if (button.id === 'logout') {await flushState();await api('logout','POST',{});signedOut();}
 }
 document.addEventListener('click',event => {
-  const button = event.target.closest('button');if (!button || button.disabled || button.type === 'submit' && button.closest('form')) return;
+  const button = event.target.closest('button');if (button?.matches('[data-quick-open],[data-download-collection]')) return;if (!button || button.disabled || button.type === 'submit' && button.closest('form')) return;
   if (!Object.keys(button.dataset).length && !['logout','mobile-account','configure-connection','configure-llm','configure-admin','change-password'].includes(button.id) && !button.classList.contains('dialog-close')) return;
   button.disabled = true;action(button).catch(error => toast(error.message)).finally(() => {button.disabled = false;});
 });
@@ -115,4 +117,5 @@ document.addEventListener('keydown',event => {
 });
 $('#modal').addEventListener('close',() => {if (!$('#modal').open) $('#modal-content').replaceChildren();});
 document.addEventListener('error',event => {if (event.target.matches?.('img.album-art,img.mini-cover')) {event.target.src = '/appicon.png';event.target.classList.add('art-2');}},true);
+bindQuickActions();
 bindAuth(signedOut);
