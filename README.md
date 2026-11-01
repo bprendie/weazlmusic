@@ -114,3 +114,8 @@ See the [phase plan](docs/PHASES.md), [verification record](docs/VERIFICATION.md
 
 Browser library search, contextual menus and original-file/collection downloads
 are described in [UI_QUICK_ACTIONS.md](docs/UI_QUICK_ACTIONS.md).
+
+Remote playback adds **Play on…** for connected owned receivers. The server/browser
+candidate and isolated simulator follow the [remote protocol](docs/REMOTE_PLAYBACK_V1.md).
+Native receivers are separate follow-up work. Implementation/release tracking is in
+the [Sol workbook](REMOTE_PLAYBACK_WORKBOOK.md); this candidate is not yet deployed.

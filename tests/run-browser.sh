@@ -22,3 +22,4 @@ for attempt in $(seq 1 40); do
   sleep 0.1
 done
 node tests/smoke.cjs
+node tests/remote.cjs

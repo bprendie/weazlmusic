@@ -65,7 +65,7 @@ export function renderPlayer() {
   $('#now-actions').hidden = !!flight || !t;
   const playing = flight ? !flight.paused : state.playing;
   $('.player').classList.toggle("recorder-active",!!flight);
-  $('#build-mood').disabled = !!flight || !t || !!t.url || !!state.mood?.running;
+  $('#build-mood').disabled = !!state.remote || !!state.remotePending || !!flight || !t || !!t.url || !!state.mood?.running;
   const meta = t?.url ? state.radioMetadata : null;
   const title = meta?.title || t?.title || 'Ready when you are.';
   const subtitle = flight ? [flight.manifest.name,flight.inGap?'No recording at this time':''].filter(Boolean).join(' · ') : t?.url ? (meta?.title ? [meta.artist,t.title].filter(Boolean).join(' · ') : 'Live radio') : t ? [t.artist,t.album].filter(Boolean).join(' · ') : 'Pick a track or a frequency.';
@@ -76,8 +76,9 @@ export function renderPlayer() {
   $('#play').textContent = playing ? 'Ⅱ' : '▶';
   $('#play').setAttribute('aria-label',playing ? 'Pause' : 'Play');
   $('#duration').textContent = t ? duration(t.duration) : '0:00';
-  $('#source').textContent = flight ? 'RECORDER' : t?.url ? 'RADIO' : 'LIBRARY';
+  $('#source').textContent = state.remote ? 'ON '+state.remote.name : flight ? 'RECORDER' : t?.url ? 'RADIO' : 'LIBRARY';
   if (flight) {const offset=flight.position();$('#elapsed').textContent=duration(offset/1000);$('#seek').value=offset/flight.manifest.durationMs*100;}
+  if(state.remote){$('#elapsed').textContent=duration(state.remote.state.positionMs/1000);$('#seek').value=state.remote.state.durationMs?state.remote.state.positionMs/state.remote.state.durationMs*100:0;}
   $('#seek').disabled = !t || !!t.url;
   $('#favorite').textContent = !flight && t && state.favorites.has(t.id) ? '♥' : '♡';
   $('#favorite').disabled = !!flight || !t || !!t.url;

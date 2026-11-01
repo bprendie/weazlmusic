@@ -8,7 +8,7 @@ const {chromium} = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     const NativeEventSource = window.EventSource;
     window.metadataSources = [];
     window.EventSource = class extends NativeEventSource {
-      constructor(...args) {super(...args);window.metadataSources.push(this);}
+      constructor(...args) {super(...args);if(String(args[0]).includes("radio/events"))window.metadataSources.push(this);}
       close() {this.wasClosed = true;super.close();}
     };
   });

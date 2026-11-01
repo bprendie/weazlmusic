@@ -16,6 +16,7 @@ export function stopFlightPlayback(id){
  audio.pause();audio.removeAttribute('src');audio.load();$('#flight-playback')?.replaceChildren();renderPlayer();
 }
 export async function openFlightPlayback(id){
+ if(state.remote||state.remotePending){toast("Return to This browser before playing recordings.");return;}
  stopFlightPlayback();stop();const request=++version,manifest=(await flightAPI('flight-recorder/sessions/'+id+'/manifest')).data;if(request!==version)return;let saved;
  try{saved=JSON.parse(localStorage.getItem('flight:'+flightIdentity()));}catch{}
  playback={manifest,offset:saved?.sessionId===id&&saved.revision===manifest.revision?saved.positionMs:0,station:saved?.sessionId===id?saved.selectedStationId:manifest.tracks[0].stationId,paused:true,anchor:performance.now(),loading:true,minutes:bufferMinutes(),position};

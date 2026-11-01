@@ -46,6 +46,7 @@ function receive(event, m) {
   progress();
 }
 export async function buildMood() {
+ if(state.remote||state.remotePending){toast("Return to This browser before building Mood.");return;}
   if (state.mood?.running) return;
   const seed = state.current;
   if (!seed || seed.url) {toast('Play a library track to seed Mood.');return;}

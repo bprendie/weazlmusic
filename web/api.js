@@ -19,7 +19,8 @@ export function flushState() {
   clearTimeout(saveTimer);
   const gen = generation;
   if (!state.user) return Promise.resolve();
-  const snapshot = structuredClone({stations: state.stations, stationsVersion:state.stationsVersion, queue: state.queue, current: state.current?.url ? state.resume : state.current});
+  const local=state.remote?state.localOutputSaved:state;
+  const snapshot = structuredClone({stations: state.stations, stationsVersion:state.stationsVersion, queue: local?.queue||[], current: local?.current?.url ? local.resume : local?.current});
   const write = saveChain.then(() => {
     if (gen !== generation) return;
     return api('state', 'PUT', {...snapshot,stationsVersion:state.stationsVersion}).then(out => {state.stationsVersion=out.stationsVersion; for (const saved of out.stations || []) {const current=state.stations.find(s=>s.url===saved.url);if(current){current.id=saved.id;current.version=saved.version;}}});
@@ -28,6 +29,7 @@ export function flushState() {
   return write;
 }
 export function saveState() {
+  if(state.remote)document.dispatchEvent(new Event("remote-queue-save"));
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => flushState().catch(error => toast('Could not save your queue/settings: ' + error.message)), 350);
 }
