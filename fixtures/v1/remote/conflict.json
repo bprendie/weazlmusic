@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": "version_conflict",
+    "message": "Refresh player state.",
+    "retryable": false,
+    "details": {}
+  }
+}

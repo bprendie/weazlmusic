@@ -41,3 +41,7 @@ hardware acceptance boundaries are in `docs/WEAZLPOD_FIRMWARE.md`.
 The base capabilities fixture also carries the optional extension; preparing,
 failed and live-lease fixtures describe the other response states. In preparing
 and failed examples no URL exists. The live example has no finite identity/hash.
+
+Remote playback extension examples are in `remote/`: registration, load with
+repeated track occurrences, observed report, uncertain command and conflict.
+See `docs/REMOTE_PLAYBACK_V1.md` for lifecycle and authentication requirements.

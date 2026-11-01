@@ -790,3 +790,11 @@ When adding/changing a route, update this reference and the relevant contract,
 capability advertisement and fixtures together. Keep browser seconds and native
 milliseconds explicit. Validate request/response claims against handlers and tests;
 do not infer endpoint support solely from a feature flag or a route wildcard.
+
+## Remote playback extension
+
+The server and browser implement the optional `remotePlayback` capability,
+revision `2026-11-01.1`. See [the normative protocol](REMOTE_PLAYBACK_V1.md) for
+`/api/v1/remote` enrollment, presence, SSE, commands, reports and acknowledgement
+routes. Existing native base contract and device-local queue APIs are unchanged.
+Receiver reports establish playback; command HTTP 202 only establishes acceptance.

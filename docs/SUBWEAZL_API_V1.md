@@ -565,3 +565,11 @@ to unrestricted execution. Existing original/proxy/file delivery is unaffected.
 Restart the service after changing CPU allocation. libmp3lame itself remains
 single-threaded, so parallelism is across tracks, not chunks of one MP3. Existing
 immutable representation IDs, hashes and encoder settings remain unchanged.
+
+## Optional remote playback extension
+
+Discover `remotePlayback` in capabilities before enabling remote controls. The
+additive [remote protocol](REMOTE_PLAYBACK_V1.md), revision `2026-11-01.1`, uses
+independent native device credentials and existing media leases. Receiver availability
+is separate from `/auth/devices` lastSeen. Existing clients remain compatible;
+this does not add remote control to native applications automatically.

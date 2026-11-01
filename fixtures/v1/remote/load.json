@@ -1,0 +1,21 @@
+{
+  "type": "load",
+  "playback": {
+    "kind": "library",
+    "queue": [
+      {
+        "entryId": "occurrence-a",
+        "trackId": "0-0",
+        "title": "Fixture track"
+      },
+      {
+        "entryId": "occurrence-b",
+        "trackId": "0-0",
+        "title": "Repeated fixture track"
+      }
+    ],
+    "currentEntryId": "occurrence-a",
+    "positionMs": 42100,
+    "playWhenReady": true
+  }
+}

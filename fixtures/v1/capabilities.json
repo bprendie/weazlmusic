@@ -77,6 +77,30 @@
       "trackDownload": true,
       "transcodeCores": 2,
       "workerModel": "parallel-processes"
+    },
+    "remotePlayback": {
+      "enabled": true,
+      "revision": "2026-11-01.1",
+      "sourceKinds": [
+        "library",
+        "radioLive"
+      ],
+      "commands": [
+        "load",
+        "replaceQueue",
+        "play",
+        "pause",
+        "stop",
+        "next",
+        "previous",
+        "seek",
+        "setVolume"
+      ],
+      "maxQueueEntries": 1000,
+      "heartbeatMs": 10000,
+      "offlineMs": 30000,
+      "commandLifetimeMs": 15000,
+      "maxReceivers": 16
     }
   }
 }

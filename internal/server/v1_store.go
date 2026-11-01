@@ -18,6 +18,7 @@ import (
 const contractRevision = "2026-10-03.2"
 
 type apiV1 struct {
+	remote       *remoteStore
 	s            *Server
 	db           *sql.DB
 	mu           sync.Mutex
@@ -78,6 +79,10 @@ func newV1(s *Server) (*apiV1, error) {
 		err = a.put("meta", "installation", "", a.installation)
 	}
 	if err != nil {
+		a.close()
+		return nil, err
+	}
+	if err = a.initRemote(); err != nil {
 		a.close()
 		return nil, err
 	}

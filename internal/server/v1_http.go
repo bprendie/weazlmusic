@@ -128,6 +128,14 @@ func (a *apiV1) routes(m *http.ServeMux) {
 	m.HandleFunc("POST /api/v1/auth/refresh", a.refresh)
 	handler := a.auth(func(w http.ResponseWriter, r *http.Request, se *session) {
 		p := strings.TrimPrefix(r.URL.Path, "/api/v1/")
+		if strings.HasPrefix(p, "remote/") {
+			if (p == "remote/receiver" && r.Method == "PUT") || (p == "remote/receiver/connections" && r.Method == "POST") {
+				a.remoteEnrollmentHTTP(w, r, se)
+			} else {
+				a.remoteHTTP(w, r, se)
+			}
+			return
+		}
 		if r.Method != "GET" && r.Method != "HEAD" && p != "media/leases" && !strings.HasPrefix(p, "media/preparations/") && p != "auth/logout" && !strings.HasPrefix(p, "auth/devices/") {
 			a.mutation(w, r, se, a.dispatch)
 			return

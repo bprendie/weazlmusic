@@ -259,6 +259,7 @@ func (a *apiV1) devices(w http.ResponseWriter, r *http.Request, se *session) {
 	}
 	d.Revoked = true
 	a.cancelDeviceMood(d.ID)
+	a.remoteRevoke(d.ID)
 	if a.put("device", id, accountID(se.User), d) != nil {
 		verror(w, 503, "storage_full", "Could not revoke device.")
 		return
@@ -277,6 +278,7 @@ func (a *apiV1) revokeDevices(user string) {
 		_ = json.Unmarshal(row, &d)
 		d.Revoked = true
 		a.cancelDeviceMood(d.ID)
+		a.remoteRevoke(d.ID)
 		_ = a.put("device", d.ID, accountID(user), d)
 	}
 }

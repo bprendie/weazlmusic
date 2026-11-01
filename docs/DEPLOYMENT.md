@@ -178,3 +178,15 @@ library playlists or listening history. A temporary station changes the station
 collection revision even after cleanup. It leaves only private captured audio
 and token-free format/timing receipts in the output directory. These are short
 server acceptance checks, not listening tests or ESP32 endurance verification.
+
+## Remote playback candidate
+
+`/api/v1/remote/events` and `/api/v1/remote/receiver/events` require unbuffered SSE
+responses and preserved Host/authentication headers. No inbound receiver ports,
+WebSockets, extra service or relaxed CORS are required. Browser logout leaves the
+receiver's independently authenticated playback active. New encrypted record kinds
+are additive in the existing SQLite schema; no schema version change is required.
+An older binary ignores them, but rollback removes remote control while receivers
+may still be playing buffered audio. Stop receivers explicitly before rollback.
+Full-volume backup/key preservation still applies. This candidate has not been
+deployed; deployment and GitHub publication remain behind owner release review.
