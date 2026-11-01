@@ -478,8 +478,9 @@ Sol maintains this section as implementation proceeds:
   link from planning. No other working-tree changes were present. The first broad
   race validation ran with the new implementation; no pristine baseline run is
   claimed.
-- Backend/protocol/simulator commit: `9cbe373`. Browser and verification commits
-  are recorded in the release receipt in `docs/VERIFICATION.md`.
+- Implementation commits: `9cbe373` (backend/protocol/simulator), `35c797d`
+  (browser and acceptance). Verification receipt: `docs/VERIFICATION.md`,
+  “Remote playback release candidate — 2026-11-01”.
 - Validation: `go test -race ./...` passed (server suite 127.808s),
   `go vet ./...` passed, `make build` passed, and `tests/run-browser.sh` passed
   both existing browser regressions and the new isolated receiver acceptance.

@@ -695,3 +695,55 @@ receipts. The user manages a separate hypervisor backup. Final cleanup reclaimed
 3,232,784,384 additional bytes after earlier archive cleanup during preflight;
 10,253,647,872 bytes (9.55 GiB) were free afterwards. Exact removals are recorded in
 `cleanup.json` in the new receipt directory. Production data volumes were retained.
+
+## Remote playback release candidate — 2026-11-01
+
+Local implementation commits: `9cbe373` (authenticated protocol, encrypted command
+records, receiver simulator and contract) and `35c797d` (browser output selection,
+queue isolation, controls and browser acceptance). Source baseline was `236a7c1`.
+This is an owner-review candidate: **not deployed, not pushed to GitHub, and no
+native receiver repository or live ShopWeazl was changed**.
+
+Validation against disposable local data and synthetic library/radio:
+
+- `go test -race ./...`: passed; server package 127.808s. New remote tests cover
+  owner/device isolation, UUID replay/conflicting content, ETags, observed-state
+  separation, wrong-receiver acknowledgements, duplicate acknowledgements, physical
+  races, report sequencing, command deadlines, generation fencing, restart with
+  completed and uncertain commands, revoke closing SSE, buffering rejected as
+  applied startup, lost-ack report reconciliation and queue/input bounds.
+- `go vet ./...`: passed. `make build`: passed.
+- `tests/run-browser.sh`: passed the existing desktop/mobile smoke and quick-action
+  coverage plus `tests/remote.cjs`. The latter starts its own fixture on loopback
+  ports 4005/4537, starts a CLI receiver, obtains real media leases/bytes, transfers
+  repeated queue occurrences, pauses/advances/enqueues/changes volume, transfers
+  radio with a held library queue, appends to that held queue without changing the
+  active radio source, returns locally, verifies rejected startup preserves local
+  playback, and recovers after a deliberately dropped acknowledgement and receiver
+  restarts. The output picker remains visible at 390px width. No page errors.
+- `git diff --check`, Python syntax compilation and JavaScript test syntax checks:
+  passed. Existing browser metadata instrumentation now counts only radio SSE;
+  independent controller events must not be interpreted as leaked radio listeners.
+
+The standard browser script now runs remote acceptance as well as existing smoke
+coverage. Reproduce the remote test alone with `node tests/remote.cjs`. CLI setup,
+protocol messages, limits and fault switches are in `REMOTE_PLAYBACK_V1.md`.
+Local logs: `/tmp/remote-race-release.log`, `/tmp/remote-vet-release.log`,
+`/tmp/remote-build-release.log`, `/tmp/remote-browser-release.log`. Initial fixture
+health polling can print connection refusals before the server is listening;
+all suites subsequently reach readiness and pass their assertions.
+
+The CLI simulator consumes bounded audio bytes and models transport; these results
+are not proof of audible output, Pi physical controls, Android background behavior,
+codec support on native hardware or production proxy behavior. Native receiver
+implementation and hardware acceptance remain subsequent work. Production deploy,
+GitHub publication and the final ShopWeazl handoff remain R5/R6 after owner review.
+The server uses full resync snapshots every 250ms instead of an event replay
+journal; high-volume/many-controller throughput and exhaustive power-loss/storage
+fault injection remain practical qualification limits. Uncertain work may require
+receiver reconnection; no automatic local fallback or silent retry is claimed.
+
+Encrypted record kinds are additive with no SQLite schema version change. Existing
+binary/data rollback instructions remain applicable; stop receivers explicitly
+before rollback because an older server cannot control them or retract buffered
+media. Preserve the whole volume and encryption key. Deployment evidence is pending.
