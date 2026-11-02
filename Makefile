@@ -12,3 +12,7 @@ build:
 	go build -trimpath -o bin/weazltunes ./cmd/weazltunes
 docker:
 	docker compose up --build -d
+
+.PHONY: verify-compose
+verify-compose:
+	scripts/verify-compose.sh

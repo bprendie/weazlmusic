@@ -192,3 +192,30 @@ Full-volume backup/key preservation still applies unless the owner supplies an
 alternative recovery point. Deployed 2026-11-02 after owner acceptance, using the
 owner's fresh Proxmox snapshot instead of a volume archive. Exact image/source and
 rollback receipts are in `VERIFICATION.md`. GitHub publication remains pending.
+
+## Verify the published Compose build
+
+Compose uses `pull_policy: build`, local context `.` and Dockerfile target
+`production`. A plain `docker compose up -d` builds the current checkout even if
+`weazltunes-web:local` already exists. BuildKit still safely caches unchanged inputs;
+it does not skip changed Go files or embedded web assets. Compose does not update
+your Git checkout: pull the latest source before deploying it.
+
+```sh
+git pull --ff-only
+SOURCE_REVISION=$(git rev-parse HEAD) docker compose up -d
+docker inspect "$(docker compose ps -q weazltunes)" \
+  --format '{{index .Config.Labels "org.opencontainers.image.revision"}}'
+```
+
+The label is `unknown` if SOURCE_REVISION is omitted. Supply a clean checkout's SHA
+for releases; a label alone is not proof that an edited tree matches that commit.
+Use current Docker Compose with support for `pull_policy: build`.
+
+`make verify-compose` tests the actual resolved Compose configuration from a clean
+committed checkout. It seeds an unstartable stale image, runs `up -d` without
+`--build`, checks the revision label and exact served assets, then authenticates a
+disposable local administrator to verify remote playback capability/API. Image tag,
+loopback port, Compose project and volume are isolated; cleanup removes only those
+test resources. The same script runs in GitHub Actions on main pushes and PRs.
+No production credentials or volume are used.

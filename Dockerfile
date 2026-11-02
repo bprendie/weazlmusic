@@ -14,6 +14,8 @@ RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/weazlfixture ./cmd
 FROM alpine:3.23@sha256:85fe1e81d6758c208f3e1eed4338a1997e19d4be002d4dd32d3100c9a8c010a0 AS runtime
 # Pin the tested Alpine FFmpeg package; Go alone validates every outbound radio URL.
 RUN apk add --no-cache ca-certificates ffmpeg=8.0.1-r1 fdkaac=1.0.6-r0 && addgroup -g 10001 weazl && adduser -D -u 10001 -G weazl weazl && mkdir /data && chown weazl:weazl /data
+ARG SOURCE_REVISION=unknown
+LABEL org.opencontainers.image.source="https://github.com/bprendie/weazlmusic"       org.opencontainers.image.revision="$SOURCE_REVISION"
 COPY --from=build /out/weazltunes /usr/local/bin/weazltunes
 USER weazl
 ENV LISTEN_ADDR=0.0.0.0:4000 DATA_DIR=/data

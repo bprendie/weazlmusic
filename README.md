@@ -15,8 +15,14 @@ Complete endpoint documentation: [API reference](docs/API_REFERENCE.md) (native 
 Boot the rig using Docker. This Compose file starts WeazlTunes only; run Navidrome separately on the same host or another reachable machine, then configure its URL under **Account → Installation settings**. No Navidrome URL is preconfigured.
 
 ```sh
-docker compose up --build -d
+git pull --ff-only
+SOURCE_REVISION=$(git rev-parse HEAD) docker compose up -d
 ```
+
+Compose always builds the source in your checkout, including when a local image
+already exists. Pull first to update that checkout from GitHub. The revision label
+records the supplied commit; it defaults to `unknown` when omitted. See
+[clean Compose verification](docs/DEPLOYMENT.md#verify-the-published-compose-build).
 
 Hit **http://localhost:4000**, or your machine's IP on port 4000. Compose publishes to `0.0.0.0:4000`.
 
