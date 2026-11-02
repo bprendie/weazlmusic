@@ -188,5 +188,7 @@ receiver's independently authenticated playback active. New encrypted record kin
 are additive in the existing SQLite schema; no schema version change is required.
 An older binary ignores them, but rollback removes remote control while receivers
 may still be playing buffered audio. Stop receivers explicitly before rollback.
-Full-volume backup/key preservation still applies. This candidate has not been
-deployed; deployment and GitHub publication remain behind owner release review.
+Full-volume backup/key preservation still applies unless the owner supplies an
+alternative recovery point. Deployed 2026-11-02 after owner acceptance, using the
+owner's fresh Proxmox snapshot instead of a volume archive. Exact image/source and
+rollback receipts are in `VERIFICATION.md`. GitHub publication remains pending.

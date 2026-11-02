@@ -747,3 +747,44 @@ Encrypted record kinds are additive with no SQLite schema version change. Existi
 binary/data rollback instructions remain applicable; stop receivers explicitly
 before rollback because an older server cannot control them or retract buffered
 media. Preserve the whole volume and encryption key. Deployment evidence is pending.
+
+
+### Remote playback production deployment — 2026-11-02
+
+Owner accepted the candidate and requested deployment to
+`bobp@weazlmusic.teralab.local`. The owner explicitly waived the volume-backup
+process because a fresh snapshot had just been taken on the Proxmox host. No new
+volume archive was created. Recovery additionally retains the previous runtime
+image; existing data, encryption key, environment and Compose settings were kept.
+
+- Deployed runtime source: `6cc91622c0328df96ed452f7aebfe1ac5ceded80`.
+- Running image: `sha256:b9a9bcb16e9fc9ac6dbaf1b28d08d1b0f1ff455398f8b073f3ac01400bf0e5d7`.
+- Previous source: `236a7c1731e2fcc1bd223fcffaedad0f5b8414ea`.
+- Retained rollback tag: `weazltunes-web:rollback-20261102-remote-playback`.
+- Previous image: `sha256:1778afd931cfb1a3c604c638b20d32c305e1a3c7ddd55d8e910263aa430b8055`.
+- Private receipt directory: `/home/bobp/weazlmusic-backups/20261102-remote-playback`
+  on production (0700). Contains source/image IDs, build log, before/after discovery,
+  process inventory, verification and rollback Compose override; no volume backup.
+
+Production was clean at the previous source. Transferred the reviewed commits in
+an incremental Git bundle and fast-forwarded the checkout without GitHub writes.
+Built the image while the old service remained online, then recreated only the
+existing Compose service with `--no-build`. At the switch, process inventory showed
+only docker-init and weazltunes, with no active media encoder. No recording schedules
+or account listening state were inspected or mutated.
+
+Verified at 2026-11-02T14:47:29Z: Docker health **healthy**, restart count **0**;
+localhost and workstation-to-LAN `/healthz` return 200. Installation discovery is
+byte-identical before/after. Served `/remote.js` matches source SHA-256
+`5362e3aee318378483be4cdd4e68f74f93657928ead2441fde1b3a5b742a57f0`.
+Unauthenticated capabilities, remote players, controller SSE and receiver SSE all
+return 401. No production login, media playback, queue, playlist or history
+mutation was used as a verification test. Authenticated protocol/audio acceptance
+remains supported by the isolated release tests; physical receiver acceptance and
+public reverse-proxy SSE delivery remain subsequent checks.
+
+For binary rollback, use the retained image with the receipt's `rollback.yaml`
+override and `docker compose up -d --no-build`; stop receivers explicitly first.
+For full-system/data recovery use the owner's Proxmox snapshot. No restore was
+performed. GitHub publication and the final ShopWeazl receiver handoff remain
+pending and were not performed as part of this deployment.
