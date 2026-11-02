@@ -788,3 +788,33 @@ override and `docker compose up -d --no-build`; stop receivers explicitly first.
 For full-system/data recovery use the owner's Proxmox snapshot. No restore was
 performed. GitHub publication and the final ShopWeazl receiver handoff remain
 pending and were not performed as part of this deployment.
+
+
+### GitHub publication and exact-source Compose verification — 2026-11-02
+
+The owner authorized publishing the remote playback updates to
+`https://github.com/bprendie/weazlmusic`, main, and required checking that published
+Compose builds current source. The published update includes the feature commits
+`9cbe373`/`35c797d`, review/deployment receipts `6cc9162`/`af91003`, and the Compose
+build verification changes accompanying this receipt.
+
+Found that `build: .` alone allows a plain `up -d` to reuse a stale local image.
+Compose now uses `pull_policy: build`, explicit local context and production target.
+Operators must still update their checkout using `git pull --ff-only`. Optional
+SOURCE_REVISION stamps the exact clean commit as an OCI image label; omitted values
+are honestly labelled unknown. No registry image is advertised as a new release.
+
+`make verify-compose` and the main/PR GitHub Actions workflow exercise the published
+configuration. A clean clone of the committed update was tested by seeding an
+unstartable stale image and running Compose `up -d` **without** --build. It replaced
+that image, matched the supplied full commit label, served index.html/app.js/player.js/
+remote.js byte-for-byte from the checkout, and passed authenticated capabilities
+and empty-player discovery using a disposable administrator/data volume. The test
+uses its own image, loopback port, network, project and volume, and cleans up those
+resources. It never contacts the production server or uses production credentials.
+
+The exact final publication commit is checked again from a clean clone before
+push. Local build output: `/tmp/weazlmusic-compose-publish-check.log`. GitHub CI
+repeats that check for the pushed SHA. This publication does not restart production;
+the running functional release remains the deployment described above. ShopWeazl
+native receiver implementation and its final handoff remain subsequent work.

@@ -191,7 +191,8 @@ may still be playing buffered audio. Stop receivers explicitly before rollback.
 Full-volume backup/key preservation still applies unless the owner supplies an
 alternative recovery point. Deployed 2026-11-02 after owner acceptance, using the
 owner's fresh Proxmox snapshot instead of a volume archive. Exact image/source and
-rollback receipts are in `VERIFICATION.md`. GitHub publication remains pending.
+rollback receipts are in `VERIFICATION.md`. GitHub publication was authorized
+2026-11-02; see the publication receipt in `VERIFICATION.md`.
 
 ## Verify the published Compose build
 

@@ -1,7 +1,7 @@
 # WeazlMusic remote playback — server workbook for Sol
 
 Created 2026-11-01. Inspected source baseline: `236a7c1`.
-Status: **R0–R4 complete; owner accepted and production deployed 2026-11-02. GitHub publication and receiver handoff pending.**
+Status: **R0–R4 complete; owner accepted and production deployed 2026-11-02. GitHub publication approved 2026-11-02; receiver handoff remains pending.**
 
 ## Assignment and release sequence
 
@@ -409,7 +409,7 @@ requests media; browser becomes a controller only after confirmed transfer.
   and encryption key. Record image IDs and any migration compatibility limits.
 - [x] Deploy the accepted source; verify health, auth, capability discovery,
   existing playback/recorder behavior and proxy SSE delivery with allowed checks.
-- [ ] Publish the accepted commits to the confirmed GitHub branch and record exact
+- [x] Publish the accepted commits to the confirmed GitHub branch and record exact
   source SHA/image digest so published code and production can be reconciled.
 - [x] Update verification receipt. Do not mutate real playlists/history as tests.
 
@@ -508,5 +508,7 @@ Sol maintains this section as implementation proceeds:
 - Production: `weazlmusic.teralab.local`, source `6cc9162`; healthy, zero restarts.
   Receipt: `/home/bobp/weazlmusic-backups/20261102-remote-playback`.
   Image and rollback details are recorded in `docs/VERIFICATION.md`.
-- Published GitHub commit: pending.
+- GitHub publication: owner authorized 2026-11-02, `bprendie/weazlmusic`, main.
+  Includes the remote playback commits, deployment receipt and verified Compose
+  build update; see the publication receipt in `docs/VERIFICATION.md`.
 - Subsequent ShopWeazl handoff path: pending.

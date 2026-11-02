@@ -36,6 +36,7 @@ service['ports']=[dict(target=4000,published='0',host_ip='127.0.0.1',protocol='t
 service['volumes']=[dict(type='volume',source='verify-data',target='/data')]
 service['environment']['COOKIE_SECURE']='false'
 config['volumes']={'verify-data':{}}
+config['networks']={'default':{}}
 config.pop('name',None)
 with open(target,'w') as f: json.dump(config,f)
 PY
