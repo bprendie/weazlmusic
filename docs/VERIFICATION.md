@@ -818,3 +818,35 @@ push. Local build output: `/tmp/weazlmusic-compose-publish-check.log`. GitHub CI
 repeats that check for the pushed SHA. This publication does not restart production;
 the running functional release remains the deployment described above. ShopWeazl
 native receiver implementation and its final handoff remain subsequent work.
+
+### Receiver availability and selector deployment — 2026-11-02
+
+Owner requested production deployment of source
+`58dd22327bc9451fe535711db1d5c7d52c28ccc3`, pushed to origin/main.
+Receiver discovery now returns only online receivers belonging to the current
+account/library, sorted by name and ID. Registrations inactive for seven days
+are removed during remote cleanup, preserving native sign-in credentials.
+The browser preserves unchanged dropdown options and defers menu changes while
+focused; a disconnected active output remains visible for explicit return.
+
+Validation: `go test ./internal/server`, `go test -race ./...`, `go vet ./...`,
+JavaScript syntax and simulated DOM selector checks passed. Remote protocol and
+media/Weazlpod tests also passed in the exact production image with isolated
+temporary data and no network or production data-volume mount.
+
+Deployed to `weazlmusic.teralab.local`, `/home/bobp/weazlmusic`:
+
+- Image: `sha256:c0f2a443fd779c684f2731c94d32eb8d45b65fff6b09373ac239fbeb104bb5fa`.
+- Rollback: `weazltunes-web:rollback-20261102-device-availability`, retaining
+  `sha256:b9a9bcb16e9fc9ac6dbaf1b28d08d1b0f1ff455398f8b073f3ac01400bf0e5d7`.
+- Restricted receipt and stopped-service full-volume backup directory:
+  `/home/bobp/weazlmusic-backups/20261102-device-availability`.
+- Backup `data.tar` verified by archive listing and SHA-256:
+  `0d4dfea8809f2436f0178d38458c490da364898c2a45f1df16284a5daa70db79`.
+
+Built before stopping the service; recreated with `--no-build --pull never`
+after backup. Localhost and workstation-to-LAN health checks returned 200;
+installation discovery remained byte-identical and unauthenticated player
+discovery returned 401. Served remote.js SHA-256 matched source:
+`c488656f2a62bafcba336b87fc9112033b0eb21afa2cb36f94b30d4185c45bb6`.
+No production playback or library mutations were used for acceptance.
