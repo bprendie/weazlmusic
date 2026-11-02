@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"sort"
 	"time"
 )
 
@@ -49,14 +50,37 @@ func (a *apiV1) remotePlayers(owner, library string) []*remotePlayer {
 	for _, p := range a.remote.players {
 		if p.Owner == owner && p.Library == library && a.remoteDeviceValid(p) {
 			p.Online = a.remoteOnline(p)
-			out = append(out, p)
+			if p.Online {
+				out = append(out, p)
+			}
 		}
 	}
+	sort.Slice(out, func(i, j int) bool {
+		if out[i].Name == out[j].Name {
+			return out[i].ID < out[j].ID
+		}
+		return out[i].Name < out[j].Name
+	})
 	return out
 }
 func (a *apiV1) remoteCleanup() {
 	if a.now().Sub(a.remote.lastCleanup) >= time.Minute {
 		a.remote.lastCleanup = a.now()
+		// Device refresh activity survives restarts; reports cover live receivers.
+		// Expire only receiver registrations, preserving sign-in credentials.
+		for id, p := range a.remote.players {
+			var d deviceSession
+			err := a.get("device", id, p.Owner, &d)
+			lastActive := p.Seen
+			if d.LastSeen.After(lastActive) {
+				lastActive = d.LastSeen
+			}
+			if !a.remoteOnline(p) && (err != nil || d.Revoked || a.now().Sub(lastActive) >= 7*24*time.Hour) {
+				if a.remove("remotePlayer", id) == nil {
+					delete(a.remote.players, id)
+				}
+			}
+		}
 		rows, err := a.list("remoteEnrollment", "*")
 		if err == nil {
 			for _, raw := range rows {

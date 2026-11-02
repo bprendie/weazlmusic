@@ -121,7 +121,10 @@ See the [phase plan](docs/PHASES.md), [verification record](docs/VERIFICATION.md
 Browser library search, contextual menus and original-file/collection downloads
 are described in [UI_QUICK_ACTIONS.md](docs/UI_QUICK_ACTIONS.md).
 
-Remote playback adds **Play on…** for connected owned receivers. The server/browser
+Remote playback adds **Play on…** for currently available receivers owned by the signed-in user.
+Receivers go offline after 30 seconds without reports (or when their connection closes).
+Inactive receiver registrations are removed after seven days, checked during remote activity;
+sign-in credentials are preserved so devices can register again. The server/browser
 implementation and isolated simulator follow the [remote protocol](docs/REMOTE_PLAYBACK_V1.md).
 Native receivers are separate follow-up work. Implementation/release tracking is in
 the [Sol workbook](REMOTE_PLAYBACK_WORKBOOK.md). Deployed to production 2026-11-02;

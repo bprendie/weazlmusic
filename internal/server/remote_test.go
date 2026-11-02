@@ -259,3 +259,50 @@ func TestRemoteRejectsFalseStartupAcknowledgement(t *testing.T) {
 		t.Fatal(code, string(raw))
 	}
 }
+
+func TestRemoteAvailabilityAndStaleRegistrationCleanup(t *testing.T) {
+	h, rx, ctl, p, closeStream := remoteSetup(t)
+	defer closeStream()
+	code, raw, _ := h.vrequest("GET", "remote/players", nil, ctl.Access, nil)
+	if code != 200 || len(decodeData[[]remotePlayer](t, raw)) != 1 {
+		t.Fatalf("available receiver missing: %d %s", code, raw)
+	}
+	a := h.app.Config.Handler.(*Server).v1
+	a.remote.mu.Lock()
+	stored := a.remote.players[p.ID]
+	stored.Seen = a.now().Add(-31 * time.Second)
+	a.remote.mu.Unlock()
+	code, raw, _ = h.vrequest("GET", "remote/players", nil, ctl.Access, nil)
+	if code != 200 || len(decodeData[[]remotePlayer](t, raw)) != 0 {
+		t.Fatalf("offline receiver listed: %d %s", code, raw)
+	}
+	a.remote.mu.Lock()
+	if a.remote.players[p.ID] == nil {
+		t.Fatal("recent receiver deleted")
+	}
+	var d deviceSession
+	if err := a.get("device", rx.Device, accountID("alice"), &d); err != nil {
+		t.Fatal(err)
+	}
+	d.LastSeen = a.now().Add(-8 * 24 * time.Hour)
+	if err := a.put("device", d.ID, accountID("alice"), d); err != nil {
+		t.Fatal(err)
+	}
+	stored.Seen = d.LastSeen
+	a.remote.lastCleanup = time.Time{}
+	a.remoteCleanup()
+	if a.remote.players[p.ID] != nil {
+		t.Error("stale receiver retained in memory")
+	}
+	var persisted struct {
+		Player remotePlayer
+		Owner  string
+	}
+	if a.get("remotePlayer", p.ID, accountID("alice"), &persisted) == nil {
+		t.Error("stale receiver retained on disk")
+	}
+	if a.get("device", rx.Device, accountID("alice"), &d) != nil {
+		t.Error("cleanup removed sign-in credentials")
+	}
+	a.remote.mu.Unlock()
+}

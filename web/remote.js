@@ -29,7 +29,25 @@ function mirror(p){
  for(const [id,command] of [['play',state.playing?'pause':'play'],['stop','stop'],['next','next'],['previous','previous'],['seek','seek'],['volume','setVolume'],['shuffle','replaceQueue']]){const el=$('#'+id);el.disabled=busy||!p.online||!p.commands.includes(command)||(command==='seek'&&s.playback?.kind!=='library')||(['play','pause','next','previous'].includes(command)&&!s.playback);}
  status.textContent=p.online?`${p.name} · ${s.transport}${busy?' · Pending…':''}`:`${p.name} is unreachable; audio may continue.`;
 }
-function options(){const current=state.remote?.id||'';select.replaceChildren(new Option('This browser',''));for(const p of players){const option=new Option(p.name+(p.online?'':' (unreachable)'),p.id);option.disabled=!p.online;select.append(option);}select.value=current;select.title=players.length?'Choose playback output':'No receivers connected. Sign in on a receiver and connect it.';if(!players.length&&!state.remote)status.textContent='No receivers connected. Sign in on a receiver to add it.';}
+// Reports update frequently. Preserve the native menu while it is being used.
+let optionSignature='';
+function options(){
+ if(busy||document.activeElement===select)return;
+ const current=state.remote?.id||'';
+ const available=players.filter(p=>p.online).sort((a,b)=>a.name.localeCompare(b.name)||a.id.localeCompare(b.id));
+ if(current&&!available.some(p=>p.id===current))available.push({...state.remote,online:false});
+ const signature=JSON.stringify(available.map(p=>[p.id,p.name,p.online]));
+ if(signature!==optionSignature||!select.options.length){
+  optionSignature=signature;
+  select.replaceChildren(new Option('This browser',''));
+  for(const p of available){const option=new Option(p.name+(p.online?'':' (unreachable)'),p.id);option.disabled=!p.online;select.append(option);}
+ }
+ select.value=current;
+ select.title=available.length?'Choose playback output':'No receivers connected. Sign in on a receiver and connect it.';
+ if(!available.length&&!state.remote)status.textContent='No receivers connected. Sign in on a receiver to add it.';
+}
+select.addEventListener('blur',()=>options());
+
 async function command(p,type,extra={}){
  const c=await request('players/'+p.id+'/commands','POST',{type,...extra},{'If-Match':`"v${p.revision}"`});if(type==='load'&&pendingTransfer?.playerId===p.id)pendingTransfer.commandId=c.id;
  for(let i=0;i<70;i++){
@@ -69,7 +87,7 @@ select.onchange=async()=>{
    else {if(b?.heldLibrary){const h=b.heldLibrary,i=h.queue.findIndex(e=>e.entryId===h.currentEntryId),convert=e=>({id:e.trackId,title:e.title||e.trackId,artist:e.artist,album:e.album,duration:e.duration,coverArt:e.coverArt});state.resume={...convert(h.queue[i]),position:h.positionMs/1000};state.queue=h.queue.slice(i+1).map(convert);}else{state.queue=[];state.resume=null;}const station=state.stations.find(s=>s.id===b?.stationId);if(station){await play({id:station.id,url:station.url,title:station.name});if(snapshot.transport!=='playing')audio.pause();}}
    status.textContent='';renderPlayer();renderQueue();
   }
- }catch(e){toast(e.message);}finally{busy=false;select.disabled=false;state.remotePending=false;options();}
+ }catch(e){toast(e.message);}finally{busy=false;select.disabled=false;state.remotePending=false;select.value=state.remote?.id||'';options();}
 };
 document.addEventListener('remote-queue-save',()=>{
  const observed=state.remote?.state.playback;if(!observed)return;const held=observed.kind==='library'?observed:observed.heldLibrary;const index=held?.queue.findIndex(e=>e.entryId===held.currentEntryId)??-1;if(JSON.stringify(state.queue.map(e=>e._entryId||'new:'+e.id))===JSON.stringify((held?.queue.slice(index+1)||[]).map(e=>e.entryId)))return;
@@ -83,6 +101,6 @@ document.addEventListener('remote-queue-save',()=>{
  queueTimer=setTimeout(submit,200);
 });
 setInterval(()=>{
- if(state.user!==user){feed?.close();feed=null;user=state.user;players=[];state.remote=null;clearTimeout(queueTimer);clearTimeout(sliderTimer);options();if(user){const connectedUser=user;feed=new EventSource('/api/v1/remote/events');feed.addEventListener('snapshot',event=>{if(state.user!==connectedUser)return;players=JSON.parse(event.data);options();if(pendingTransfer?.commandId&&!busy){const p=players.find(p=>p.id===pendingTransfer.playerId);if(p?.state.lastAppliedCommandId===pendingTransfer.commandId&&p.state.transport!=='buffering'){if(pendingTransfer.version===(state.transferVersion||0)){cancelSave();stop();mirror(p);}else toast('Earlier transfer is playing on '+p.name+'.');pendingTransfer=null;}}if(state.remote){const p=players.find(p=>p.id===state.remote.id);if(p)mirror(p);else{status.textContent='Receiver unavailable. Return to This browser explicitly.';}}});feed.onerror=()=>{status.textContent='Receiver connection interrupted; audio may continue.';};}}
+ if(state.user!==user){feed?.close();feed=null;user=state.user;players=[];state.remote=null;clearTimeout(queueTimer);clearTimeout(sliderTimer);options();if(user){const connectedUser=user;feed=new EventSource('/api/v1/remote/events');feed.addEventListener('snapshot',event=>{if(state.user!==connectedUser)return;players=JSON.parse(event.data);options();if(pendingTransfer?.commandId&&!busy){const p=players.find(p=>p.id===pendingTransfer.playerId);if(p?.state.lastAppliedCommandId===pendingTransfer.commandId&&p.state.transport!=='buffering'){if(pendingTransfer.version===(state.transferVersion||0)){cancelSave();stop();mirror(p);}else toast('Earlier transfer is playing on '+p.name+'.');pendingTransfer=null;}}if(state.remote){const p=players.find(p=>p.id===state.remote.id);if(p)mirror(p);else{mirror({...state.remote,online:false});}}});feed.onerror=()=>{status.textContent='Receiver connection interrupted; audio may continue.';};}}
 },500);
 options();
